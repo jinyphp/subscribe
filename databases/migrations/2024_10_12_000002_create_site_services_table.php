@@ -20,15 +20,18 @@ return new class extends Migration
 
             $table->boolean('enable')->default(true);
             $table->boolean('featured')->default(false);
+            $table->unsignedInteger('view_count')->default(0);
 
             $table->string('slug')->unique();
             $table->string('title');
             $table->text('description')->nullable();
             $table->longText('content')->nullable();
             $table->string('category')->nullable();
+            $table->unsignedBigInteger('category_id')->nullable(); // Foreign key to site_service_categories
 
             // 서비스 정보
             $table->decimal('price', 10, 2)->nullable();
+            $table->decimal('sale_price', 10, 2)->nullable(); // 할인 판매가
             $table->string('duration')->nullable(); // 예: "1-2주", "30일"
 
             // 이미지
@@ -49,9 +52,15 @@ return new class extends Migration
             // 관리
             $table->string('manager')->nullable();
 
+            // Foreign key constraints
+            $table->foreign('category_id')->references('id')->on('site_service_categories')->onDelete('set null');
+
+            // Indexes
             $table->index(['enable', 'deleted_at']);
             $table->index(['category', 'deleted_at']);
             $table->index(['featured', 'deleted_at']);
+            $table->index(['view_count']);
+            $table->index(['category_id', 'deleted_at']);
         });
     }
 
