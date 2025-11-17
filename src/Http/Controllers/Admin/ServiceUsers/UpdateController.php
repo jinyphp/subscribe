@@ -1,17 +1,17 @@
 <?php
 
-namespace Jiny\Service\Http\Controllers\Admin\ServiceUsers;
+namespace Jiny\Subscribe\Http\Controllers\Admin\subscribeUsers;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Jiny\Service\Models\ServiceUser;
-use Jiny\Service\Models\Service;
+use Jiny\Subscribe\Models\subscribeUser;
+use Jiny\Subscribe\Models\subscribe;
 
 class UpdateController extends Controller
 {
     public function __invoke(Request $request, $id)
     {
-        $serviceUser = ServiceUser::findOrFail($id);
+        $subscribeUser = subscribeUser::findOrFail($id);
 
         $validated = $request->validate([
             'user_uuid' => 'required|string|max:255',
@@ -19,7 +19,7 @@ class UpdateController extends Controller
             'user_id' => 'required|integer',
             'user_email' => 'required|email|max:255',
             'user_name' => 'required|string|max:255',
-            'service_id' => 'required|exists:services,id',
+            'subscribe_id' => 'required|exists:subscribes,id',
             'status' => 'required|in:pending,active,suspended,cancelled,expired',
             'billing_cycle' => 'required|in:monthly,quarterly,yearly,lifetime',
             'started_at' => 'nullable|date',
@@ -41,18 +41,18 @@ class UpdateController extends Controller
         ]);
 
         try {
-            // 서비스 정보 업데이트
-            if ($validated['service_id'] !== $serviceUser->service_id) {
-                $service = Service::findOrFail($validated['service_id']);
-                $validated['service_title'] = $service->title;
+            // 구독 정보 업데이트
+            if ($validated['subscribe_id'] !== $subscribeUser->subscribe_id) {
+                $subscribe = subscribe::findOrFail($validated['subscribe_id']);
+                $validated['subscribe_title'] = $subscribe->title;
             }
 
             // 상태 변경 로그
-            $statusChanged = $serviceUser->status !== $validated['status'];
-            $oldStatus = $serviceUser->status;
+            $statusChanged = $subscribeUser->status !== $validated['status'];
+            $oldStatus = $subscribeUser->status;
 
             // 취소 처리
-            if ($validated['status'] === 'cancelled' && !$serviceUser->cancelled_at) {
+            if ($validated['status'] === 'cancelled' && !$subscribeUser->cancelled_at) {
                 $validated['cancelled_at'] = now();
                 $validated['auto_renewal'] = false;
             }
@@ -65,16 +65,16 @@ class UpdateController extends Controller
             }
 
             // 업데이트 실행
-            $serviceUser->update($validated);
+            $subscribeUser->update($validated);
 
             // 사용자 캐시 정보 업데이트
-            $serviceUser->updateUserCache();
+            $subscribeUser->updateUserCache();
 
             // 상태 변경 로그 기록
             if ($statusChanged) {
-                $serviceUser->subscriptionLogs()->create([
-                    'user_uuid' => $serviceUser->user_uuid,
-                    'service_id' => $serviceUser->service_id,
+                $subscribeUser->subscriptionLogs()->create([
+                    'user_uuid' => $subscribeUser->user_uuid,
+                    'subscribe_id' => $subscribeUser->subscribe_id,
                     'action' => 'status_change',
                     'action_title' => '상태 변경',
                     'action_description' => "상태가 '{$oldStatus}'에서 '{$validated['status']}'로 변경되었습니다.",
@@ -85,8 +85,8 @@ class UpdateController extends Controller
             }
 
             return redirect()
-                ->route('admin.service.users.show', $serviceUser->id)
-                ->with('success', '서비스 구독자 정보가 성공적으로 업데이트되었습니다.');
+                ->route('admin.subscribe.users.show', $subscribeUser->id)
+                ->with('success', '구독 구독자 정보가 성공적으로 업데이트되었습니다.');
 
         } catch (\Exception $e) {
             return redirect()

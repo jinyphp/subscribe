@@ -29,7 +29,7 @@
                 대시보드
             ============================================ --}}
             <li class="nav-item">
-                <a class="nav-link" href="/admin/service">
+                <a class="nav-link" href="/admin/subscribe">
                     <i class="nav-icon fe fe-home me-2"></i>
                     대시보드
                 </a>
@@ -40,43 +40,43 @@
             </li>
 
             <li class="nav-item">
-                <a class="nav-link" href="{{ route('admin.service.plan.index') }}">
+                <a class="nav-link" href="{{ route('admin.subscribe.plan.index') }}">
                     <i class="nav-icon fe fe-grid me-2"></i>
-                    서비스 플렌
+                    구독 플렌
                 </a>
             </li>
 
             {{-- ============================================
-                서비스 관리
+                구독 관리
             ============================================ --}}
             <li class="nav-item">
-                <div class="navbar-heading">서비스 관리</div>
+                <div class="navbar-heading">구독 관리</div>
             </li>
 
-            {{-- 서비스 카테고리 관리 --}}
+            {{-- 구독 카테고리 관리 --}}
             <li class="nav-item">
-                <a class="nav-link" href="{{ route('admin.service.categories.index') }}">
+                <a class="nav-link" href="{{ route('admin.subscribe.categories.index') }}">
                     <i class="nav-icon fe fe-folder me-2"></i>
-                    서비스 카테고리
+                    구독 카테고리
                 </a>
             </li>
 
-            {{-- 서비스 목록 관리 --}}
+            {{-- 구독 목록 관리 --}}
             <li class="nav-item">
-                <a class="nav-link" href="{{ route('admin.site.services.index') }}">
+                <a class="nav-link" href="{{ route('admin.site.subscribes.index') }}">
                     <i class="nav-icon fe fe-briefcase me-2"></i>
-                    서비스 목록
+                    구독 목록
                 </a>
             </li>
 
             <li class="nav-item">
-                <div class="navbar-heading">서비스 회원</div>
+                <div class="navbar-heading">구독 회원</div>
             </li>
 
 
             {{-- 구독 사용자 관리 --}}
             <li class="nav-item">
-                <a class="nav-link" href="{{ route('admin.service.users.index') }}">
+                <a class="nav-link" href="{{ route('admin.subscribe.users.index') }}">
                     <i class="nav-icon fe fe-users me-2"></i>
                     구독 사용자
                 </a>
@@ -84,7 +84,7 @@
 
             {{-- 구독 로그 관리 --}}
             <li class="nav-item">
-                <a class="nav-link" href="{{ route('admin.service.subscription-logs.index') }}">
+                <a class="nav-link" href="{{ route('admin.subscribe.subscription-logs.index') }}">
                     <i class="nav-icon fe fe-activity me-2"></i>
                     구독 로그
                 </a>
@@ -92,7 +92,7 @@
 
             {{-- 결제 내역 관리 --}}
             <li class="nav-item">
-                <a class="nav-link" href="{{ route('admin.service.payments.index') }}">
+                <a class="nav-link" href="{{ route('admin.subscribe.payments.index') }}">
                     <i class="nav-icon fe fe-credit-card me-2"></i>
                     결제 내역
                 </a>
@@ -107,19 +107,19 @@
                 <div id="navSubscriptionProcess" class="collapse" data-bs-parent="#sideNavbar">
                     <ul class="nav flex-column">
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ route('admin.service.users.index') }}?status=active">
+                            <a class="nav-link" href="{{ route('admin.subscribe.users.index') }}?status=active">
                                 <i class="fe fe-play-circle me-2"></i>
                                 활성 구독
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ route('admin.service.users.index') }}?status=expiring_soon">
+                            <a class="nav-link" href="{{ route('admin.subscribe.users.index') }}?status=expiring_soon">
                                 <i class="fe fe-alert-triangle me-2"></i>
                                 만료 임박
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ route('admin.service.users.index') }}?status=cancelled">
+                            <a class="nav-link" href="{{ route('admin.subscribe.users.index') }}?status=cancelled">
                                 <i class="fe fe-x-circle me-2"></i>
                                 취소된 구독
                             </a>
@@ -168,7 +168,7 @@
 
             {{-- 예약 관리 --}}
             <li class="nav-item">
-                <a class="nav-link" href="{{ route('admin.service.operations.appointments.index') }}">
+                <a class="nav-link" href="{{ route('admin.subscribe.operations.appointments.index') }}">
                     <i class="nav-icon fe fe-calendar me-2"></i>
                     예약 관리
                 </a>
@@ -176,7 +176,7 @@
 
             {{-- 고객 주소 관리 --}}
             <li class="nav-item">
-                <a class="nav-link" href="{{ route('admin.service.customers.addresses.index') }}">
+                <a class="nav-link" href="{{ route('admin.subscribe.customers.addresses.index') }}">
                     <i class="nav-icon fe fe-map-pin me-2"></i>
                     고객 주소 관리
                 </a>
@@ -189,27 +189,27 @@
                 <div class="navbar-heading">품질 관리</div>
             </li>
 
-            {{-- 서비스 체크리스트 --}}
+            {{-- 구독 체크리스트 --}}
             <li class="nav-item">
-                <a class="nav-link" href="{{ route('admin.service.quality.checklists.index') }}">
+                <a class="nav-link" href="{{ route('admin.subscribe.quality.checklists.index') }}">
                     <i class="nav-icon fe fe-check-square me-2"></i>
-                    서비스 체크리스트
+                    구독 체크리스트
                 </a>
             </li>
 
-            {{-- 서비스 진행상황 --}}
+            {{-- 구독 진행상황 --}}
             <li class="nav-item">
-                <a class="nav-link" href="{{ route('admin.service.quality.progress.index') }}">
+                <a class="nav-link" href="{{ route('admin.subscribe.quality.progress.index') }}">
                     <i class="nav-icon fe fe-activity me-2"></i>
-                    서비스 진행상황
+                    구독 진행상황
                 </a>
             </li>
 
-            {{-- 서비스 검수 --}}
+            {{-- 구독 검수 --}}
             <li class="nav-item">
-                <a class="nav-link" href="{{ route('admin.service.quality.inspections.index') }}">
+                <a class="nav-link" href="{{ route('admin.subscribe.quality.inspections.index') }}">
                     <i class="nav-icon fe fe-eye me-2"></i>
-                    서비스 검수
+                    구독 검수
                 </a>
             </li>
 
@@ -222,17 +222,17 @@
 
             {{-- 작업 배정 --}}
             <li class="nav-item">
-                <a class="nav-link" href="{{ route('admin.service.work.assignments.index') }}">
+                <a class="nav-link" href="{{ route('admin.subscribe.work.assignments.index') }}">
                     <i class="nav-icon fe fe-user-plus me-2"></i>
                     작업 배정
                 </a>
             </li>
 
-            {{-- 서비스 제공자 --}}
+            {{-- 구독 제공자 --}}
             <li class="nav-item">
-                <a class="nav-link" href="{{ route('admin.service.work.providers.index') }}">
+                <a class="nav-link" href="{{ route('admin.subscribe.work.providers.index') }}">
                     <i class="nav-icon fe fe-users me-2"></i>
-                    서비스 제공자
+                    구독 제공자
                 </a>
             </li>
 
@@ -245,7 +245,7 @@
 
             {{-- 예약 변경 이력 --}}
             <li class="nav-item">
-                <a class="nav-link" href="{{ route('admin.service.history.appointment-changes.index') }}">
+                <a class="nav-link" href="{{ route('admin.subscribe.history.appointment-changes.index') }}">
                     <i class="nav-icon fe fe-clock me-2"></i>
                     예약 변경 이력
                 </a>

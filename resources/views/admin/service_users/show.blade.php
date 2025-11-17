@@ -1,6 +1,6 @@
-@extends('jiny-service::layouts.admin.sidebar')
+@extends('jiny-subscribe::layouts.admin.sidebar')
 
-@section('title', '서비스 구독자 상세 정보')
+@section('title', '구독 구독자 상세 정보')
 
 @section('content')
 <div class="container mx-auto px-4 py-6">
@@ -8,15 +8,15 @@
     <div class="mb-6">
         <div class="flex items-center justify-between">
             <div>
-                <h1 class="text-2xl font-bold text-gray-900">서비스 구독자 상세 정보</h1>
-                <p class="text-gray-600 mt-1">{{ $serviceUser->user_name }}님의 구독 정보를 확인합니다.</p>
+                <h1 class="text-2xl font-bold text-gray-900">구독 구독자 상세 정보</h1>
+                <p class="text-gray-600 mt-1">{{ $subscribeUser->user_name }}님의 구독 정보를 확인합니다.</p>
             </div>
             <div class="flex space-x-2">
-                <a href="{{ route('admin.service.users.index') }}"
+                <a href="{{ route('admin.subscribe.users.index') }}"
                    class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition-colors">
                     목록으로
                 </a>
-                <a href="{{ route('admin.service.users.edit', $serviceUser->id) }}"
+                <a href="{{ route('admin.subscribe.users.edit', $subscribeUser->id) }}"
                    class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors">
                     편집
                 </a>
@@ -39,7 +39,7 @@
                     <dl>
                         <dt class="text-sm font-medium text-gray-500 truncate">구독 상태</dt>
                         <dd class="text-lg font-medium text-gray-900">
-                            @switch($serviceUser->status)
+                            @switch($subscribeUser->status)
                                 @case('active')
                                     <span class="px-2 py-1 text-xs font-semibold bg-green-100 text-green-800 rounded-full">활성</span>
                                     @break
@@ -75,7 +75,7 @@
                     <dl>
                         <dt class="text-sm font-medium text-gray-500 truncate">결제 상태</dt>
                         <dd class="text-lg font-medium text-gray-900">
-                            @switch($serviceUser->payment_status)
+                            @switch($subscribeUser->payment_status)
                                 @case('paid')
                                     <span class="px-2 py-1 text-xs font-semibold bg-green-100 text-green-800 rounded-full">결제완료</span>
                                     @break
@@ -108,7 +108,7 @@
                     <dl>
                         <dt class="text-sm font-medium text-gray-500 truncate">청구 주기</dt>
                         <dd class="text-lg font-medium text-gray-900">
-                            @switch($serviceUser->billing_cycle)
+                            @switch($subscribeUser->billing_cycle)
                                 @case('monthly') 월간 @break
                                 @case('quarterly') 분기 @break
                                 @case('yearly') 연간 @break
@@ -133,7 +133,7 @@
                     <dl>
                         <dt class="text-sm font-medium text-gray-500 truncate">총 결제금액</dt>
                         <dd class="text-lg font-medium text-gray-900">
-                            ₩{{ number_format($serviceUser->total_paid ?? 0) }}
+                            ₩{{ number_format($subscribeUser->total_paid ?? 0) }}
                         </dd>
                     </dl>
                 </div>
@@ -152,59 +152,59 @@
                 <div class="grid grid-cols-2 gap-4">
                     <div>
                         <dt class="text-sm font-medium text-gray-500">이름</dt>
-                        <dd class="mt-1 text-sm text-gray-900">{{ $serviceUser->user_name }}</dd>
+                        <dd class="mt-1 text-sm text-gray-900">{{ $subscribeUser->user_name }}</dd>
                     </div>
                     <div>
                         <dt class="text-sm font-medium text-gray-500">이메일</dt>
-                        <dd class="mt-1 text-sm text-gray-900">{{ $serviceUser->user_email }}</dd>
+                        <dd class="mt-1 text-sm text-gray-900">{{ $subscribeUser->user_email }}</dd>
                     </div>
                     <div>
                         <dt class="text-sm font-medium text-gray-500">사용자 ID</dt>
-                        <dd class="mt-1 text-sm text-gray-900">{{ $serviceUser->user_id }}</dd>
+                        <dd class="mt-1 text-sm text-gray-900">{{ $subscribeUser->user_id }}</dd>
                     </div>
                     <div>
                         <dt class="text-sm font-medium text-gray-500">사용자 샤드</dt>
-                        <dd class="mt-1 text-sm text-gray-900">{{ $serviceUser->user_shard }}</dd>
+                        <dd class="mt-1 text-sm text-gray-900">{{ $subscribeUser->user_shard }}</dd>
                     </div>
                 </div>
                 <div>
                     <dt class="text-sm font-medium text-gray-500">UUID</dt>
-                    <dd class="mt-1 text-sm text-gray-900 break-all">{{ $serviceUser->user_uuid }}</dd>
+                    <dd class="mt-1 text-sm text-gray-900 break-all">{{ $subscribeUser->user_uuid }}</dd>
                 </div>
             </div>
         </div>
 
-        <!-- 서비스 정보 -->
+        <!-- 구독 정보 -->
         <div class="bg-white rounded-lg shadow">
             <div class="px-6 py-4 border-b border-gray-200">
-                <h3 class="text-lg font-medium text-gray-900">서비스 정보</h3>
+                <h3 class="text-lg font-medium text-gray-900">구독 정보</h3>
             </div>
             <div class="px-6 py-4 space-y-4">
                 <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <dt class="text-sm font-medium text-gray-500">서비스</dt>
-                        <dd class="mt-1 text-sm text-gray-900">{{ $serviceUser->service->title ?? $serviceUser->service_title }}</dd>
+                        <dt class="text-sm font-medium text-gray-500">구독</dt>
+                        <dd class="mt-1 text-sm text-gray-900">{{ $subscribeUser->subscribe->title ?? $subscribeUser->subscribe_title }}</dd>
                     </div>
                     <div>
                         <dt class="text-sm font-medium text-gray-500">플랜</dt>
-                        <dd class="mt-1 text-sm text-gray-900">{{ $serviceUser->plan_name ?? '미설정' }}</dd>
+                        <dd class="mt-1 text-sm text-gray-900">{{ $subscribeUser->plan_name ?? '미설정' }}</dd>
                     </div>
                     <div>
                         <dt class="text-sm font-medium text-gray-500">플랜 가격</dt>
-                        <dd class="mt-1 text-sm text-gray-900">₩{{ number_format($serviceUser->plan_price ?? 0) }}</dd>
+                        <dd class="mt-1 text-sm text-gray-900">₩{{ number_format($subscribeUser->plan_price ?? 0) }}</dd>
                     </div>
                     <div>
                         <dt class="text-sm font-medium text-gray-500">월 가격</dt>
-                        <dd class="mt-1 text-sm text-gray-900">₩{{ number_format($serviceUser->monthly_price ?? 0) }}</dd>
+                        <dd class="mt-1 text-sm text-gray-900">₩{{ number_format($subscribeUser->monthly_price ?? 0) }}</dd>
                     </div>
                     <div>
                         <dt class="text-sm font-medium text-gray-500">결제 방법</dt>
-                        <dd class="mt-1 text-sm text-gray-900">{{ $serviceUser->payment_method ?? '미설정' }}</dd>
+                        <dd class="mt-1 text-sm text-gray-900">{{ $subscribeUser->payment_method ?? '미설정' }}</dd>
                     </div>
                     <div>
                         <dt class="text-sm font-medium text-gray-500">자동 갱신</dt>
                         <dd class="mt-1 text-sm text-gray-900">
-                            @if($serviceUser->auto_renewal)
+                            @if($subscribeUser->auto_renewal)
                                 <span class="text-green-600">활성</span>
                             @else
                                 <span class="text-gray-500">비활성</span>
@@ -226,19 +226,19 @@
                 <div>
                     <dt class="text-sm font-medium text-gray-500">시작일</dt>
                     <dd class="mt-1 text-sm text-gray-900">
-                        {{ $serviceUser->started_at ? $serviceUser->started_at->format('Y-m-d H:i') : '미설정' }}
+                        {{ $subscribeUser->started_at ? $subscribeUser->started_at->format('Y-m-d H:i') : '미설정' }}
                     </dd>
                 </div>
                 <div>
                     <dt class="text-sm font-medium text-gray-500">만료일</dt>
                     <dd class="mt-1 text-sm text-gray-900">
-                        {{ $serviceUser->expires_at ? $serviceUser->expires_at->format('Y-m-d H:i') : '미설정' }}
+                        {{ $subscribeUser->expires_at ? $subscribeUser->expires_at->format('Y-m-d H:i') : '미설정' }}
                     </dd>
                 </div>
                 <div>
                     <dt class="text-sm font-medium text-gray-500">다음 결제일</dt>
                     <dd class="mt-1 text-sm text-gray-900">
-                        {{ $serviceUser->next_billing_at ? $serviceUser->next_billing_at->format('Y-m-d H:i') : '미설정' }}
+                        {{ $subscribeUser->next_billing_at ? $subscribeUser->next_billing_at->format('Y-m-d H:i') : '미설정' }}
                     </dd>
                 </div>
             </div>
@@ -252,8 +252,8 @@
         </div>
         <div class="px-6 py-4">
             <div class="flex flex-wrap gap-3">
-                @if(in_array($serviceUser->status, ['pending', 'suspended']))
-                    <form action="{{ route('admin.service.users.activate', $serviceUser->id) }}" method="POST" class="inline">
+                @if(in_array($subscribeUser->status, ['pending', 'suspended']))
+                    <form action="{{ route('admin.subscribe.users.activate', $subscribeUser->id) }}" method="POST" class="inline">
                         @csrf
                         <button type="submit" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors">
                             활성화
@@ -261,13 +261,13 @@
                     </form>
                 @endif
 
-                @if($serviceUser->status === 'active')
+                @if($subscribeUser->status === 'active')
                     <button type="button" onclick="openSuspendModal()" class="bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-lg transition-colors">
                         일시정지
                     </button>
                 @endif
 
-                @if(in_array($serviceUser->status, ['active', 'suspended', 'pending']))
+                @if(in_array($subscribeUser->status, ['active', 'suspended', 'pending']))
                     <button type="button" onclick="openCancelModal()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition-colors">
                         구독 취소
                     </button>
@@ -277,15 +277,15 @@
                     기간 연장
                 </button>
 
-                <form action="{{ route('admin.service.users.update-cache', $serviceUser->id) }}" method="POST" class="inline">
+                <form action="{{ route('admin.subscribe.users.update-cache', $subscribeUser->id) }}" method="POST" class="inline">
                     @csrf
                     <button type="submit" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg transition-colors">
                         캐시 업데이트
                     </button>
                 </form>
 
-                @if($serviceUser->status !== 'active')
-                    <form action="{{ route('admin.service.users.destroy', $serviceUser->id) }}" method="POST" class="inline" onsubmit="return confirm('정말로 삭제하시겠습니까?')">
+                @if($subscribeUser->status !== 'active')
+                    <form action="{{ route('admin.subscribe.users.destroy', $subscribeUser->id) }}" method="POST" class="inline" onsubmit="return confirm('정말로 삭제하시겠습니까?')">
                         @csrf
                         @method('DELETE')
                         <button type="submit" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg transition-colors">
@@ -298,19 +298,19 @@
     </div>
 
     <!-- 관리자 메모 -->
-    @if($serviceUser->admin_notes)
+    @if($subscribeUser->admin_notes)
     <div class="bg-white rounded-lg shadow mb-6">
         <div class="px-6 py-4 border-b border-gray-200">
             <h3 class="text-lg font-medium text-gray-900">관리자 메모</h3>
         </div>
         <div class="px-6 py-4">
-            <pre class="whitespace-pre-wrap text-sm text-gray-700">{{ $serviceUser->admin_notes }}</pre>
+            <pre class="whitespace-pre-wrap text-sm text-gray-700">{{ $subscribeUser->admin_notes }}</pre>
         </div>
     </div>
     @endif
 
     <!-- 환불 정보 -->
-    @if($serviceUser->refund_amount || $serviceUser->refunded_at)
+    @if($subscribeUser->refund_amount || $subscribeUser->refunded_at)
     <div class="bg-white rounded-lg shadow mb-6">
         <div class="px-6 py-4 border-b border-gray-200">
             <h3 class="text-lg font-medium text-gray-900">환불 정보</h3>
@@ -319,12 +319,12 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                     <dt class="text-sm font-medium text-gray-500">환불 금액</dt>
-                    <dd class="mt-1 text-sm text-gray-900">₩{{ number_format($serviceUser->refund_amount ?? 0) }}</dd>
+                    <dd class="mt-1 text-sm text-gray-900">₩{{ number_format($subscribeUser->refund_amount ?? 0) }}</dd>
                 </div>
                 <div>
                     <dt class="text-sm font-medium text-gray-500">환불일</dt>
                     <dd class="mt-1 text-sm text-gray-900">
-                        {{ $serviceUser->refunded_at ? $serviceUser->refunded_at->format('Y-m-d H:i') : '미설정' }}
+                        {{ $subscribeUser->refunded_at ? $subscribeUser->refunded_at->format('Y-m-d H:i') : '미설정' }}
                     </dd>
                 </div>
             </div>
@@ -338,7 +338,7 @@
     <div class="flex items-center justify-center min-h-screen">
         <div class="bg-white rounded-lg p-6 w-full max-w-md">
             <h3 class="text-lg font-medium text-gray-900 mb-4">구독 일시정지</h3>
-            <form action="{{ route('admin.service.users.suspend', $serviceUser->id) }}" method="POST">
+            <form action="{{ route('admin.subscribe.users.suspend', $subscribeUser->id) }}" method="POST">
                 @csrf
                 <div class="mb-4">
                     <label for="suspend_reason" class="block text-sm font-medium text-gray-700 mb-2">정지 사유</label>
@@ -366,7 +366,7 @@
     <div class="flex items-center justify-center min-h-screen">
         <div class="bg-white rounded-lg p-6 w-full max-w-md">
             <h3 class="text-lg font-medium text-gray-900 mb-4">구독 취소</h3>
-            <form action="{{ route('admin.service.users.cancel', $serviceUser->id) }}" method="POST">
+            <form action="{{ route('admin.subscribe.users.cancel', $subscribeUser->id) }}" method="POST">
                 @csrf
                 <div class="mb-4">
                     <label for="cancel_reason" class="block text-sm font-medium text-gray-700 mb-2">취소 사유</label>
@@ -394,7 +394,7 @@
     <div class="flex items-center justify-center min-h-screen">
         <div class="bg-white rounded-lg p-6 w-full max-w-md">
             <h3 class="text-lg font-medium text-gray-900 mb-4">기간 연장</h3>
-            <form action="{{ route('admin.service.users.extend', $serviceUser->id) }}" method="POST">
+            <form action="{{ route('admin.subscribe.users.extend', $subscribeUser->id) }}" method="POST">
                 @csrf
                 <div class="mb-4">
                     <label for="extend_days" class="block text-sm font-medium text-gray-700 mb-2">연장 일수</label>

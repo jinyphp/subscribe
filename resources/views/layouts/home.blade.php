@@ -29,9 +29,9 @@
 
   <body>
     <!-- Page Content -->
-    @include('jiny-service::partials.home-top')
+    @include('jiny-subscribe::partials.home-top')
 
-    @include('jiny-service::partials.home-side')
+    @include('jiny-subscribe::partials.home-side')
 
     <div class="db-content">
       @yield('content')

@@ -1,27 +1,27 @@
 <?php
 
-namespace Jiny\Service\Http\Controllers\Admin\Plan;
+namespace Jiny\Subscribe\Http\Controllers\Admin\Plan;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Jiny\Service\Models\ServicePlan;
-use Jiny\Service\Models\SiteService;
+use Jiny\Subscribe\Models\subscribePlan;
+use Jiny\Subscribe\Models\Sitesubscribe;
 
 class IndexController extends Controller
 {
     public function __invoke(Request $request)
     {
-        // 서비스 필터링을 위한 서비스 목록
-        $services = SiteService::select('id', 'title')->orderBy('title')->get();
+        // 구독 필터링을 위한 구독 목록
+        $subscribes = Sitesubscribe::select('id', 'title')->orderBy('title')->get();
 
         // 플랜 목록 조회 with 필터링
-        $query = ServicePlan::with('service')
+        $query = subscribePlan::with('subscribe')
                     ->orderBy('sort_order')
                     ->orderBy('monthly_price');
 
-        // 서비스별 필터링
-        if ($request->filled('service_id')) {
-            $query->where('service_id', $request->service_id);
+        // 구독별 필터링
+        if ($request->filled('subscribe_id')) {
+            $query->where('subscribe_id', $request->subscribe_id);
         }
 
         // 플랜 타입별 필터링
@@ -52,12 +52,12 @@ class IndexController extends Controller
 
         // 통계 정보
         $stats = [
-            'total' => ServicePlan::count(),
-            'active' => ServicePlan::where('is_active', true)->count(),
-            'featured' => ServicePlan::where('is_featured', true)->count(),
-            'with_trial' => ServicePlan::where('allow_trial', true)->where('trial_period_days', '>', 0)->count(),
+            'total' => subscribePlan::count(),
+            'active' => subscribePlan::where('is_active', true)->count(),
+            'featured' => subscribePlan::where('is_featured', true)->count(),
+            'with_trial' => subscribePlan::where('allow_trial', true)->where('trial_period_days', '>', 0)->count(),
         ];
 
-        return view('jiny-service::admin.plan.index', compact('plans', 'services', 'stats'));
+        return view('jiny-subscribe::admin.plan.index', compact('plans', 'subscribes', 'stats'));
     }
 }

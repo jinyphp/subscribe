@@ -1,16 +1,16 @@
 <?php
 
-namespace Jiny\Service\Http\Controllers\Admin\Categories;
+namespace Jiny\Subscribe\Http\Controllers\Admin\Categories;
 
 use Illuminate\Routing\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 /**
- * Service Categories 수정 컨트롤러
+ * subscribe Categories 수정 컨트롤러
  *
  * 진입 경로:
- * Route::get('/admin/service/categories/{id}/edit') → EditController::__invoke()
+ * Route::get('/admin/subscribe/categories/{id}/edit') → EditController::__invoke()
  */
 class EditController extends Controller
 {
@@ -24,10 +24,10 @@ class EditController extends Controller
     protected function loadConfig()
     {
         $this->config = [
-            'table' => 'service_categories',
-            'view' => 'jiny-service::admin.categories.edit',
-            'title' => 'Service Category 수정',
-            'subtitle' => '서비스 카테고리를 수정합니다.',
+            'table' => 'subscribe_categories',
+            'view' => 'jiny-subscribe::admin.categories.edit',
+            'title' => 'subscribe Category 수정',
+            'subtitle' => '구독 카테고리를 수정합니다.',
         ];
     }
 
@@ -39,7 +39,7 @@ class EditController extends Controller
 
         if (!$category) {
             return redirect()
-                ->route('admin.service.categories.index')
+                ->route('admin.subscribe.categories.index')
                 ->with('error', '카테고리를 찾을 수 없습니다.');
         }
 
@@ -54,7 +54,7 @@ class EditController extends Controller
 
     protected function getParentCategories($excludeId = null)
     {
-        $query = DB::table('service_categories')
+        $query = DB::table('subscribe_categories')
             ->whereNull('parent_id')
             ->where('enable', true);
 

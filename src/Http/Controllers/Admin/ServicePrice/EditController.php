@@ -1,21 +1,21 @@
 <?php
 
-namespace Jiny\Service\Http\Controllers\Admin\ServicePrice;
+namespace Jiny\Subscribe\Http\Controllers\Admin\subscribePrice;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Jiny\Service\Models\SiteService;
-use Jiny\Service\Models\ServicePrice;
+use Jiny\Subscribe\Models\Sitesubscribe;
+use Jiny\Subscribe\Models\subscribePrice;
 
 class EditController extends Controller
 {
-    public function __invoke(Request $request, $serviceId, $priceId)
+    public function __invoke(Request $request, $subscribeId, $priceId)
     {
-        $service = SiteService::findOrFail($serviceId);
+        $subscribe = Sitesubscribe::findOrFail($subscribeId);
 
-        $price = ServicePrice::where('service_id', $serviceId)
+        $price = subscribePrice::where('subscribe_id', $subscribeId)
                    ->findOrFail($priceId);
 
-        return view('jiny-service::admin.service_price.edit', compact('service', 'price'));
+        return view('jiny-subscribe::admin.service_price.edit', compact('subscribe', 'price'));
     }
 }

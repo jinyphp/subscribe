@@ -1,4 +1,4 @@
-@extends('jiny-service::layouts.admin.sidebar')
+@extends('jiny-subscribe::layouts.admin.sidebar')
 
 @section('title', '구독 로그 관리')
 
@@ -14,13 +14,13 @@
             <div class="d-flex justify-content-between align-items-center">
                 <div>
                     <h1 class="h2 fw-bold text-dark">구독 로그 관리</h1>
-                    <p class="text-muted mb-0">서비스 구독자들의 모든 활동과 상태 변경을 추적합니다.</p>
+                    <p class="text-muted mb-0">구독 구독자들의 모든 활동과 상태 변경을 추적합니다.</p>
                 </div>
                 <div class="d-flex gap-2">
-                    <a href="{{ route('admin.service.subscription-logs.stats') }}" class="btn btn-info">
+                    <a href="{{ route('admin.subscribe.subscription-logs.stats') }}" class="btn btn-info">
                         <i class="fe fe-bar-chart-2 me-2"></i>통계 보기
                     </a>
-                    <a href="{{ route('admin.service.subscription-logs.export', ['format' => 'csv']) }}" class="btn btn-success">
+                    <a href="{{ route('admin.subscribe.subscription-logs.export', ['format' => 'csv']) }}" class="btn btn-success">
                         <i class="fe fe-download me-2"></i>CSV 내보내기
                     </a>
                 </div>
@@ -119,12 +119,12 @@
                                    placeholder="사용자명, 이메일, 액션 제목...">
                         </div>
                         <div class="col-md-2">
-                            <label for="service_id" class="form-label">서비스</label>
-                            <select id="service_id" name="service_id" class="form-select">
+                            <label for="subscribe_id" class="form-label">구독</label>
+                            <select id="subscribe_id" name="subscribe_id" class="form-select">
                                 <option value="">전체</option>
-                                @foreach($services as $service)
-                                    <option value="{{ $service->id }}" {{ request('service_id') == $service->id ? 'selected' : '' }}>
-                                        {{ $service->title }}
+                                @foreach($subscribes as $subscribe)
+                                    <option value="{{ $subscribe->id }}" {{ request('subscribe_id') == $subscribe->id ? 'selected' : '' }}>
+                                        {{ $subscribe->title }}
                                     </option>
                                 @endforeach
                             </select>
@@ -191,7 +191,7 @@
                                 <tr>
                                     <th class="ps-3">ID</th>
                                     <th>사용자</th>
-                                    <th>서비스</th>
+                                    <th>구독</th>
                                     <th>액션</th>
                                     <th>상태 변경</th>
                                     <th>금액</th>
@@ -209,12 +209,12 @@
                                         </td>
                                         <td>
                                             <div class="d-flex flex-column">
-                                                <span class="fw-medium">{{ $log->serviceUser->user_name ?? 'N/A' }}</span>
-                                                <small class="text-muted">{{ $log->serviceUser->user_email ?? $log->user_uuid }}</small>
+                                                <span class="fw-medium">{{ $log->subscribeUser->user_name ?? 'N/A' }}</span>
+                                                <small class="text-muted">{{ $log->subscribeUser->user_email ?? $log->user_uuid }}</small>
                                             </div>
                                         </td>
                                         <td>
-                                            <span class="badge bg-light text-dark">{{ $log->service->title ?? 'N/A' }}</span>
+                                            <span class="badge bg-light text-dark">{{ $log->subscribe->title ?? 'N/A' }}</span>
                                         </td>
                                         <td>
                                             <div class="d-flex flex-column">
@@ -265,7 +265,7 @@
                                             </div>
                                         </td>
                                         <td class="pe-3">
-                                            <a href="{{ route('admin.service.subscription-logs.show', $log->id) }}"
+                                            <a href="{{ route('admin.subscribe.subscription-logs.show', $log->id) }}"
                                                class="btn btn-sm btn-outline-primary">
                                                 <i class="fe fe-eye"></i>
                                             </a>
@@ -339,7 +339,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // 다른 필터 요소들 즉시 제출
-    const filterElements = ['service_id', 'action', 'result', 'processed_by'];
+    const filterElements = ['subscribe_id', 'action', 'result', 'processed_by'];
     filterElements.forEach(id => {
         const element = document.getElementById(id);
         if (element) {

@@ -1,25 +1,25 @@
 <?php
 
-namespace Jiny\Service\Http\Controllers\Admin\PlanDetail;
+namespace Jiny\Subscribe\Http\Controllers\Admin\PlanDetail;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Jiny\Service\Models\ServicePlan;
-use Jiny\Service\Models\ServicePlanDetail;
+use Jiny\Subscribe\Models\subscribePlan;
+use Jiny\Subscribe\Models\subscribePlanDetail;
 
 class ShowController extends Controller
 {
     public function __invoke(Request $request, $planId, $detailId)
     {
-        $plan = ServicePlan::with('service')->findOrFail($planId);
+        $plan = subscribePlan::with('subscribe')->findOrFail($planId);
 
-        $detail = ServicePlanDetail::where('service_plan_id', $planId)
+        $detail = subscribePlanDetail::where('subscribe_plan_id', $planId)
                     ->findOrFail($detailId);
 
         // 같은 그룹의 다른 상세 정보들
         $relatedDetails = [];
         if ($detail->group_name) {
-            $relatedDetails = ServicePlanDetail::where('service_plan_id', $planId)
+            $relatedDetails = subscribePlanDetail::where('subscribe_plan_id', $planId)
                                 ->where('group_name', $detail->group_name)
                                 ->where('id', '!=', $detailId)
                                 ->enabled()
@@ -30,7 +30,7 @@ class ShowController extends Controller
         // 같은 카테고리의 다른 상세 정보들
         $categoryDetails = [];
         if ($detail->category) {
-            $categoryDetails = ServicePlanDetail::where('service_plan_id', $planId)
+            $categoryDetails = subscribePlanDetail::where('subscribe_plan_id', $planId)
                                 ->where('category', $detail->category)
                                 ->where('id', '!=', $detailId)
                                 ->enabled()
@@ -40,17 +40,17 @@ class ShowController extends Controller
         }
 
         // 이전/다음 상세 정보
-        $prevDetail = ServicePlanDetail::where('service_plan_id', $planId)
+        $prevDetail = subscribePlanDetail::where('subscribe_plan_id', $planId)
                         ->where('pos', '<', $detail->pos)
                         ->orderBy('pos', 'desc')
                         ->first();
 
-        $nextDetail = ServicePlanDetail::where('service_plan_id', $planId)
+        $nextDetail = subscribePlanDetail::where('subscribe_plan_id', $planId)
                         ->where('pos', '>', $detail->pos)
                         ->orderBy('pos', 'asc')
                         ->first();
 
-        return view('jiny-service::admin.plan_detail.show', compact(
+        return view('jiny-subscribe::admin.plan_detail.show', compact(
             'plan',
             'detail',
             'relatedDetails',

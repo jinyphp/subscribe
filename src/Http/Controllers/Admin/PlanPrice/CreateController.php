@@ -1,17 +1,17 @@
 <?php
 
-namespace Jiny\Service\Http\Controllers\Admin\PlanPrice;
+namespace Jiny\Subscribe\Http\Controllers\Admin\PlanPrice;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Jiny\Service\Models\ServicePlan;
-use Jiny\Service\Models\ServicePlanPrice;
+use Jiny\Subscribe\Models\subscribePlan;
+use Jiny\Subscribe\Models\subscribePlanPrice;
 
 class CreateController extends Controller
 {
     public function __invoke(Request $request, $planId)
     {
-        $plan = ServicePlan::with('service')->findOrFail($planId);
+        $plan = subscribePlan::with('subscribe')->findOrFail($planId);
 
         // 결제 주기 옵션
         $billingPeriods = [
@@ -30,7 +30,7 @@ class CreateController extends Controller
         ];
 
         // 다음 정렬순서 제안
-        $nextPos = ServicePlanPrice::where('service_plan_id', $planId)->max('pos') + 1;
+        $nextPos = subscribePlanPrice::where('subscribe_plan_id', $planId)->max('pos') + 1;
 
         // 기본 가격 제안 (기존 가격들 참조)
         $suggestedPrices = $this->getSuggestedPrices($planId);
@@ -75,7 +75,7 @@ class CreateController extends Controller
             ],
         ];
 
-        return view('jiny-service::admin.plan_price.create', compact(
+        return view('jiny-subscribe::admin.plan_price.create', compact(
             'plan',
             'billingPeriods',
             'currencies',
@@ -88,7 +88,7 @@ class CreateController extends Controller
 
     protected function getSuggestedPrices($planId)
     {
-        $existingPrices = ServicePlanPrice::where('service_plan_id', $planId)
+        $existingPrices = subscribePlanPrice::where('subscribe_plan_id', $planId)
                             ->orderBy('price')
                             ->get(['billing_period', 'price']);
 

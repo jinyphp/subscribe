@@ -23,7 +23,7 @@
             @if(isset($item['data_bs_popper'])) data-bs-popper="{{ $item['data_bs_popper'] }}" @endif>
             @if(isset($item['children']) && is_array($item['children']))
                 @foreach ($item['children'] as $subItem)
-                    @include('jiny-service::partials.navs.horizontal.menu-item', ['item' => $subItem])
+                    @include('jiny-subscribe::partials.navs.horizontal.menu-item', ['item' => $subItem])
                 @endforeach
             @endif
         </ul>

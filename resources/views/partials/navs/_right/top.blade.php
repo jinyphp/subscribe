@@ -10,7 +10,7 @@
                     aria-labelledby="{{ $menuItem['id'] ?? '' }}">
                     @if (isset($menuItem['children']) && is_array($menuItem['children']))
                         @foreach ($menuItem['children'] as $child)
-                            @include('jiny-service::partials.navs.right.menu-item', ['item' => $child])
+                            @include('jiny-subscribe::partials.navs.right.menu-item', ['item' => $child])
                         @endforeach
                     @endif
                 </ul>

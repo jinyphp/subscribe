@@ -1,14 +1,14 @@
 # 002. Database Schema Design - TDD Implementation
 
 ## 개요
-Jiny 생태계 패키지 기반 구독형 서비스 관리 시스템의 데이터베이스 스키마 설계
+Jiny 생태계 패키지 기반 구독형 구독 관리 시스템의 데이터베이스 스키마 설계
 
 ### 기존 Jiny 패키지 테이블 활용
 - **jiny/admin**: `users`, `admin_user_types`, `admin_user_logs` 테이블 활용
 - **jiny/auth**: 샤딩 테이블 활용 (설정에 따라 동적으로 결정)
   - 설정: `config('jiny-auth.sharding.shard_count')` (기본값: 100)
   - 테이블 명: `config('jiny-auth.sharding.table_prefix')` + 샤드번호 (기본값: `users_001`~`users_099`)
-- **새로 추가**: 서비스 관리 특화 테이블들 (아래 참조)
+- **새로 추가**: 구독 관리 특화 테이블들 (아래 참조)
 
 ## 의존관계
 - **선행 태스크**: [001. 프로젝트 개요](001_project_overview.md)
@@ -29,8 +29,8 @@ public function test_all_migrations_run_successfully()
     $this->artisan('migrate:fresh');
 
     // Then: HTTP 200과 모든 테이블 생성 확인
-    $this->assertDatabaseHas('migrations', ['migration' => '2024_01_01_000001_create_services_table']);
-    $this->assertTrue(Schema::hasTable('services'));
+    $this->assertDatabaseHas('migrations', ['migration' => '2024_01_01_000001_create_subscribes_table']);
+    $this->assertTrue(Schema::hasTable('subscribes'));
     $this->assertTrue(Schema::hasTable('subscriptions'));
     $this->assertTrue(Schema::hasTable('partners'));
 }
@@ -43,17 +43,17 @@ public function test_all_migrations_run_successfully()
 public function test_foreign_key_relationships_work()
 {
     // Given: 기본 데이터
-    $service = Service::factory()->create();
+    $subscribe = subscribe::factory()->create();
     $customer = User::factory()->create();
 
     // When: 관계 데이터 생성
     $subscription = Subscription::factory()->create([
-        'service_id' => $service->id,
+        'subscribe_id' => $subscribe->id,
         'customer_id' => $customer->id
     ]);
 
     // Then: 관계가 올바르게 작동
-    $this->assertEquals($service->id, $subscription->service->id);
+    $this->assertEquals($subscribe->id, $subscription->subscribe->id);
     $this->assertEquals($customer->id, $subscription->customer->id);
 }
 ```
@@ -68,15 +68,15 @@ public function test_sharding_configuration_dynamically_loaded()
     config(['jiny-auth.sharding.shard_count' => 50]);
     config(['jiny-auth.sharding.table_prefix' => 'customers_']);
 
-    // When: CustomerShardService 인스턴스 생성
-    $shardService = new CustomerShardService();
+    // When: CustomerShardsubscribe 인스턴스 생성
+    $shardsubscribe = new CustomerShardsubscribe();
 
     // Then: 동적 설정이 올바르게 로드됨
-    $this->assertEquals(50, $shardService->getShardCount());
-    $this->assertEquals('customers_', $shardService->getTablePrefix());
+    $this->assertEquals(50, $shardsubscribe->getShardCount());
+    $this->assertEquals('customers_', $shardsubscribe->getTablePrefix());
 
     // And: HTTP 200 응답으로 설정 확인 가능
-    $response = $this->get('/admin/service/config/sharding');
+    $response = $this->get('/admin/subscribe/config/sharding');
     $response->assertStatus(200);
     $response->assertJson([
         'shard_count' => 50,
@@ -87,20 +87,20 @@ public function test_sharding_configuration_dynamically_loaded()
 
 ## 데이터베이스 스키마 구조
 
-### 1. Services Table (서비스 카탈로그)
+### 1. subscribes Table (구독 카탈로그)
 ```sql
-CREATE TABLE services (
+CREATE TABLE subscribes (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
-    name VARCHAR(255) NOT NULL COMMENT '서비스 이름',
+    name VARCHAR(255) NOT NULL COMMENT '구독 이름',
     slug VARCHAR(255) UNIQUE NOT NULL COMMENT 'URL용 슬러그',
-    description TEXT NOT NULL COMMENT '서비스 설명',
+    description TEXT NOT NULL COMMENT '구독 설명',
     category VARCHAR(100) NOT NULL COMMENT '카테고리 (maintenance, installation, repair)',
     pricing_model ENUM('fixed', 'hourly', 'subscription') NOT NULL COMMENT '가격 모델',
     base_price DECIMAL(12,2) NOT NULL COMMENT '기본 가격',
     features JSON COMMENT '제공 기능 목록',
     trial_config JSON COMMENT '무료 체험 설정',
-    status ENUM('active', 'inactive', 'draft') DEFAULT 'draft' COMMENT '서비스 상태',
-    image_url VARCHAR(500) COMMENT '서비스 이미지',
+    status ENUM('active', 'inactive', 'draft') DEFAULT 'draft' COMMENT '구독 상태',
+    image_url VARCHAR(500) COMMENT '구독 이미지',
     sort_order INT DEFAULT 0 COMMENT '정렬 순서',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -110,12 +110,12 @@ CREATE TABLE services (
     INDEX idx_pricing_model (pricing_model),
     INDEX idx_sort_order (sort_order),
     FULLTEXT idx_search (name, description)
-) COMMENT='서비스 카탈로그';
+) COMMENT='구독 카탈로그';
 ```
 
-### 2. Service Categories Table (서비스 카테고리)
+### 2. subscribe Categories Table (구독 카테고리)
 ```sql
-CREATE TABLE service_categories (
+CREATE TABLE subscribe_categories (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
     name VARCHAR(100) NOT NULL UNIQUE COMMENT '카테고리 이름',
     description TEXT COMMENT '카테고리 설명',
@@ -126,7 +126,7 @@ CREATE TABLE service_categories (
 
     INDEX idx_sort_order (sort_order),
     INDEX idx_active (is_active)
-) COMMENT='서비스 카테고리';
+) COMMENT='구독 카테고리';
 ```
 
 ### 3. Subscriptions Table (구독 관리)
@@ -136,7 +136,7 @@ CREATE TABLE subscriptions (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
     customer_id BIGINT NOT NULL COMMENT '고객 ID (jiny/auth 샤딩 테이블)',
     customer_shard VARCHAR(3) NOT NULL COMMENT '고객 샤드 번호 (jiny/auth 설정 기반)',
-    service_id BIGINT NOT NULL COMMENT '서비스 ID',
+    subscribe_id BIGINT NOT NULL COMMENT '구독 ID',
     status ENUM('trial', 'active', 'inactive', 'cancelled', 'expired', 'suspended') DEFAULT 'trial' COMMENT '구독 상태',
     start_date DATE NOT NULL COMMENT '시작일',
     end_date DATE COMMENT '종료일',
@@ -153,9 +153,9 @@ CREATE TABLE subscriptions (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
-    FOREIGN KEY (service_id) REFERENCES services(id) ON DELETE RESTRICT,
+    FOREIGN KEY (subscribe_id) REFERENCES subscribes(id) ON DELETE RESTRICT,
     INDEX idx_customer (customer_id),
-    INDEX idx_service (service_id),
+    INDEX idx_subscribe (subscribe_id),
     INDEX idx_status (status),
     INDEX idx_billing_date (next_billing_date),
     INDEX idx_trial_end (trial_end_date),
@@ -289,9 +289,9 @@ CREATE TABLE partner_commissions (
 ) COMMENT='파트너 커미션';
 ```
 
-### 8. Service Executions Table (서비스 실행 이력)
+### 8. subscribe Executions Table (구독 실행 이력)
 ```sql
-CREATE TABLE service_executions (
+CREATE TABLE subscribe_executions (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
     subscription_id BIGINT NOT NULL COMMENT '구독 ID',
     partner_id BIGINT COMMENT '담당 파트너 ID',
@@ -299,7 +299,7 @@ CREATE TABLE service_executions (
     started_at DATETIME COMMENT '시작 시간',
     completed_at DATETIME COMMENT '완료 시간',
     status ENUM('scheduled', 'in_progress', 'completed', 'cancelled', 'rescheduled', 'failed') DEFAULT 'scheduled' COMMENT '실행 상태',
-    location_address TEXT COMMENT '서비스 주소',
+    location_address TEXT COMMENT '구독 주소',
     location_notes TEXT COMMENT '위치 관련 메모',
     work_notes TEXT COMMENT '작업 내용',
     before_images JSON COMMENT '작업 전 사진',
@@ -319,14 +319,14 @@ CREATE TABLE service_executions (
     INDEX idx_scheduled_date (scheduled_date),
     INDEX idx_status (status),
     INDEX idx_rating (customer_rating)
-) COMMENT='서비스 실행 이력';
+) COMMENT='구독 실행 이력';
 ```
 
 ### 9. Free Trial Configurations Table (무료 체험 설정)
 ```sql
 CREATE TABLE free_trial_configs (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
-    service_id BIGINT NOT NULL COMMENT '서비스 ID',
+    subscribe_id BIGINT NOT NULL COMMENT '구독 ID',
     name VARCHAR(255) NOT NULL COMMENT '체험 설정 이름',
     trial_type ENUM('time_based', 'usage_based', 'feature_based', 'hybrid') NOT NULL COMMENT '체험 유형',
     config_data JSON NOT NULL COMMENT '체험 설정 데이터',
@@ -339,8 +339,8 @@ CREATE TABLE free_trial_configs (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
-    FOREIGN KEY (service_id) REFERENCES services(id) ON DELETE CASCADE,
-    INDEX idx_service (service_id),
+    FOREIGN KEY (subscribe_id) REFERENCES subscribes(id) ON DELETE CASCADE,
+    INDEX idx_subscribe (subscribe_id),
     INDEX idx_type (trial_type),
     INDEX idx_active (is_active),
     INDEX idx_ab_group (ab_test_group)
@@ -352,7 +352,7 @@ CREATE TABLE free_trial_configs (
 CREATE TABLE free_trial_instances (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
     customer_id BIGINT NOT NULL COMMENT '고객 ID',
-    service_id BIGINT NOT NULL COMMENT '서비스 ID',
+    subscribe_id BIGINT NOT NULL COMMENT '구독 ID',
     trial_config_id BIGINT NOT NULL COMMENT '체험 설정 ID',
     status ENUM('active', 'completed', 'expired', 'cancelled', 'converted') DEFAULT 'active' COMMENT '체험 상태',
     start_date DATE NOT NULL COMMENT '시작일',
@@ -367,29 +367,29 @@ CREATE TABLE free_trial_instances (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
-    FOREIGN KEY (service_id) REFERENCES services(id) ON DELETE CASCADE,
+    FOREIGN KEY (subscribe_id) REFERENCES subscribes(id) ON DELETE CASCADE,
     FOREIGN KEY (trial_config_id) REFERENCES free_trial_configs(id) ON DELETE CASCADE,
     FOREIGN KEY (subscription_id) REFERENCES subscriptions(id) ON DELETE SET NULL,
     INDEX idx_customer (customer_id),
-    INDEX idx_service (service_id),
+    INDEX idx_subscribe (subscribe_id),
     INDEX idx_config (trial_config_id),
     INDEX idx_status (status),
     INDEX idx_dates (start_date, end_date),
     INDEX idx_conversion (conversion_date),
-    UNIQUE KEY unique_customer_service_active (customer_id, service_id, status)
+    UNIQUE KEY unique_customer_subscribe_active (customer_id, subscribe_id, status)
 ) COMMENT='무료 체험 인스턴스';
 ```
 
 ## 마이그레이션 구현 체크리스트
 
 ### 기본 마이그레이션
-- [ ] **Services 테이블 마이그레이션**
+- [ ] **subscribes 테이블 마이그레이션**
   - [ ] 기본 컬럼 생성
   - [ ] 인덱스 추가
   - [ ] JSON 컬럼 설정
   - [ ] 테스트: HTTP 200 반환
 
-- [ ] **Service Categories 테이블 마이그레이션**
+- [ ] **subscribe Categories 테이블 마이그레이션**
   - [ ] 기본 데이터 시딩
   - [ ] 정렬 순서 설정
   - [ ] 테스트: HTTP 200 반환
@@ -430,12 +430,12 @@ CREATE TABLE free_trial_instances (
 
 ### 기본 데이터 시딩
 ```php
-// ServiceCategorySeeder
+// subscribeCategorySeeder
 $categories = [
     ['name' => 'maintenance', 'description' => '정기 유지보수', 'icon' => 'fas fa-tools'],
-    ['name' => 'installation', 'description' => '설치 서비스', 'icon' => 'fas fa-hammer'],
-    ['name' => 'repair', 'description' => '수리 서비스', 'icon' => 'fas fa-wrench'],
-    ['name' => 'cleaning', 'description' => '청소 서비스', 'icon' => 'fas fa-broom'],
+    ['name' => 'installation', 'description' => '설치 구독', 'icon' => 'fas fa-hammer'],
+    ['name' => 'repair', 'description' => '수리 구독', 'icon' => 'fas fa-wrench'],
+    ['name' => 'cleaning', 'description' => '청소 구독', 'icon' => 'fas fa-broom'],
 ];
 
 // CommissionRateSeeder
@@ -455,7 +455,7 @@ $rates = [
 ### 인덱스 전략
 - **복합 인덱스**: 자주 함께 사용되는 컬럼
 - **부분 인덱스**: 상태 기반 필터링
-- **전문 검색**: 서비스 이름/설명 검색
+- **전문 검색**: 구독 이름/설명 검색
 - **JSON 인덱스**: 구조화된 데이터 검색
 
 ### 샤딩 전략 (jiny/auth 설정 기반)

@@ -1,6 +1,6 @@
 <?php
 
-namespace Jiny\Service\Http\Controllers\Admin\Services;
+namespace Jiny\Subscribe\Http\Controllers\Admin\subscribes;
 
 use Illuminate\Routing\Controller;
 use Illuminate\Http\Request;
@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 /**
- * Services 저장 컨트롤러
+ * subscribes 저장 컨트롤러
  */
 class StoreController extends Controller
 {
@@ -17,8 +17,8 @@ class StoreController extends Controller
     public function __construct()
     {
         $this->config = [
-            'table' => 'services',
-            'redirect_route' => 'admin.site.services.index',
+            'table' => 'subscribes',
+            'redirect_route' => 'admin.site.subscribes.index',
         ];
     }
 
@@ -28,7 +28,7 @@ class StoreController extends Controller
             'title' => 'required|max:255',
             'description' => 'nullable|string',
             'content' => 'nullable|string',
-            'category_id' => 'nullable|integer|exists:service_categories,id',
+            'category_id' => 'nullable|integer|exists:subscribe_categories,id',
             'price' => 'nullable|numeric|min:0',
             'duration' => 'nullable|string|max:100',
             'image' => 'nullable|string|max:500',
@@ -65,6 +65,6 @@ class StoreController extends Controller
 
         return redirect()
             ->route($this->config['redirect_route'])
-            ->with('success', 'Service가 성공적으로 생성되었습니다.');
+            ->with('success', 'subscribe가 성공적으로 생성되었습니다.');
     }
 }

@@ -4,7 +4,7 @@
 구독 생명주기 관리 시스템: 구독 생성, 수정, 취소, 갱신 및 청구 처리
 
 ## 의존관계
-- **선행 태스크**: [004. 서비스 카탈로그](004_service_catalog.md)
+- **선행 태스크**: [004. 구독 카탈로그](004_subscribe_catalog.md)
 - **후속 태스크**: [006. 파트너 트리 구조](006_partner_tree_structure.md)
 
 ## TDD 테스트 시나리오 (모두 HTTP 200 반환)
@@ -19,11 +19,11 @@ public function test_admin_subscription_list_returns_200()
 {
     // Given: 관리자와 구독 데이터
     $admin = User::factory()->admin()->create();
-    $service = Service::factory()->create();
-    Subscription::factory()->count(10)->create(['service_id' => $service->id]);
+    $subscribe = subscribe::factory()->create();
+    Subscription::factory()->count(10)->create(['subscribe_id' => $subscribe->id]);
 
     // When: 구독 목록 조회
-    $response = $this->actingAs($admin)->get('/admin/service/subscriptions');
+    $response = $this->actingAs($admin)->get('/admin/subscribe/subscriptions');
 
     // Then: HTTP 200과 구독 목록
     $response->assertStatus(200);
@@ -31,7 +31,7 @@ public function test_admin_subscription_list_returns_200()
         'status',
         'data' => [
             'subscriptions' => [
-                '*' => ['id', 'customer_name', 'service_name', 'status', 'start_date', 'amount']
+                '*' => ['id', 'customer_name', 'subscribe_name', 'status', 'start_date', 'amount']
             ],
             'summary' => ['total_subscriptions', 'active_subscriptions', 'monthly_revenue'],
             'pagination'
@@ -48,7 +48,7 @@ public function test_admin_subscription_filtering_returns_200()
     Subscription::factory()->create(['status' => 'trial']);
 
     // When: 상태별 필터링
-    $response = $this->actingAs($admin)->get('/admin/service/subscriptions?status=active');
+    $response = $this->actingAs($admin)->get('/admin/subscribe/subscriptions?status=active');
 
     // Then: HTTP 200과 필터된 결과
     $response->assertStatus(200);
@@ -66,18 +66,18 @@ public function test_admin_subscription_detail_returns_200()
     $admin = User::factory()->admin()->create();
     $subscription = Subscription::factory()->create();
     SubscriptionBilling::factory()->count(3)->create(['subscription_id' => $subscription->id]);
-    ServiceExecution::factory()->count(2)->create(['subscription_id' => $subscription->id]);
+    subscribeExecution::factory()->count(2)->create(['subscription_id' => $subscription->id]);
 
     // When: 구독 상세 조회
-    $response = $this->actingAs($admin)->get("/admin/service/subscriptions/{$subscription->id}");
+    $response = $this->actingAs($admin)->get("/admin/subscribe/subscriptions/{$subscription->id}");
 
     // Then: HTTP 200과 상세 정보
     $response->assertStatus(200);
     $response->assertJsonStructure([
         'data' => [
-            'subscription' => ['id', 'customer', 'service', 'status', 'billing_cycle'],
+            'subscription' => ['id', 'customer', 'subscribe', 'status', 'billing_cycle'],
             'billing_history' => ['*' => ['date', 'amount', 'status']],
-            'service_history' => ['*' => ['date', 'engineer', 'status', 'rating']]
+            'subscribe_history' => ['*' => ['date', 'engineer', 'status', 'rating']]
         ]
     ]);
 }
@@ -94,7 +94,7 @@ public function test_admin_can_update_subscription_status_returns_200()
     $subscription = Subscription::factory()->create(['status' => 'active']);
 
     // When: 구독 상태 변경
-    $response = $this->actingAs($admin)->patch("/admin/service/subscriptions/{$subscription->id}/status", [
+    $response = $this->actingAs($admin)->patch("/admin/subscribe/subscriptions/{$subscription->id}/status", [
         'status' => 'suspended',
         'reason' => 'Payment failure',
         'effective_date' => now()->addDays(1)->format('Y-m-d')
@@ -123,15 +123,15 @@ public function test_customer_subscription_list_returns_200()
 
     // When: 고객 구독 목록 조회
     $response = $this->withHeaders(['Authorization' => "Bearer {$token}"])
-                     ->get('/home/service/subscriptions');
+                     ->get('/home/subscribe/subscriptions');
 
     // Then: HTTP 200과 고객의 구독만 반환
     $response->assertStatus(200);
     $response->assertJsonCount(3, 'data.subscriptions');
     $response->assertJsonStructure([
         'data' => [
-            'subscriptions' => ['*' => ['id', 'service_name', 'status', 'next_service']],
-            'upcoming_services' => ['*' => ['subscription_id', 'service_date', 'engineer']]
+            'subscriptions' => ['*' => ['id', 'subscribe_name', 'status', 'next_subscribe']],
+            'upcoming_subscribes' => ['*' => ['subscription_id', 'subscribe_date', 'engineer']]
         ]
     ]);
 }
@@ -152,11 +152,11 @@ public function test_customer_can_cancel_subscription_returns_200()
 
     // When: 구독 취소 요청
     $response = $this->withHeaders(['Authorization' => "Bearer {$token}"])
-                     ->post("/home/service/subscriptions/{$subscription->id}/cancel", [
-                         'reason' => 'Service no longer needed',
+                     ->post("/home/subscribe/subscriptions/{$subscription->id}/cancel", [
+                         'reason' => 'subscribe no longer needed',
                          'cancel_immediately' => false,
                          'feedback_rating' => 4,
-                         'feedback_comment' => 'Good service overall'
+                         'feedback_comment' => 'Good subscribe overall'
                      ]);
 
     // Then: HTTP 200과 취소 처리
@@ -177,7 +177,7 @@ public function test_customer_cannot_cancel_others_subscription()
 
     // When: 다른 고객의 구독 취소 시도
     $response = $this->withHeaders(['Authorization' => "Bearer {$token1}"])
-                     ->post("/home/service/subscriptions/{$subscription->id}/cancel", [
+                     ->post("/home/subscribe/subscriptions/{$subscription->id}/cancel", [
                          'reason' => 'Test'
                      ]);
 
@@ -199,7 +199,7 @@ public function test_partner_subscription_overview_returns_200()
     $subscriptions = Subscription::factory()->count(5)->create();
 
     foreach ($subscriptions as $subscription) {
-        ServiceExecution::factory()->create([
+        subscribeExecution::factory()->create([
             'subscription_id' => $subscription->id,
             'partner_id' => $partner->id,
             'status' => 'scheduled'
@@ -214,8 +214,8 @@ public function test_partner_subscription_overview_returns_200()
     $response->assertStatus(200);
     $response->assertJsonStructure([
         'data' => [
-            'overview' => ['assigned_subscriptions', 'completed_services', 'customer_satisfaction'],
-            'subscriptions' => ['*' => ['id', 'customer_name', 'service_date', 'status']]
+            'overview' => ['assigned_subscriptions', 'completed_subscribes', 'customer_satisfaction'],
+            'subscriptions' => ['*' => ['id', 'customer_name', 'subscribe_date', 'status']]
         ]
     ]);
 }
@@ -228,32 +228,32 @@ public function test_partner_subscription_overview_returns_200()
 ```php
 <?php
 
-namespace Jiny\Service\Http\Controllers\Admin;
+namespace Jiny\Subscribe\Http\Controllers\Admin;
 
 use Illuminate\Http\Request;
-use Jiny\Service\Models\Subscription;
-use Jiny\Service\Models\SubscriptionBilling;
-use Jiny\Service\Models\ServiceExecution;
-use Jiny\Service\Services\CustomerShardService;
+use Jiny\Subscribe\Models\Subscription;
+use Jiny\Subscribe\Models\SubscriptionBilling;
+use Jiny\Subscribe\Models\subscribeExecution;
+use Jiny\Subscribe\subscribes\CustomerShardsubscribe;
 
 class SubscriptionController extends Controller
 {
-    private CustomerShardService $shardService;
+    private CustomerShardsubscribe $shardsubscribe;
 
-    public function __construct(CustomerShardService $shardService)
+    public function __construct(CustomerShardsubscribe $shardsubscribe)
     {
-        $this->shardService = $shardService;
+        $this->shardsubscribe = $shardsubscribe;
     }
 
     public function index(Request $request)
     {
-        $query = Subscription::with(['service']);
+        $query = Subscription::with(['subscribe']);
 
         // 검색 필터
         if ($search = $request->get('search')) {
             $query->where(function ($q) use ($search) {
-                $q->whereHas('service', function ($serviceQuery) use ($search) {
-                    $serviceQuery->where('name', 'like', "%{$search}%");
+                $q->whereHas('subscribe', function ($subscribeQuery) use ($search) {
+                    $subscribeQuery->where('name', 'like', "%{$search}%");
                 })->orWhere('customer_id', 'like', "%{$search}%");
             });
         }
@@ -263,9 +263,9 @@ class SubscriptionController extends Controller
             $query->where('status', $status);
         }
 
-        // 서비스 필터
-        if ($serviceId = $request->get('service_id')) {
-            $query->where('service_id', $serviceId);
+        // 구독 필터
+        if ($subscribeId = $request->get('subscribe_id')) {
+            $query->where('subscribe_id', $subscribeId);
         }
 
         // 날짜 범위 필터
@@ -290,7 +290,7 @@ class SubscriptionController extends Controller
                 'id' => $subscription->id,
                 'customer_name' => $customer->name ?? 'Unknown',
                 'customer_email' => $customer->email ?? 'Unknown',
-                'service_name' => $subscription->service->name,
+                'subscribe_name' => $subscription->subscribe->name,
                 'status' => $subscription->status,
                 'start_date' => $subscription->start_date,
                 'end_date' => $subscription->end_date,
@@ -327,7 +327,7 @@ class SubscriptionController extends Controller
 
     public function show(Subscription $subscription)
     {
-        $subscription->load(['service']);
+        $subscription->load(['subscribe']);
 
         // 고객 정보
         $customer = $this->getCustomerInfo($subscription->customer_id);
@@ -337,8 +337,8 @@ class SubscriptionController extends Controller
                                             ->orderBy('billing_date', 'desc')
                                             ->get();
 
-        // 서비스 실행 이력
-        $serviceHistory = ServiceExecution::where('subscription_id', $subscription->id)
+        // 구독 실행 이력
+        $subscribeHistory = subscribeExecution::where('subscription_id', $subscription->id)
                                          ->with(['partner'])
                                          ->orderBy('scheduled_date', 'desc')
                                          ->get();
@@ -346,9 +346,9 @@ class SubscriptionController extends Controller
         // 구독 메트릭스
         $metrics = [
             'total_paid' => $billingHistory->where('status', 'paid')->sum('total_amount'),
-            'average_rating' => $serviceHistory->whereNotNull('customer_rating')->avg('customer_rating'),
-            'services_completed' => $serviceHistory->where('status', 'completed')->count(),
-            'next_service_date' => $serviceHistory->where('status', 'scheduled')->first()?->scheduled_date
+            'average_rating' => $subscribeHistory->whereNotNull('customer_rating')->avg('customer_rating'),
+            'subscribes_completed' => $subscribeHistory->where('status', 'completed')->count(),
+            'next_subscribe_date' => $subscribeHistory->where('status', 'scheduled')->first()?->scheduled_date
         ];
 
         return response()->json([
@@ -362,7 +362,7 @@ class SubscriptionController extends Controller
                         'email' => $customer->email ?? 'Unknown',
                         'phone' => $customer->phone ?? null
                     ],
-                    'service' => $subscription->service,
+                    'subscribe' => $subscription->subscribe,
                     'status' => $subscription->status,
                     'start_date' => $subscription->start_date,
                     'end_date' => $subscription->end_date,
@@ -376,7 +376,7 @@ class SubscriptionController extends Controller
                     'cancellation_reason' => $subscription->cancellation_reason
                 ],
                 'billing_history' => $billingHistory,
-                'service_history' => $serviceHistory,
+                'subscribe_history' => $subscribeHistory,
                 'metrics' => $metrics
             ]
         ], 200);
@@ -442,8 +442,8 @@ class SubscriptionController extends Controller
         // 이탈 분석
         $churnData = $this->calculateChurnMetrics($startDate);
 
-        // 서비스별 성과
-        $servicePerformance = $this->calculateServicePerformance($startDate);
+        // 구독별 성과
+        $subscribePerformance = $this->calculatesubscribePerformance($startDate);
 
         return response()->json([
             'status' => 'success',
@@ -456,7 +456,7 @@ class SubscriptionController extends Controller
                 'growth' => $growthData,
                 'revenue' => $revenueData,
                 'churn' => $churnData,
-                'service_performance' => $servicePerformance
+                'subscribe_performance' => $subscribePerformance
             ]
         ], 200);
     }
@@ -501,7 +501,7 @@ class SubscriptionController extends Controller
     private function getCustomerInfo(int $customerId): ?object
     {
         // 샤드에서 고객 정보 조회
-        return $this->shardService->findCustomerById($customerId);
+        return $this->shardsubscribe->findCustomerById($customerId);
     }
 
     private function calculateMonthlyRevenue(): float
@@ -545,8 +545,8 @@ class SubscriptionController extends Controller
             'notes' => $subscription->notes . "\nSuspended on {$effectiveDate}: {$reason}"
         ]);
 
-        // 예정된 서비스 실행 일시 정지
-        ServiceExecution::where('subscription_id', $subscription->id)
+        // 예정된 구독 실행 일시 정지
+        subscribeExecution::where('subscription_id', $subscription->id)
                        ->where('status', 'scheduled')
                        ->where('scheduled_date', '>', $effectiveDate)
                        ->update(['status' => 'cancelled']);
@@ -600,20 +600,20 @@ class SubscriptionController extends Controller
 ```php
 <?php
 
-namespace Jiny\Service\Http\Controllers\Customer;
+namespace Jiny\Subscribe\Http\Controllers\Customer;
 
 use Illuminate\Http\Request;
-use Jiny\Service\Models\Subscription;
-use Jiny\Service\Models\ServiceExecution;
-use Jiny\Service\Services\SubscriptionService;
+use Jiny\Subscribe\Models\Subscription;
+use Jiny\Subscribe\Models\subscribeExecution;
+use Jiny\Subscribe\subscribes\Subscriptionsubscribe;
 
 class SubscriptionController extends Controller
 {
-    private SubscriptionService $subscriptionService;
+    private Subscriptionsubscribe $subscriptionsubscribe;
 
-    public function __construct(SubscriptionService $subscriptionService)
+    public function __construct(Subscriptionsubscribe $subscriptionsubscribe)
     {
-        $this->subscriptionService = $subscriptionService;
+        $this->subscriptionsubscribe = $subscriptionsubscribe;
     }
 
     public function index(Request $request)
@@ -621,7 +621,7 @@ class SubscriptionController extends Controller
         $customer = $request->input('authenticated_customer');
 
         $query = Subscription::where('customer_id', $customer->id)
-                            ->with(['service']);
+                            ->with(['subscribe']);
 
         // 상태 필터
         if ($status = $request->get('status')) {
@@ -634,8 +634,8 @@ class SubscriptionController extends Controller
         $transformedSubscriptions = $subscriptions->map(function ($subscription) {
             return [
                 'id' => $subscription->id,
-                'service_name' => $subscription->service->name,
-                'service_image' => $subscription->service->image_url,
+                'subscribe_name' => $subscription->subscribe->name,
+                'subscribe_image' => $subscription->subscribe->image_url,
                 'status' => $subscription->status,
                 'start_date' => $subscription->start_date,
                 'end_date' => $subscription->end_date,
@@ -649,8 +649,8 @@ class SubscriptionController extends Controller
             ];
         });
 
-        // 다가오는 서비스
-        $upcomingServices = ServiceExecution::whereIn('subscription_id', $subscriptions->pluck('id'))
+        // 다가오는 구독
+        $upcomingsubscribes = subscribeExecution::whereIn('subscription_id', $subscriptions->pluck('id'))
                                            ->where('status', 'scheduled')
                                            ->where('scheduled_date', '>', now())
                                            ->orderBy('scheduled_date')
@@ -659,8 +659,8 @@ class SubscriptionController extends Controller
                                            ->map(function ($execution) {
                                                return [
                                                    'subscription_id' => $execution->subscription_id,
-                                                   'service_date' => $execution->scheduled_date,
-                                                   'service_name' => $execution->subscription->service->name,
+                                                   'subscribe_date' => $execution->scheduled_date,
+                                                   'subscribe_name' => $execution->subscription->subscribe->name,
                                                    'engineer' => $execution->partner->name ?? 'To be assigned',
                                                    'status' => $execution->status
                                                ];
@@ -670,7 +670,7 @@ class SubscriptionController extends Controller
             'status' => 'success',
             'data' => [
                 'subscriptions' => $transformedSubscriptions,
-                'upcoming_services' => $upcomingServices,
+                'upcoming_subscribes' => $upcomingsubscribes,
                 'summary' => [
                     'total_subscriptions' => $subscriptions->count(),
                     'active_subscriptions' => $subscriptions->where('status', 'active')->count(),
@@ -689,10 +689,10 @@ class SubscriptionController extends Controller
             return response()->json(['error' => 'Subscription not found'], 404);
         }
 
-        $subscription->load(['service']);
+        $subscription->load(['subscribe']);
 
-        // 서비스 실행 이력
-        $serviceHistory = ServiceExecution::where('subscription_id', $subscription->id)
+        // 구독 실행 이력
+        $subscribeHistory = subscribeExecution::where('subscription_id', $subscription->id)
                                          ->orderBy('scheduled_date', 'desc')
                                          ->get()
                                          ->map(function ($execution) {
@@ -732,7 +732,7 @@ class SubscriptionController extends Controller
             'data' => [
                 'subscription' => [
                     'id' => $subscription->id,
-                    'service' => $subscription->service,
+                    'subscribe' => $subscription->subscribe,
                     'status' => $subscription->status,
                     'start_date' => $subscription->start_date,
                     'end_date' => $subscription->end_date,
@@ -743,7 +743,7 @@ class SubscriptionController extends Controller
                     'next_billing_date' => $subscription->next_billing_date,
                     'auto_renewal' => $subscription->auto_renewal
                 ],
-                'service_history' => $serviceHistory,
+                'subscribe_history' => $subscribeHistory,
                 'billing_history' => $billingHistory,
                 'options' => [
                     'can_cancel' => $this->canCancel($subscription),
@@ -755,7 +755,7 @@ class SubscriptionController extends Controller
         ], 200);
     }
 
-    public function subscribe(Request $request, Service $service)
+    public function subscribe(Request $request, subscribe $subscribe)
     {
         $customer = $request->input('authenticated_customer');
 
@@ -768,16 +768,16 @@ class SubscriptionController extends Controller
 
         // 중복 구독 확인
         $existingSubscription = Subscription::where('customer_id', $customer->id)
-                                          ->where('service_id', $service->id)
+                                          ->where('subscribe_id', $subscribe->id)
                                           ->whereIn('status', ['active', 'trial'])
                                           ->first();
 
         if ($existingSubscription) {
-            return response()->json(['error' => 'You already have an active subscription for this service'], 422);
+            return response()->json(['error' => 'You already have an active subscription for this subscribe'], 422);
         }
 
         // 구독 생성
-        $subscription = $this->subscriptionService->createSubscription($customer, $service, $validated);
+        $subscription = $this->subscriptionsubscribe->createSubscription($customer, $subscribe, $validated);
 
         return response()->json([
             'status' => 'success',
@@ -785,7 +785,7 @@ class SubscriptionController extends Controller
             'data' => [
                 'subscription' => [
                     'id' => $subscription->id,
-                    'service_name' => $subscription->service->name,
+                    'subscribe_name' => $subscription->subscribe->name,
                     'status' => $subscription->status,
                     'start_date' => $subscription->start_date,
                     'billing_cycle' => $subscription->billing_cycle,
@@ -817,7 +817,7 @@ class SubscriptionController extends Controller
         ]);
 
         // 취소 처리
-        $cancellationResult = $this->subscriptionService->cancelSubscription($subscription, $validated);
+        $cancellationResult = $this->subscriptionsubscribe->cancelSubscription($subscription, $validated);
 
         return response()->json([
             'status' => 'success',
@@ -849,7 +849,7 @@ class SubscriptionController extends Controller
         ]);
 
         // 수정 처리
-        $modificationResult = $this->subscriptionService->modifySubscription($subscription, $validated);
+        $modificationResult = $this->subscriptionsubscribe->modifySubscription($subscription, $validated);
 
         return response()->json([
             'status' => 'success',
@@ -875,7 +875,7 @@ class SubscriptionController extends Controller
             'reason' => 'required|string|max:500'
         ]);
 
-        $pauseResult = $this->subscriptionService->pauseSubscription($subscription, $validated);
+        $pauseResult = $this->subscriptionsubscribe->pauseSubscription($subscription, $validated);
 
         return response()->json([
             'status' => 'success',
@@ -895,7 +895,7 @@ class SubscriptionController extends Controller
             return response()->json(['error' => 'Subscription not found'], 404);
         }
 
-        $resumeResult = $this->subscriptionService->resumeSubscription($subscription);
+        $resumeResult = $this->subscriptionsubscribe->resumeSubscription($subscription);
 
         return response()->json([
             'status' => 'success',
@@ -916,17 +916,17 @@ class SubscriptionController extends Controller
         }
 
         // 모든 이력 정보 통합
-        $timeline = $this->subscriptionService->getSubscriptionTimeline($subscription);
+        $timeline = $this->subscriptionsubscribe->getSubscriptionTimeline($subscription);
 
         return response()->json([
             'status' => 'success',
             'data' => [
                 'timeline' => $timeline,
                 'statistics' => [
-                    'total_services' => $timeline->where('type', 'service_execution')->count(),
+                    'total_subscribes' => $timeline->where('type', 'subscribe_execution')->count(),
                     'total_payments' => $timeline->where('type', 'billing')->where('status', 'paid')->count(),
                     'total_paid' => $timeline->where('type', 'billing')->where('status', 'paid')->sum('amount'),
-                    'average_rating' => $timeline->where('type', 'service_execution')->whereNotNull('rating')->avg('rating')
+                    'average_rating' => $timeline->where('type', 'subscribe_execution')->whereNotNull('rating')->avg('rating')
                 ]
             ]
         ], 200);

@@ -1,13 +1,13 @@
 <?php
 
-namespace Jiny\Service\Http\Controllers\Admin\Services;
+namespace Jiny\Subscribe\Http\Controllers\Admin\subscribes;
 
 use Illuminate\Routing\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 /**
- * Services 생성 폼 컨트롤러
+ * subscribes 생성 폼 컨트롤러
  */
 class CreateController extends Controller
 {
@@ -16,16 +16,16 @@ class CreateController extends Controller
     public function __construct()
     {
         $this->config = [
-            'view' => 'jiny-service::admin.services.create',
-            'title' => 'Service 추가',
-            'subtitle' => '새로운 서비스를 추가합니다.',
+            'view' => 'jiny-subscribe::admin.services.create',
+            'title' => 'subscribe 추가',
+            'subtitle' => '새로운 구독를 추가합니다.',
         ];
     }
 
     public function __invoke(Request $request)
     {
-        // 활성화된 서비스 카테고리 목록 조회
-        $categories = DB::table('service_categories')
+        // 활성화된 구독 카테고리 목록 조회
+        $categories = DB::table('subscribe_categories')
             ->whereNull('deleted_at')
             ->where('enable', true)
             ->orderBy('pos')

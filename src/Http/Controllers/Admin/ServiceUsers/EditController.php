@@ -1,20 +1,20 @@
 <?php
 
-namespace Jiny\Service\Http\Controllers\Admin\ServiceUsers;
+namespace Jiny\Subscribe\Http\Controllers\Admin\subscribeUsers;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Jiny\Service\Models\ServiceUser;
-use Jiny\Service\Models\Service;
+use Jiny\Subscribe\Models\subscribeUser;
+use Jiny\Subscribe\Models\subscribe;
 
 class EditController extends Controller
 {
     public function __invoke(Request $request, $id)
     {
-        $serviceUser = ServiceUser::with(['service'])->findOrFail($id);
+        $subscribeUser = subscribeUser::with(['subscribe'])->findOrFail($id);
 
         // 폼에 필요한 데이터
-        $services = Service::where('enable', true)->orderBy('title')->get();
+        $subscribes = subscribe::where('enable', true)->orderBy('title')->get();
 
         $statusOptions = [
             'pending' => '대기',
@@ -56,15 +56,15 @@ class EditController extends Controller
         // 변경 가능 여부 체크
         $canEdit = [
             'user_info' => true, // 사용자 정보는 항상 수정 가능
-            'service' => $serviceUser->status !== 'active', // 활성 상태에서는 서비스 변경 불가
-            'billing' => in_array($serviceUser->status, ['pending', 'active']), // 결제 정보 수정 가능 상태
+            'subscribe' => $subscribeUser->status !== 'active', // 활성 상태에서는 구독 변경 불가
+            'billing' => in_array($subscribeUser->status, ['pending', 'active']), // 결제 정보 수정 가능 상태
             'dates' => true, // 날짜는 항상 수정 가능 (관리자)
             'status' => true, // 상태는 항상 변경 가능
         ];
 
-        return view('jiny-service::admin.service_users.edit', compact(
-            'serviceUser',
-            'services',
+        return view('jiny-subscribe::admin.service_users.edit', compact(
+            'subscribeUser',
+            'subscribes',
             'statusOptions',
             'billingCycleOptions',
             'paymentStatusOptions',

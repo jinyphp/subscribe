@@ -152,6 +152,6 @@
             </div>
         </div>
 
-        @includeIf('jiny-service::partials.navs.second.top', ['menuItems' => Site::menuItems('second')])
+        @includeIf('jiny-subscribe::partials.navs.second.top', ['menuItems' => Site::menuItems('second')])
     </div>
 </nav>

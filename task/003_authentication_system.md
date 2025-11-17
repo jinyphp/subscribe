@@ -14,7 +14,7 @@ Jiny 생태계 패키지 기반 3-tier 사용자 인증 시스템 구현
 
 ## 의존관계
 - **선행 태스크**: [002. 데이터베이스 스키마](002_database_schema.md)
-- **후속 태스크**: [004. 서비스 카탈로그](004_service_catalog.md)
+- **후속 태스크**: [004. 구독 카탈로그](004_subscribe_catalog.md)
 
 ## TDD 테스트 시나리오 (모두 HTTP 200 반환)
 
@@ -47,7 +47,7 @@ public function test_admin_middleware_blocks_non_admin()
     $user = User::factory()->create(['isAdmin' => false]);
 
     // When: 관리자 페이지 접근
-    $response = $this->actingAs($user)->get('/admin/service/catalog');
+    $response = $this->actingAs($user)->get('/admin/subscribe/catalog');
 
     // Then: 403 Forbidden
     $response->assertStatus(403);
@@ -85,7 +85,7 @@ public function test_jwt_protected_routes_return_200_with_valid_token()
     // When: 보호된 엔드포인트 접근
     $response = $this->withHeaders([
         'Authorization' => 'Bearer ' . $token
-    ])->get('/home/service/subscriptions');
+    ])->get('/home/subscribe/subscriptions');
 
     // Then: HTTP 200
     $response->assertStatus(200);
@@ -135,7 +135,7 @@ public function test_partner_middleware_blocks_non_partner()
 ```php
 <?php
 
-namespace Jiny\Service\Http\Middleware;
+namespace Jiny\Subscribe\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
@@ -218,7 +218,7 @@ class AdminMiddleware
 ```php
 <?php
 
-namespace Jiny\Service\Http\Controllers\Admin;
+namespace Jiny\Subscribe\Http\Controllers\Admin;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -228,7 +228,7 @@ class AdminLoginController extends Controller
 {
     public function showLoginForm()
     {
-        return view('jiny-service::admin.auth.login');
+        return view('jiny-subscribe::admin.auth.login');
     }
 
     public function login(Request $request)
@@ -328,22 +328,22 @@ class AdminLoginController extends Controller
 
 ### 2. Customer JWT 인증 (jiny/auth 패키지 확장)
 
-#### JWT Service (jiny/auth 패키지 기반)
+#### JWT subscribe (jiny/auth 패키지 기반)
 ```php
 <?php
 
-namespace Jiny\Service\Services;
+namespace Jiny\Subscribe\subscribes;
 
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 use Carbon\Carbon;
-use Jiny\Auth\Services\JWTAuthService; // jiny/auth 패키지 활용
+use Jiny\Auth\subscribes\JWTAuthsubscribe; // jiny/auth 패키지 활용
 
 /**
- * jiny/auth 패키지의 JWT 서비스를 확장하여 서비스 특화 기능 추가
+ * jiny/auth 패키지의 JWT 구독를 확장하여 구독 특화 기능 추가
  * 기존 JWT 인증 시스템과 완전 호환
  */
-class JWTService extends JWTAuthService
+class JWTsubscribe extends JWTAuthsubscribe
 {
     private string $secret;
     private string $algorithm = 'HS256';
@@ -423,19 +423,19 @@ class JWTService extends JWTAuthService
 ```php
 <?php
 
-namespace Jiny\Service\Http\Middleware;
+namespace Jiny\Subscribe\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use Jiny\Service\Services\JWTService;
+use Jiny\Subscribe\subscribes\JWTsubscribe;
 
 class JWTAuthMiddleware
 {
-    private JWTService $jwtService;
+    private JWTsubscribe $jwtsubscribe;
 
-    public function __construct(JWTService $jwtService)
+    public function __construct(JWTsubscribe $jwtsubscribe)
     {
-        $this->jwtService = $jwtService;
+        $this->jwtsubscribe = $jwtsubscribe;
     }
 
     public function handle(Request $request, Closure $next)
@@ -446,7 +446,7 @@ class JWTAuthMiddleware
             return response()->json(['error' => 'Token not provided'], 401);
         }
 
-        $customer = $this->jwtService->getCustomerFromToken($token);
+        $customer = $this->jwtsubscribe->getCustomerFromToken($token);
 
         if (!$customer) {
             return response()->json(['error' => 'Invalid or expired token'], 401);
@@ -461,7 +461,7 @@ class JWTAuthMiddleware
         $request->merge(['authenticated_customer' => $customer]);
 
         // 토큰 갱신 확인
-        $refreshedToken = $this->jwtService->refreshToken($token);
+        $refreshedToken = $this->jwtsubscribe->refreshToken($token);
         if ($refreshedToken) {
             // 새 토큰을 응답 헤더에 추가
             $response = $next($request);
@@ -488,22 +488,22 @@ class JWTAuthMiddleware
 ```php
 <?php
 
-namespace Jiny\Service\Http\Controllers\Customer;
+namespace Jiny\Subscribe\Http\Controllers\Customer;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Jiny\Service\Services\JWTService;
-use Jiny\Service\Services\CustomerShardService;
+use Jiny\Subscribe\subscribes\JWTsubscribe;
+use Jiny\Subscribe\subscribes\CustomerShardsubscribe;
 
 class CustomerAuthController extends Controller
 {
-    private JWTService $jwtService;
-    private CustomerShardService $shardService;
+    private JWTsubscribe $jwtsubscribe;
+    private CustomerShardsubscribe $shardsubscribe;
 
-    public function __construct(JWTService $jwtService, CustomerShardService $shardService)
+    public function __construct(JWTsubscribe $jwtsubscribe, CustomerShardsubscribe $shardsubscribe)
     {
-        $this->jwtService = $jwtService;
-        $this->shardService = $shardService;
+        $this->jwtsubscribe = $jwtsubscribe;
+        $this->shardsubscribe = $shardsubscribe;
     }
 
     public function login(Request $request)
@@ -514,7 +514,7 @@ class CustomerAuthController extends Controller
         ]);
 
         // 샤드에서 고객 찾기
-        $customer = $this->shardService->findCustomerByEmail($credentials['email']);
+        $customer = $this->shardsubscribe->findCustomerByEmail($credentials['email']);
 
         if (!$customer || !Hash::check($credentials['password'], $customer->password)) {
             return response()->json(['error' => 'Invalid credentials'], 401);
@@ -526,7 +526,7 @@ class CustomerAuthController extends Controller
         }
 
         // JWT 토큰 생성
-        $token = $this->jwtService->generateToken([
+        $token = $this->jwtsubscribe->generateToken([
             'customer_id' => $customer->id,
             'shard' => $customer->shard,
             'email' => $customer->email
@@ -557,10 +557,10 @@ class CustomerAuthController extends Controller
         ]);
 
         // 샤드 선택
-        $shard = $this->shardService->selectShardForNewCustomer();
+        $shard = $this->shardsubscribe->selectShardForNewCustomer();
 
         // 고객 생성
-        $customer = $this->shardService->createCustomer($shard, [
+        $customer = $this->shardsubscribe->createCustomer($shard, [
             'name' => $data['name'],
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
@@ -591,7 +591,7 @@ class CustomerAuthController extends Controller
             return response()->json(['error' => 'Token not provided'], 401);
         }
 
-        $newToken = $this->jwtService->refreshToken($token);
+        $newToken = $this->jwtsubscribe->refreshToken($token);
 
         if (!$newToken) {
             return response()->json(['error' => 'Cannot refresh token'], 401);
@@ -629,7 +629,7 @@ class CustomerAuthController extends Controller
 ```php
 <?php
 
-namespace Jiny\Service\Http\Middleware;
+namespace Jiny\Subscribe\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
@@ -685,19 +685,19 @@ class PartnerVerificationMiddleware
 }
 ```
 
-## Customer Shard Service (jiny/auth 패키지 확장)
+## Customer Shard subscribe (jiny/auth 패키지 확장)
 
 ```php
 <?php
 
-namespace Jiny\Service\Services;
+namespace Jiny\Subscribe\subscribes;
 
-use Jiny\Auth\Services\UserShardService; // jiny/auth 패키지 활용
+use Jiny\Auth\subscribes\UserShardsubscribe; // jiny/auth 패키지 활용
 
 /**
- * jiny/auth 패키지의 UserShardService를 확장하여 서비스 특화 기능 추가
+ * jiny/auth 패키지의 UserShardsubscribe를 확장하여 구독 특화 기능 추가
  */
-class CustomerShardService extends UserShardService
+class CustomerShardsubscribe extends UserShardsubscribe
 {
     // jiny/auth 패키지 설정에서 샤드 설정을 읽어옴
     private int $shardCount;
@@ -848,7 +848,7 @@ class CustomerShardService extends UserShardService
   - [ ] 테스트: HTTP 200 반환
 
 ### Customer JWT 인증
-- [ ] **JWT Service 구현**
+- [ ] **JWT subscribe 구현**
   - [ ] 토큰 생성/검증
   - [ ] 토큰 갱신 로직
   - [ ] 고객 정보 추출
@@ -877,7 +877,7 @@ class CustomerShardService extends UserShardService
   - [ ] 활동 로그 기록
   - [ ] 테스트: HTTP 200 반환
 
-### Customer Shard Service
+### Customer Shard subscribe
 - [ ] **샤드 관리 로직**
   - [ ] 이메일 기반 고객 검색
   - [ ] 신규 고객 샤드 선택
@@ -922,4 +922,4 @@ class CustomerShardService extends UserShardService
 ---
 
 **이전 태스크**: [002. 데이터베이스 스키마](002_database_schema.md)
-**다음 태스크**: [004. 서비스 카탈로그 관리](004_service_catalog.md)
+**다음 태스크**: [004. 구독 카탈로그 관리](004_subscribe_catalog.md)

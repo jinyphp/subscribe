@@ -1,6 +1,6 @@
 <?php
 
-namespace Jiny\Service\Models;
+namespace Jiny\Subscribe\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -12,12 +12,12 @@ class ServicePayment extends Model
 {
     use HasFactory, SoftDeletes;
 
-    protected $table = 'service_payments';
+    protected $table = 'subscribe_payments';
 
     protected $fillable = [
-        'service_user_id',
+        'subscribe_user_id',
         'user_uuid',
-        'service_id',
+        'subscribe_id',
         'payment_uuid',
         'transaction_id',
         'order_id',
@@ -74,14 +74,14 @@ class ServicePayment extends Model
     }
 
     // Relationships
-    public function serviceUser(): BelongsTo
+    public function subscribeUser(): BelongsTo
     {
-        return $this->belongsTo(ServiceUser::class, 'service_user_id');
+        return $this->belongsTo(subscribeUser::class, 'subscribe_user_id');
     }
 
-    public function service(): BelongsTo
+    public function subscribe(): BelongsTo
     {
-        return $this->belongsTo(Service::class, 'service_id');
+        return $this->belongsTo(subscribe::class, 'subscribe_id');
     }
 
     // Scopes
@@ -110,9 +110,9 @@ class ServicePayment extends Model
         return $query->where('user_uuid', $userUuid);
     }
 
-    public function scopeByService($query, $serviceId)
+    public function scopeBysubscribe($query, $subscribeId)
     {
-        return $query->where('service_id', $serviceId);
+        return $query->where('subscribe_id', $subscribeId);
     }
 
     public function scopeByMethod($query, $method)
@@ -173,9 +173,9 @@ class ServicePayment extends Model
         ]);
 
         // 구독 사용자 정보 업데이트
-        if ($this->serviceUser) {
-            $this->serviceUser->increment('total_paid', $this->final_amount);
-            $this->serviceUser->update(['payment_status' => 'completed']);
+        if ($this->subscribeUser) {
+            $this->subscribeUser->increment('total_paid', $this->final_amount);
+            $this->subscribeUser->update(['payment_status' => 'completed']);
         }
 
         return $this;
@@ -190,8 +190,8 @@ class ServicePayment extends Model
         ]);
 
         // 구독 사용자 정보 업데이트
-        if ($this->serviceUser) {
-            $this->serviceUser->update(['payment_status' => 'failed']);
+        if ($this->subscribeUser) {
+            $this->subscribeUser->update(['payment_status' => 'failed']);
         }
 
         return $this;
@@ -221,9 +221,9 @@ class ServicePayment extends Model
         ]);
 
         // 구독 사용자 정보 업데이트
-        if ($this->serviceUser) {
-            $this->serviceUser->increment('refund_amount', $refundAmount);
-            $this->serviceUser->update(['refunded_at' => now()]);
+        if ($this->subscribeUser) {
+            $this->subscribeUser->increment('refund_amount', $refundAmount);
+            $this->subscribeUser->update(['refunded_at' => now()]);
         }
 
         return $this;

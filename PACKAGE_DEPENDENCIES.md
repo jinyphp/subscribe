@@ -1,7 +1,7 @@
-# Jiny Service Package Dependencies
+# Jiny subscribe Package Dependencies
 
 ## 개요
-이 문서는 `jiny/service` 패키지가 기존 Jiny 생태계 패키지들과 어떻게 통합되는지 설명합니다.
+이 문서는 `jiny/subscribe` 패키지가 기존 Jiny 생태계 패키지들과 어떻게 통합되는지 설명합니다.
 
 ## 주요 의존성
 
@@ -23,12 +23,12 @@
 #### 통합 방식
 ```php
 // 기존 jiny/admin 미들웨어 활용
-Route::middleware(['admin'])->prefix('admin/service')->group(function () {
-    // 서비스 관리 라우트들
+Route::middleware(['admin'])->prefix('admin/subscribe')->group(function () {
+    // 구독 관리 라우트들
 });
 
 // 기존 Admin 사이드바 확장
-@include('jiny-service::partials.admin.sidebar')
+@include('jiny-subscribe::partials.admin.sidebar')
 ```
 
 ### 2. jiny/auth 패키지
@@ -49,13 +49,13 @@ Route::middleware(['admin'])->prefix('admin/service')->group(function () {
 #### 통합 방식
 ```php
 // 기존 jiny/auth JWT 시스템 활용
-Route::middleware(['jwt.auth'])->prefix('home/service')->group(function () {
-    // 고객 서비스 라우트들
+Route::middleware(['jwt.auth'])->prefix('home/subscribe')->group(function () {
+    // 고객 구독 라우트들
 });
 
 // 파트너용 추가 검증
 Route::middleware(['jwt.auth', 'partner.verify'])->prefix('partner')->group(function () {
-    // 파트너 서비스 라우트들
+    // 파트너 구독 라우트들
 });
 ```
 
@@ -67,7 +67,7 @@ Route::middleware(['jwt.auth', 'partner.verify'])->prefix('partner')->group(func
 테이블: users (중앙집중)
 인증: 세션 기반
 미들웨어: admin
-접근: /admin/service/*
+접근: /admin/subscribe/*
 권한: isAdmin = true, utype 검증
 ```
 
@@ -79,7 +79,7 @@ Route::middleware(['jwt.auth', 'partner.verify'])->prefix('partner')->group(func
   - 예: users_001 ~ users_099 (기본값)
 인증: JWT 토큰
 미들웨어: jwt.auth
-접근: /home/service/*
+접근: /home/subscribe/*
 확장: 대용량 사용자 지원
 ```
 
@@ -106,12 +106,12 @@ Route::middleware(['jwt.auth', 'partner.verify'])->prefix('partner')->group(func
 - `admin_user_logs` (jiny/admin): 관리자 활동 로그
 
 ### 새로 추가되는 테이블
-- `services`: 서비스 카탈로그
+- `subscribes`: 구독 카탈로그
 - `subscriptions`: 구독 관리 (customer_id → users_0xx 참조)
 - `partners`: 파트너 트리 구조 (user_id → users_0xx 참조)
 - `partner_commissions`: 커미션 관리
 - `free_trial_configs`: 무료 체험 설정
-- `service_executions`: 서비스 실행 이력
+- `subscribe_executions`: 구독 실행 이력
 
 ### 외래 키 관계 (jiny/auth 설정 기반)
 ```sql
@@ -126,28 +126,28 @@ ADD COLUMN customer_shard VARCHAR(3) NOT NULL COMMENT '고객 샤드 번호 (jin
 ALTER TABLE partners
 ADD COLUMN user_shard VARCHAR(3) NOT NULL COMMENT '사용자 샤드 번호 (jiny/auth 설정 기반)';
 
--- CustomerShardService에서 동적으로 처리
+-- CustomerShardsubscribe에서 동적으로 처리
 -- $shardCount = config('jiny-auth.sharding.shard_count', 100);
 -- $tablePrefix = config('jiny-auth.sharding.table_prefix', 'users_');
 ```
 
 ## 라우트 구조
 
-### 관리자 라우트 (`/admin/service/*`)
+### 관리자 라우트 (`/admin/subscribe/*`)
 ```php
 // jiny/admin 패키지 미들웨어 활용
-Route::middleware(['admin'])->prefix('admin/service')->group(function () {
-    Route::resource('catalog', AdminServiceCatalogController::class);
+Route::middleware(['admin'])->prefix('admin/subscribe')->group(function () {
+    Route::resource('catalog', AdminsubscribeCatalogController::class);
     Route::resource('subscriptions', AdminSubscriptionController::class);
     Route::resource('partners', AdminPartnerController::class);
 });
 ```
 
-### 고객 라우트 (`/home/service/*`)
+### 고객 라우트 (`/home/subscribe/*`)
 ```php
 // jiny/auth 패키지 JWT 미들웨어 활용
-Route::middleware(['jwt.auth'])->prefix('home/service')->group(function () {
-    Route::get('catalog', [CustomerServiceController::class, 'catalog']);
+Route::middleware(['jwt.auth'])->prefix('home/subscribe')->group(function () {
+    Route::get('catalog', [CustomersubscribeController::class, 'catalog']);
     Route::resource('subscriptions', CustomerSubscriptionController::class);
     Route::resource('trials', CustomerTrialController::class);
 });
@@ -169,17 +169,17 @@ Route::middleware(['jwt.auth', 'partner.verify'])->prefix('partner')->group(func
 ```bash
 composer require jiny/admin:^1.0
 composer require jiny/auth:^0.5
-composer require jiny/service:^1.0
+composer require jiny/subscribe:^1.0
 ```
 
-### 2. 서비스 프로바이더 등록
+### 2. 구독 프로바이더 등록
 ```php
 // config/app.php
 'providers' => [
     // ...
-    Jiny\Admin\JinyAdminServiceProvider::class,
-    Jiny\Auth\JinyAuthServiceProvider::class,
-    Jiny\Service\JinyServiceServiceProvider::class,
+    Jiny\Admin\JinyAdminsubscribeProvider::class,
+    Jiny\Auth\JinyAuthsubscribeProvider::class,
+    Jiny\Subscribe\JinysubscribesubscribeProvider::class,
 ],
 ```
 
@@ -192,7 +192,7 @@ protected $routeMiddleware = [
     'jwt.auth' => \Jiny\Auth\Http\Middleware\JWTAuthMiddleware::class,
 
     // 새로 추가되는 미들웨어
-    'partner.verify' => \Jiny\Service\Http\Middleware\PartnerVerificationMiddleware::class,
+    'partner.verify' => \Jiny\Subscribe\Http\Middleware\PartnerVerificationMiddleware::class,
 ];
 ```
 
@@ -202,8 +202,8 @@ protected $routeMiddleware = [
 php artisan migrate --path=vendor/jiny/admin/database/migrations
 php artisan migrate --path=vendor/jiny/auth/database/migrations
 
-# 새로운 서비스 마이그레이션
-php artisan migrate --path=vendor/jiny/service/database/migrations
+# 새로운 구독 마이그레이션
+php artisan migrate --path=vendor/jiny/subscribe/database/migrations
 ```
 
 ## 개발 시 주의사항
@@ -230,15 +230,15 @@ php artisan migrate --path=vendor/jiny/service/database/migrations
 
 ## 버전 호환성
 
-| jiny/service | jiny/admin | jiny/auth | Laravel |
+| jiny/subscribe | jiny/admin | jiny/auth | Laravel |
 |-------------|------------|-----------|---------|
 | 1.0.x       | ^1.0       | ^0.5      | ^10.0   |
 | 1.1.x       | ^1.0       | ^0.5      | ^10.0   |
 
 ## 지원 및 문의
 
-- **문서**: `/vendor/jiny/service/docs/`
-- **예제**: `/vendor/jiny/service/docs/sample01.md`, `sample02.md`
-- **태스크**: `/vendor/jiny/service/task/001_project_overview.md` ~ `016_implementation_checklist.md`
-- **GitHub**: https://github.com/jinyphp/service
+- **문서**: `/vendor/jiny/subscribe/docs/`
+- **예제**: `/vendor/jiny/subscribe/docs/sample01.md`, `sample02.md`
+- **태스크**: `/vendor/jiny/subscribe/task/001_project_overview.md` ~ `016_implementation_checklist.md`
+- **GitHub**: https://github.com/jinyphp/subscribe
 - **Issues**: 기존 Jiny 패키지와의 통합 문제는 각 패키지 저장소에 문의

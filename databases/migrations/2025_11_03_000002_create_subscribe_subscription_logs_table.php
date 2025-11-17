@@ -11,13 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('service_subscription_logs', function (Blueprint $table) {
+        Schema::create('subscribe_subscription_logs', function (Blueprint $table) {
             $table->id();
 
             // 관련 구독 정보
-            $table->unsignedBigInteger('service_user_id')->index();
+            $table->unsignedBigInteger('subscribe_user_id')->index();
             $table->string('user_uuid')->index();
-            $table->unsignedBigInteger('service_id')->index();
+            $table->unsignedBigInteger('subscribe_id')->index();
 
             // 액션 정보
             $table->enum('action', [
@@ -76,13 +76,13 @@ return new class extends Migration
             // 인덱스
             $table->index(['action', 'created_at']);
             $table->index(['user_uuid', 'action']);
-            $table->index(['service_id', 'action']);
+            $table->index(['subscribe_id', 'action']);
             $table->index(['processed_by', 'created_at']);
             $table->index(['result', 'created_at']);
 
             // 외래키
-            $table->foreign('service_user_id')->references('id')->on('service_users')->onDelete('cascade');
-            $table->foreign('service_id')->references('id')->on('services')->onDelete('cascade');
+            $table->foreign('subscribe_user_id')->references('id')->on('subscribe_users')->onDelete('cascade');
+            $table->foreign('subscribe_id')->references('id')->on('subscribes')->onDelete('cascade');
         });
     }
 
@@ -91,6 +91,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('service_subscription_logs');
+        Schema::dropIfExists('subscribe_subscription_logs');
     }
 };

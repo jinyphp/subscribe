@@ -1,8 +1,8 @@
 <?php
 
-namespace Jiny\Service\Http\Controllers\Admin;
+namespace Jiny\Subscribe\Http\Controllers\Admin;
 
-use Jiny\Service\Models\ServiceProvider;
+use Jiny\Subscribe\Models\ServiceProvider;
 use App\Models\User;
 use Illuminate\Http\Request;
 
@@ -12,7 +12,7 @@ class ServiceProviderController extends BaseAdminController
     {
         parent::__construct();
         $this->model = ServiceProvider::class;
-        $this->viewPath = 'jiny-service::admin.service-providers';
+        $this->viewPath = 'jiny-subscribe::admin.service-providers';
         $this->routePrefix = 'service-providers';
         $this->title = '서비스 제공자';
     }
@@ -108,8 +108,8 @@ class ServiceProviderController extends BaseAdminController
 
     public function create()
     {
-        // 서비스 제공자가 아닌 사용자만 선택 가능
-        $users = User::whereDoesntHave('serviceProvider')->orderBy('name')->get();
+        // 구독 제공자가 아닌 사용자만 선택 가능
+        $users = User::whereDoesntHave('subscribeProvider')->orderBy('name')->get();
 
         return view("{$this->viewPath}.create", [
             'users' => $users,
@@ -122,7 +122,7 @@ class ServiceProviderController extends BaseAdminController
     {
         $item = $this->model::with('user')->findOrFail($id);
         $users = User::where('id', $item->user_id)
-                    ->orWhereDoesntHave('serviceProvider')
+                    ->orWhereDoesntHave('subscribeProvider')
                     ->orderBy('name')->get();
 
         return view("{$this->viewPath}.edit", [
@@ -249,7 +249,7 @@ class ServiceProviderController extends BaseAdminController
         $provider->update(['status' => 'suspended']);
 
         return redirect()->route("admin.{$this->routePrefix}.show", $id)
-            ->with('success', '서비스 제공자 계정이 정지되었습니다.');
+            ->with('success', '구독 제공자 계정이 정지되었습니다.');
     }
 
     /**
@@ -267,7 +267,7 @@ class ServiceProviderController extends BaseAdminController
         $provider->update(['status' => 'active']);
 
         return redirect()->route("admin.{$this->routePrefix}.show", $id)
-            ->with('success', '서비스 제공자 계정이 활성화되었습니다.');
+            ->with('success', '구독 제공자 계정이 활성화되었습니다.');
     }
 
     /**

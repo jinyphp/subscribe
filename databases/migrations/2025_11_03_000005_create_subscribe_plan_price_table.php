@@ -14,15 +14,15 @@ return new class extends Migration
      */
     public function up()
     {
-        // 서비스 플랜 가격 옵션 테이블
-        Schema::create('service_plan_price', function (Blueprint $table) {
+        // 구독 플랜 가격 옵션 테이블
+        Schema::create('subscribe_plan_price', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
             $table->softDeletes();
 
             // 기본 정보
-            $table->unsignedBigInteger('service_plan_id');
-            $table->foreign('service_plan_id')->references('id')->on('service_plans')->onDelete('cascade');
+            $table->unsignedBigInteger('subscribe_plan_id');
+            $table->foreign('subscribe_plan_id')->references('id')->on('subscribe_plans')->onDelete('cascade');
 
             $table->boolean('enable')->default(true);
             $table->integer('pos')->default(0); // 정렬 순서
@@ -56,16 +56,16 @@ return new class extends Migration
             $table->date('valid_from')->nullable(); // 유효 시작일
             $table->date('valid_until')->nullable(); // 유효 종료일
 
-            $table->index(['service_plan_id', 'enable']);
+            $table->index(['subscribe_plan_id', 'enable']);
             $table->index(['billing_period', 'enable']);
             $table->index(['is_popular', 'pos']);
         });
 
-        // Insert default service plan price options
-        DB::table('service_plan_price')->insert([
+        // Insert default subscribe plan price options
+        DB::table('subscribe_plan_price')->insert([
             // 웹사이트 기본 플랜 가격 옵션들
             [
-                'service_plan_id' => 1, // 기본 웹사이트 플랜
+                'subscribe_plan_id' => 1, // 기본 웹사이트 플랜
                 'name' => '월간 구독',
                 'code' => 'web-basic-monthly',
                 'description' => '매월 결제하는 기본 웹사이트 플랜',
@@ -85,7 +85,7 @@ return new class extends Migration
                 'updated_at' => now(),
             ],
             [
-                'service_plan_id' => 1, // 기본 웹사이트 플랜
+                'subscribe_plan_id' => 1, // 기본 웹사이트 플랜
                 'name' => '연간 구독',
                 'code' => 'web-basic-yearly',
                 'description' => '연간 결제로 20% 할인 혜택',
@@ -106,7 +106,7 @@ return new class extends Migration
             ],
             // 프로 웹사이트 플랜 가격 옵션들
             [
-                'service_plan_id' => 2, // 프로 웹사이트 플랜
+                'subscribe_plan_id' => 2, // 프로 웹사이트 플랜
                 'name' => '월간 구독',
                 'code' => 'web-pro-monthly',
                 'description' => '매월 결제하는 프로 웹사이트 플랜',
@@ -126,7 +126,7 @@ return new class extends Migration
                 'updated_at' => now(),
             ],
             [
-                'service_plan_id' => 2, // 프로 웹사이트 플랜
+                'subscribe_plan_id' => 2, // 프로 웹사이트 플랜
                 'name' => '연간 구독',
                 'code' => 'web-pro-yearly',
                 'description' => '연간 결제로 17% 할인 혜택',
@@ -147,7 +147,7 @@ return new class extends Migration
             ],
             // 모바일 앱 플랜 가격 옵션들
             [
-                'service_plan_id' => 3, // 기본 모바일 앱 플랜
+                'subscribe_plan_id' => 3, // 기본 모바일 앱 플랜
                 'name' => '월간 구독',
                 'code' => 'mobile-basic-monthly',
                 'description' => '매월 결제하는 기본 모바일 앱 플랜',
@@ -167,7 +167,7 @@ return new class extends Migration
                 'updated_at' => now(),
             ],
             [
-                'service_plan_id' => 4, // 기본 디자인 패키지
+                'subscribe_plan_id' => 4, // 기본 디자인 패키지
                 'name' => '일회성 결제',
                 'code' => 'design-basic-once',
                 'description' => '한 번만 결제하는 기본 디자인 패키지',
@@ -196,6 +196,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('service_plan_price');
+        Schema::dropIfExists('subscribe_plan_price');
     }
 };

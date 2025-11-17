@@ -1,16 +1,16 @@
 <?php
 
-namespace Jiny\Service\Http\Controllers\Admin\Categories;
+namespace Jiny\Subscribe\Http\Controllers\Admin\Categories;
 
 use Illuminate\Routing\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 /**
- * Service Categories 삭제 컨트롤러
+ * subscribe Categories 삭제 컨트롤러
  *
  * 진입 경로:
- * Route::delete('/admin/service/categories/{id}') → DestroyController::__invoke()
+ * Route::delete('/admin/subscribe/categories/{id}') → DestroyController::__invoke()
  */
 class DestroyController extends Controller
 {
@@ -24,8 +24,8 @@ class DestroyController extends Controller
     protected function loadConfig()
     {
         $this->config = [
-            'table' => 'service_categories',
-            'redirect_route' => 'admin.service.categories.index',
+            'table' => 'subscribe_categories',
+            'redirect_route' => 'admin.subscribe.categories.index',
         ];
     }
 
@@ -42,16 +42,16 @@ class DestroyController extends Controller
         }
 
         try {
-            // Check if category has services
-            $serviceCount = DB::table('site_services')
+            // Check if category has subscribes
+            $subscribeCount = DB::table('site_subscribes')
                 ->where('category_id', $id)
                 ->whereNull('deleted_at')
                 ->count();
 
-            if ($serviceCount > 0) {
+            if ($subscribeCount > 0) {
                 return redirect()
                     ->route($this->config['redirect_route'])
-                    ->with('error', '이 카테고리에 속한 서비스가 ' . $serviceCount . '개 있어서 삭제할 수 없습니다. 먼저 서비스들을 다른 카테고리로 이동하거나 삭제해주세요.');
+                    ->with('error', '이 카테고리에 속한 구독가 ' . $subscribeCount . '개 있어서 삭제할 수 없습니다. 먼저 구독들을 다른 카테고리로 이동하거나 삭제해주세요.');
             }
 
             // Check if category has subcategories

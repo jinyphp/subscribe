@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('service_store', function (Blueprint $table) {
+        Schema::create('subscribe_store', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
             $table->timestamp('deleted_at')->nullable();
@@ -38,7 +38,7 @@ return new class extends Migration
             $table->string('image')->nullable();
             $table->text('images')->nullable(); // JSON
 
-            // 서비스 상세 정보
+            // 구독 상세 정보
             $table->text('features')->nullable(); // JSON
             $table->text('specifications')->nullable(); // JSON
             $table->string('tags')->nullable();
@@ -47,7 +47,7 @@ return new class extends Migration
             $table->string('meta_title')->nullable();
             $table->text('meta_description')->nullable();
 
-            // 서비스 옵션
+            // 구독 옵션
             $table->boolean('enable_purchase')->default(true);
             $table->boolean('enable_cart')->default(true);
             $table->boolean('enable_quote')->default(true);
@@ -57,7 +57,7 @@ return new class extends Migration
             // 관리자
             $table->string('manager')->nullable();
 
-            // 서비스 특화 필드
+            // 구독 특화 필드
             $table->string('duration')->nullable(); // 소요 기간
             $table->text('deliverables')->nullable(); // JSON - 결과물
             $table->integer('revision_limit')->nullable(); // 수정 횟수 제한
@@ -77,6 +77,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('service_store');
+        Schema::dropIfExists('subscribe_store');
     }
 };

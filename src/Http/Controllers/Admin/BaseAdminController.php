@@ -1,6 +1,6 @@
 <?php
 
-namespace Jiny\Service\Http\Controllers\Admin;
+namespace Jiny\Subscribe\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;

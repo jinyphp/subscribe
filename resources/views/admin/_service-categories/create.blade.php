@@ -1,4 +1,4 @@
-@extends($layout ?? 'jiny-service::layouts.admin.sidebar')
+@extends($layout ?? 'jiny-subscribe::layouts.admin.sidebar')
 
 @section('title', $title . ' 추가')
 
@@ -12,7 +12,7 @@
                     <h1 class="mb-0 h2 fw-bold">{{ $title }} 추가</h1>
                     <nav aria-label="breadcrumb">
                         <ol class="breadcrumb">
-                            <li class="breadcrumb-item"><a href="/admin/service">대시보드</a></li>
+                            <li class="breadcrumb-item"><a href="/admin/subscribe">대시보드</a></li>
                             <li class="breadcrumb-item"><a href="{{ route('admin.' . $routePrefix . '.index') }}">{{ $title }}</a></li>
                             <li class="breadcrumb-item active" aria-current="page">추가</li>
                         </ol>

@@ -1,4 +1,4 @@
-@extends('jiny-service::layouts.admin.sidebar')
+@extends('jiny-subscribe::layouts.admin.sidebar')
 
 @section('content')
 <div class="container-fluid">
@@ -7,11 +7,11 @@
         <div class="col-12">
             <div class="d-flex justify-content-between align-items-center">
                 <div>
-                    <h2 class="mb-1">서비스 구독자 관리</h2>
-                    <p class="text-muted mb-0">서비스를 구독하고 있는 사용자들을 관리합니다.</p>
+                    <h2 class="mb-1">구독 구독자 관리</h2>
+                    <p class="text-muted mb-0">구독를 구독하고 있는 사용자들을 관리합니다.</p>
                 </div>
                 <div>
-                    <a href="{{ route('admin.service.users.create') }}" class="btn btn-primary">
+                    <a href="{{ route('admin.subscribe.users.create') }}" class="btn btn-primary">
                         <i class="fe fe-plus me-2"></i>새 구독자 추가
                     </a>
                 </div>
@@ -129,7 +129,7 @@
     <!-- 필터 -->
     <div class="card mb-4">
         <div class="card-body">
-            <form method="GET" action="{{ route('admin.service.users.index') }}">
+            <form method="GET" action="{{ route('admin.subscribe.users.index') }}">
                 <div class="row">
                     <div class="col-md-2">
                         <div class="form-group">
@@ -153,12 +153,12 @@
                     </div>
                     <div class="col-md-2">
                         <div class="form-group">
-                            <label for="service_id">서비스</label>
-                            <select id="service_id" name="service_id" class="form-control">
+                            <label for="subscribe_id">구독</label>
+                            <select id="subscribe_id" name="subscribe_id" class="form-control">
                                 <option value="">전체</option>
-                                @foreach($services as $service)
-                                    <option value="{{ $service->id }}" {{ request('service_id') == $service->id ? 'selected' : '' }}>
-                                        {{ $service->title }}
+                                @foreach($subscribes as $subscribe)
+                                    <option value="{{ $subscribe->id }}" {{ request('subscribe_id') == $subscribe->id ? 'selected' : '' }}>
+                                        {{ $subscribe->title }}
                                     </option>
                                 @endforeach
                             </select>
@@ -194,7 +194,7 @@
                         <button type="submit" class="btn btn-outline-primary me-2">
                             <i class="fe fe-search me-1"></i>검색
                         </button>
-                        <a href="{{ route('admin.service.users.index') }}" class="btn btn-outline-secondary">
+                        <a href="{{ route('admin.subscribe.users.index') }}" class="btn btn-outline-secondary">
                             <i class="fe fe-refresh-cw me-1"></i>초기화
                         </a>
                     </div>
@@ -209,13 +209,13 @@
             <h5 class="mb-0">구독자 목록</h5>
         </div>
         <div class="card-body p-0">
-            @if($serviceUsers->count() > 0)
+            @if($subscribeUsers->count() > 0)
                 <div class="table-responsive">
                     <table class="table table-hover mb-0">
                         <thead class="table-light">
                             <tr>
                                 <th>사용자</th>
-                                <th>서비스</th>
+                                <th>구독</th>
                                 <th>플랜</th>
                                 <th>상태</th>
                                 <th>결제 주기</th>
@@ -225,7 +225,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach($serviceUsers as $serviceUser)
+                            @foreach($subscribeUsers as $subscribeUser)
                             <tr>
                                 <td>
                                     <div class="d-flex align-items-center">
@@ -235,20 +235,20 @@
                                             </div>
                                         </div>
                                         <div>
-                                            <strong>{{ $serviceUser->user_name ?? '이름 없음' }}</strong>
-                                            <div class="small text-muted">{{ $serviceUser->user_email }}</div>
-                                            <div class="small text-muted">Shard: {{ $serviceUser->user_shard }}</div>
+                                            <strong>{{ $subscribeUser->user_name ?? '이름 없음' }}</strong>
+                                            <div class="small text-muted">{{ $subscribeUser->user_email }}</div>
+                                            <div class="small text-muted">Shard: {{ $subscribeUser->user_shard }}</div>
                                         </div>
                                     </div>
                                 </td>
                                 <td>
-                                    <strong>{{ $serviceUser->service->title ?? $serviceUser->service_title }}</strong>
+                                    <strong>{{ $subscribeUser->subscribe->title ?? $subscribeUser->subscribe_title }}</strong>
                                 </td>
                                 <td>
-                                    @if($serviceUser->plan_name)
-                                        <strong>{{ $serviceUser->plan_name }}</strong>
-                                        @if($serviceUser->plan_price > 0)
-                                            <div class="small text-muted">₩{{ number_format($serviceUser->plan_price) }}</div>
+                                    @if($subscribeUser->plan_name)
+                                        <strong>{{ $subscribeUser->plan_name }}</strong>
+                                        @if($subscribeUser->plan_price > 0)
+                                            <div class="small text-muted">₩{{ number_format($subscribeUser->plan_price) }}</div>
                                         @endif
                                     @else
                                         <span class="text-muted">-</span>
@@ -256,49 +256,49 @@
                                 </td>
                                 <td>
                                     <span class="badge bg-{{
-                                        $serviceUser->status === 'active' ? 'success' :
-                                        ($serviceUser->status === 'pending' ? 'warning' :
-                                        ($serviceUser->status === 'suspended' ? 'info' :
-                                        ($serviceUser->status === 'cancelled' ? 'secondary' : 'danger')))
+                                        $subscribeUser->status === 'active' ? 'success' :
+                                        ($subscribeUser->status === 'pending' ? 'warning' :
+                                        ($subscribeUser->status === 'suspended' ? 'info' :
+                                        ($subscribeUser->status === 'cancelled' ? 'secondary' : 'danger')))
                                     }}">
                                         {{
-                                            $serviceUser->status === 'active' ? '활성' :
-                                            ($serviceUser->status === 'pending' ? '대기' :
-                                            ($serviceUser->status === 'suspended' ? '일시정지' :
-                                            ($serviceUser->status === 'cancelled' ? '취소' : '만료')))
+                                            $subscribeUser->status === 'active' ? '활성' :
+                                            ($subscribeUser->status === 'pending' ? '대기' :
+                                            ($subscribeUser->status === 'suspended' ? '일시정지' :
+                                            ($subscribeUser->status === 'cancelled' ? '취소' : '만료')))
                                         }}
                                     </span>
-                                    @if($serviceUser->is_expiring_soon && $serviceUser->status === 'active')
+                                    @if($subscribeUser->is_expiring_soon && $subscribeUser->status === 'active')
                                         <div class="small text-warning">곧 만료</div>
                                     @endif
                                 </td>
                                 <td>
                                     <span class="badge bg-light text-dark">
                                         {{
-                                            $serviceUser->billing_cycle === 'monthly' ? '월간' :
-                                            ($serviceUser->billing_cycle === 'quarterly' ? '분기' :
-                                            ($serviceUser->billing_cycle === 'yearly' ? '연간' : '평생'))
+                                            $subscribeUser->billing_cycle === 'monthly' ? '월간' :
+                                            ($subscribeUser->billing_cycle === 'quarterly' ? '분기' :
+                                            ($subscribeUser->billing_cycle === 'yearly' ? '연간' : '평생'))
                                         }}
                                     </span>
                                 </td>
                                 <td>
-                                    @if($serviceUser->expires_at)
-                                        <span class="{{ $serviceUser->is_expired ? 'text-danger' : ($serviceUser->is_expiring_soon ? 'text-warning' : '') }}">
-                                            {{ $serviceUser->expires_at->format('Y-m-d') }}
+                                    @if($subscribeUser->expires_at)
+                                        <span class="{{ $subscribeUser->is_expired ? 'text-danger' : ($subscribeUser->is_expiring_soon ? 'text-warning' : '') }}">
+                                            {{ $subscribeUser->expires_at->format('Y-m-d') }}
                                         </span>
                                         <div class="small text-muted">
-                                            {{ $serviceUser->days_until_expiry }}일 {{ $serviceUser->days_until_expiry >= 0 ? '남음' : '지남' }}
+                                            {{ $subscribeUser->days_until_expiry }}일 {{ $subscribeUser->days_until_expiry >= 0 ? '남음' : '지남' }}
                                         </div>
                                     @else
                                         <span class="text-muted">-</span>
                                     @endif
                                 </td>
                                 <td>
-                                    @if($serviceUser->monthly_price > 0)
-                                        <strong>₩{{ number_format($serviceUser->monthly_price) }}</strong>
+                                    @if($subscribeUser->monthly_price > 0)
+                                        <strong>₩{{ number_format($subscribeUser->monthly_price) }}</strong>
                                         <div class="small">
-                                            <span class="badge bg-{{ $serviceUser->payment_status === 'paid' ? 'success' : ($serviceUser->payment_status === 'pending' ? 'warning' : 'danger') }}">
-                                                {{ $paymentStatusOptions[$serviceUser->payment_status] ?? $serviceUser->payment_status }}
+                                            <span class="badge bg-{{ $subscribeUser->payment_status === 'paid' ? 'success' : ($subscribeUser->payment_status === 'pending' ? 'warning' : 'danger') }}">
+                                                {{ $paymentStatusOptions[$subscribeUser->payment_status] ?? $subscribeUser->payment_status }}
                                             </span>
                                         </div>
                                     @else
@@ -307,17 +307,17 @@
                                 </td>
                                 <td>
                                     <div class="btn-group btn-group-sm" role="group">
-                                        <a href="{{ route('admin.service.users.show', $serviceUser->id) }}"
+                                        <a href="{{ route('admin.subscribe.users.show', $subscribeUser->id) }}"
                                            class="btn btn-outline-info btn-square" title="상세보기">
                                             <i class="fe fe-eye"></i>
                                         </a>
-                                        <a href="{{ route('admin.service.users.edit', $serviceUser->id) }}"
+                                        <a href="{{ route('admin.subscribe.users.edit', $subscribeUser->id) }}"
                                            class="btn btn-outline-primary btn-square" title="수정">
                                             <i class="fe fe-edit"></i>
                                         </a>
-                                        @if($serviceUser->status !== 'active')
+                                        @if($subscribeUser->status !== 'active')
                                         <button type="button" class="btn btn-outline-danger btn-square"
-                                                onclick="deleteServiceUser({{ $serviceUser->id }})" title="삭제">
+                                                onclick="deletesubscribeUser({{ $subscribeUser->id }})" title="삭제">
                                             <i class="fe fe-trash-2"></i>
                                         </button>
                                         @endif
@@ -333,11 +333,11 @@
                 <div class="card-footer">
                     <div class="d-flex justify-content-between align-items-center">
                         <div class="text-muted">
-                            전체 {{ $serviceUsers->total() }}개 중
-                            {{ $serviceUsers->firstItem() }}~{{ $serviceUsers->lastItem() }}개 표시
+                            전체 {{ $subscribeUsers->total() }}개 중
+                            {{ $subscribeUsers->firstItem() }}~{{ $subscribeUsers->lastItem() }}개 표시
                         </div>
                         <div>
-                            {{ $serviceUsers->appends(request()->query())->links('pagination::bootstrap-4') }}
+                            {{ $subscribeUsers->appends(request()->query())->links('pagination::bootstrap-4') }}
                         </div>
                     </div>
                 </div>
@@ -345,8 +345,8 @@
                 <div class="text-center py-5">
                     <i class="fe fe-users fe-3x text-muted mb-3"></i>
                     <h5 class="text-muted">등록된 구독자가 없습니다</h5>
-                    <p class="text-muted">새로운 서비스 구독자를 추가해보세요.</p>
-                    <a href="{{ route('admin.service.users.create') }}" class="btn btn-primary">
+                    <p class="text-muted">새로운 구독 구독자를 추가해보세요.</p>
+                    <a href="{{ route('admin.subscribe.users.create') }}" class="btn btn-primary">
                         <i class="fe fe-plus me-2"></i>첫 번째 구독자 추가
                     </a>
                 </div>
@@ -427,10 +427,10 @@
 
 @push('scripts')
 <script>
-function deleteServiceUser(id) {
+function deletesubscribeUser(id) {
     const modal = new bootstrap.Modal(document.getElementById('deleteModal'));
     const form = document.getElementById('deleteForm');
-    form.action = `{{ route('admin.service.users.index') }}/${id}`;
+    form.action = `{{ route('admin.subscribe.users.index') }}/${id}`;
     modal.show();
 }
 </script>

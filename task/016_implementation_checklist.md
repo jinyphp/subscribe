@@ -1,12 +1,12 @@
 # 016. Complete Implementation Checklist
 
 ## 전체 구현 체크리스트
-Jiny 생태계 패키지 기반 구독형 서비스 관리 시스템 구현 완료 확인
+Jiny 생태계 패키지 기반 구독형 구독 관리 시스템 구현 완료 확인
 
 ### 핵심 패키지 의존성
 - **jiny/admin**: 관리자 인증 및 인터페이스 (users 테이블, admin 미들웨어)
 - **jiny/auth**: 고객/파트너 JWT 인증 (users_0xx 샤딩, jwt.auth 미들웨어)
-- **새로운 기능**: 구독 서비스 관리 특화 기능들
+- **새로운 기능**: 구독 구독 관리 특화 기능들
 
 ## 의존관계 순서
 
@@ -15,8 +15,8 @@ Jiny 생태계 패키지 기반 구독형 서비스 관리 시스템 구현 완�
 - [ ] **002. 데이터베이스 스키마** - 10개 테이블 설계 및 마이그레이션
 - [ ] **003. 인증 시스템** - 3-tier 인증 (Admin 세션, Customer JWT, Partner 검증)
 
-### Phase 2: 핵심 서비스 (004-005)
-- [ ] **004. 서비스 카탈로그** - CRUD 관리 및 공개 카탈로그
+### Phase 2: 핵심 구독 (004-005)
+- [ ] **004. 구독 카탈로그** - CRUD 관리 및 공개 카탈로그
 - [ ] **005. 구독 관리 시스템** - 구독 생명주기 및 청구 처리
 
 ### Phase 3: 파트너 시스템 (006-008)
@@ -40,38 +40,38 @@ Jiny 생태계 패키지 기반 구독형 서비스 관리 시스템 구현 완�
 ### 필수 검증 항목 (모든 항목 ✅ 완료 필요)
 
 #### Admin 엔드포인트
-- [ ] `GET /admin/service/catalog` - 서비스 목록
-- [ ] `POST /admin/service/catalog` - 서비스 생성
-- [ ] `GET /admin/service/catalog/{id}` - 서비스 상세
-- [ ] `PUT /admin/service/catalog/{id}` - 서비스 수정
-- [ ] `DELETE /admin/service/catalog/{id}` - 서비스 삭제
-- [ ] `GET /admin/service/subscriptions` - 구독 목록
-- [ ] `GET /admin/service/subscriptions/{id}` - 구독 상세
-- [ ] `PATCH /admin/service/subscriptions/{id}/status` - 구독 상태 변경
-- [ ] `GET /admin/service/partners/tree` - 파트너 트리
-- [ ] `POST /admin/service/partners/tree` - 파트너 추가
-- [ ] `PATCH /admin/service/partners/tree/{id}/move` - 파트너 이동
-- [ ] `GET /admin/service/commissions` - 커미션 목록
-- [ ] `GET /admin/service/analytics/dashboard` - 분석 대시보드
+- [ ] `GET /admin/subscribe/catalog` - 구독 목록
+- [ ] `POST /admin/subscribe/catalog` - 구독 생성
+- [ ] `GET /admin/subscribe/catalog/{id}` - 구독 상세
+- [ ] `PUT /admin/subscribe/catalog/{id}` - 구독 수정
+- [ ] `DELETE /admin/subscribe/catalog/{id}` - 구독 삭제
+- [ ] `GET /admin/subscribe/subscriptions` - 구독 목록
+- [ ] `GET /admin/subscribe/subscriptions/{id}` - 구독 상세
+- [ ] `PATCH /admin/subscribe/subscriptions/{id}/status` - 구독 상태 변경
+- [ ] `GET /admin/subscribe/partners/tree` - 파트너 트리
+- [ ] `POST /admin/subscribe/partners/tree` - 파트너 추가
+- [ ] `PATCH /admin/subscribe/partners/tree/{id}/move` - 파트너 이동
+- [ ] `GET /admin/subscribe/commissions` - 커미션 목록
+- [ ] `GET /admin/subscribe/analytics/dashboard` - 분석 대시보드
 
 #### Customer 엔드포인트
-- [ ] `GET /home/service/catalog` - 공개 서비스 카탈로그
-- [ ] `GET /home/service/catalog/{id}` - 서비스 상세 (공개)
-- [ ] `GET /home/service/subscriptions` - 고객 구독 목록
-- [ ] `GET /home/service/subscriptions/{id}` - 구독 상세
-- [ ] `POST /home/service/subscriptions/{id}/cancel` - 구독 취소
-- [ ] `GET /home/service/trials` - 무료 체험 목록
-- [ ] `POST /home/service/catalog/{id}/trial` - 체험 시작
-- [ ] `POST /home/service/trials/{id}/convert` - 체험 전환
-- [ ] `GET /home/service/billing` - 청구 내역
-- [ ] `GET /home/service/profile` - 프로필 관리
+- [ ] `GET /home/subscribe/catalog` - 공개 구독 카탈로그
+- [ ] `GET /home/subscribe/catalog/{id}` - 구독 상세 (공개)
+- [ ] `GET /home/subscribe/subscriptions` - 고객 구독 목록
+- [ ] `GET /home/subscribe/subscriptions/{id}` - 구독 상세
+- [ ] `POST /home/subscribe/subscriptions/{id}/cancel` - 구독 취소
+- [ ] `GET /home/subscribe/trials` - 무료 체험 목록
+- [ ] `POST /home/subscribe/catalog/{id}/trial` - 체험 시작
+- [ ] `POST /home/subscribe/trials/{id}/convert` - 체험 전환
+- [ ] `GET /home/subscribe/billing` - 청구 내역
+- [ ] `GET /home/subscribe/profile` - 프로필 관리
 
 #### Partner 엔드포인트
 - [ ] `GET /partner/dashboard` - 파트너 대시보드
 - [ ] `GET /partner/tree/downlines` - 하위 파트너 목록
 - [ ] `POST /partner/tree/recruit` - 파트너 모집
 - [ ] `GET /partner/subscriptions` - 할당된 구독 목록
-- [ ] `PATCH /partner/subscriptions/{id}/execution` - 서비스 실행 업데이트
+- [ ] `PATCH /partner/subscriptions/{id}/execution` - 구독 실행 업데이트
 - [ ] `GET /partner/commissions` - 커미션 내역
 - [ ] `GET /partner/commissions/analytics` - 커미션 분석
 
@@ -91,17 +91,17 @@ Jiny 생태계 패키지 기반 구독형 서비스 관리 시스템 구현 완�
 - [ ] 미들웨어 보안 검증 완료
 - [ ] 토큰 갱신 메커니즘 작동
 
-### 서비스 카탈로그 (004)
+### 구독 카탈로그 (004)
 - [ ] Admin CRUD 작업 완전 구현
 - [ ] 공개 카탈로그 조회 정상 작동
 - [ ] 검색/필터/정렬 기능 작동
 - [ ] 이미지 업로드 처리 완료
-- [ ] 서비스 상태 관리 완료
+- [ ] 구독 상태 관리 완료
 
 ### 구독 관리 (005)
 - [ ] 구독 생명주기 관리 완료
 - [ ] 청구 및 결제 처리 완료
-- [ ] 고객 셀프서비스 기능 완료
+- [ ] 고객 셀프구독 기능 완료
 - [ ] 구독 분석 및 리포팅 완료
 - [ ] 자동 갱신 시스템 작동
 
@@ -180,11 +180,11 @@ Jiny 생태계 패키지 기반 구독형 서비스 관리 시스템 구현 완�
 - [ ] 네트워크 성장률 추적 가능
 
 ### 고객 만족도
-- [ ] > 4.5/5 전체 서비스 평점
+- [ ] > 4.5/5 전체 구독 평점
 - [ ] < 2% 월간 이탈률
-- [ ] > 95% 서비스 완료율
+- [ ] > 95% 구독 완료율
 - [ ] < 24시간 고객 문의 응답
-- [ ] > 90% 첫 서비스 만족도
+- [ ] > 90% 첫 구독 만족도
 
 ### 수익 성과
 - [ ] 월간 수익 증가율 추적
@@ -229,7 +229,7 @@ Jiny 생태계 패키지 기반 구독형 서비스 관리 시스템 구현 완�
 - ✅ **기술적 달성**: 모든 시스템 정상 작동
 - ✅ **비즈니스 달성**: 목표 성과 지표 달성
 - ✅ **사용자 만족**: 높은 사용자 만족도
-- ✅ **운영 안정성**: 안정적인 서비스 운영
+- ✅ **운영 안정성**: 안정적인 구독 운영
 - ✅ **확장 가능성**: 미래 확장성 확보
 
 ---

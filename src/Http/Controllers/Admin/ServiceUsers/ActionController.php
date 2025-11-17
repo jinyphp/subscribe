@@ -1,26 +1,26 @@
 <?php
 
-namespace Jiny\Service\Http\Controllers\Admin\ServiceUsers;
+namespace Jiny\Subscribe\Http\Controllers\Admin\subscribeUsers;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Jiny\Service\Models\ServiceUser;
+use Jiny\Subscribe\Models\subscribeUser;
 
 class ActionController extends Controller
 {
     public function activate(Request $request, $id)
     {
         try {
-            $serviceUser = ServiceUser::findOrFail($id);
+            $subscribeUser = subscribeUser::findOrFail($id);
 
-            if (!in_array($serviceUser->status, ['pending', 'suspended'])) {
+            if (!in_array($subscribeUser->status, ['pending', 'suspended'])) {
                 return redirect()->back()->with('error', '현재 상태에서는 활성화할 수 없습니다.');
             }
 
-            $serviceUser->activate();
+            $subscribeUser->activate();
 
             return redirect()
-                ->route('admin.service.service-users.show', $serviceUser->id)
+                ->route('admin.subscribe.subscribe-users.show', $subscribeUser->id)
                 ->with('success', '구독이 활성화되었습니다.');
 
         } catch (\Exception $e) {
@@ -31,24 +31,24 @@ class ActionController extends Controller
     public function suspend(Request $request, $id)
     {
         try {
-            $serviceUser = ServiceUser::findOrFail($id);
+            $subscribeUser = subscribeUser::findOrFail($id);
 
-            if ($serviceUser->status !== 'active') {
+            if ($subscribeUser->status !== 'active') {
                 return redirect()->back()->with('error', '활성 상태의 구독만 일시정지할 수 있습니다.');
             }
 
             $reason = $request->input('reason', '관리자에 의한 일시정지');
-            $previousStatus = $serviceUser->status;
+            $previousStatus = $subscribeUser->status;
 
-            $serviceUser->update([
+            $subscribeUser->update([
                 'status' => 'suspended',
-                'admin_notes' => $serviceUser->admin_notes . "\n[" . now() . "] 일시정지: " . $reason
+                'admin_notes' => $subscribeUser->admin_notes . "\n[" . now() . "] 일시정지: " . $reason
             ]);
 
             // 로그 기록
-            $serviceUser->subscriptionLogs()->create([
-                'user_uuid' => $serviceUser->user_uuid,
-                'service_id' => $serviceUser->service_id,
+            $subscribeUser->subscriptionLogs()->create([
+                'user_uuid' => $subscribeUser->user_uuid,
+                'subscribe_id' => $subscribeUser->subscribe_id,
                 'action' => 'suspend',
                 'action_title' => '구독 일시정지',
                 'action_description' => $reason,
@@ -58,7 +58,7 @@ class ActionController extends Controller
             ]);
 
             return redirect()
-                ->route('admin.service.service-users.show', $serviceUser->id)
+                ->route('admin.subscribe.subscribe-users.show', $subscribeUser->id)
                 ->with('success', '구독이 일시정지되었습니다.');
 
         } catch (\Exception $e) {
@@ -69,17 +69,17 @@ class ActionController extends Controller
     public function cancel(Request $request, $id)
     {
         try {
-            $serviceUser = ServiceUser::findOrFail($id);
+            $subscribeUser = subscribeUser::findOrFail($id);
 
-            if (!in_array($serviceUser->status, ['active', 'suspended', 'pending'])) {
+            if (!in_array($subscribeUser->status, ['active', 'suspended', 'pending'])) {
                 return redirect()->back()->with('error', '현재 상태에서는 취소할 수 없습니다.');
             }
 
             $reason = $request->input('reason', '관리자에 의한 취소');
-            $serviceUser->cancel($reason);
+            $subscribeUser->cancel($reason);
 
             return redirect()
-                ->route('admin.service.service-users.show', $serviceUser->id)
+                ->route('admin.subscribe.subscribe-users.show', $subscribeUser->id)
                 ->with('success', '구독이 취소되었습니다.');
 
         } catch (\Exception $e) {
@@ -94,13 +94,13 @@ class ActionController extends Controller
         ]);
 
         try {
-            $serviceUser = ServiceUser::findOrFail($id);
+            $subscribeUser = subscribeUser::findOrFail($id);
             $days = $request->input('days');
 
-            $serviceUser->extend($days);
+            $subscribeUser->extend($days);
 
             return redirect()
-                ->route('admin.service.service-users.show', $serviceUser->id)
+                ->route('admin.subscribe.subscribe-users.show', $subscribeUser->id)
                 ->with('success', "{$days}일 연장되었습니다.");
 
         } catch (\Exception $e) {
@@ -111,11 +111,11 @@ class ActionController extends Controller
     public function updateUserCache(Request $request, $id)
     {
         try {
-            $serviceUser = ServiceUser::findOrFail($id);
-            $serviceUser->updateUserCache();
+            $subscribeUser = subscribeUser::findOrFail($id);
+            $subscribeUser->updateUserCache();
 
             return redirect()
-                ->route('admin.service.service-users.show', $serviceUser->id)
+                ->route('admin.subscribe.subscribe-users.show', $subscribeUser->id)
                 ->with('success', '사용자 캐시 정보가 업데이트되었습니다.');
 
         } catch (\Exception $e) {

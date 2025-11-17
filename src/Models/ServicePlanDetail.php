@@ -1,6 +1,6 @@
 <?php
 
-namespace Jiny\Service\Models;
+namespace Jiny\Subscribe\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -10,11 +10,11 @@ class ServicePlanDetail extends Model
 {
     use SoftDeletes;
 
-    protected $table = 'service_plan_detail';
+    protected $table = 'subscribe_plan_detail';
 
     protected $fillable = [
-        'service_id',
-        'service_plan_id',
+        'subscribe_id',
+        'subscribe_plan_id',
         'enable',
         'pos',
         'detail_type',
@@ -48,14 +48,14 @@ class ServicePlanDetail extends Model
     ];
 
     // Relationships
-    public function service(): BelongsTo
+    public function subscribe(): BelongsTo
     {
-        return $this->belongsTo(SiteService::class, 'service_id');
+        return $this->belongsTo(Sitesubscribe::class, 'subscribe_id');
     }
 
-    public function servicePlan(): BelongsTo
+    public function subscribePlan(): BelongsTo
     {
-        return $this->belongsTo(ServicePlan::class, 'service_plan_id');
+        return $this->belongsTo(subscribePlan::class, 'subscribe_plan_id');
     }
 
     // Scopes

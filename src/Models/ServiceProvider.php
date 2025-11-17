@@ -1,6 +1,6 @@
 <?php
 
-namespace Jiny\Service\Models;
+namespace Jiny\Subscribe\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;

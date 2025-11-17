@@ -1,16 +1,16 @@
 <?php
 
-namespace Jiny\Service\Models;
+namespace Jiny\Subscribe\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class SiteService extends Model
+class Sitesubscribe extends Model
 {
     use HasFactory, SoftDeletes;
 
-    protected $table = 'services';
+    protected $table = 'subscribes';
 
     protected $fillable = [
         'enable',
@@ -51,7 +51,7 @@ class SiteService extends Model
     ];
 
     /**
-     * 활성화된 서비스만 조회
+     * 활성화된 구독만 조회
      */
     public function scopeEnabled($query)
     {
@@ -59,7 +59,7 @@ class SiteService extends Model
     }
 
     /**
-     * 추천 서비스만 조회
+     * 추천 구독만 조회
      */
     public function scopeFeatured($query)
     {
@@ -134,7 +134,7 @@ class SiteService extends Model
     }
 
     /**
-     * 서비스 프로세스 단계 수
+     * 구독 프로세스 단계 수
      */
     public function getProcessStepsCountAttribute()
     {
@@ -158,7 +158,7 @@ class SiteService extends Model
     }
 
     /**
-     * 서비스 특징 수
+     * 구독 특징 수
      */
     public function getFeaturesCountAttribute()
     {
@@ -168,27 +168,27 @@ class SiteService extends Model
     /**
      * 카테고리와의 관계
      */
-    public function serviceCategory()
+    public function subscribeCategory()
     {
-        return $this->belongsTo(\Jiny\Service\Models\ServiceCategory::class, 'category_id');
+        return $this->belongsTo(\Jiny\Subscribe\Models\subscribeCategory::class, 'category_id');
     }
 
     /**
-     * 서비스 플랜들과의 관계
+     * 구독 플랜들과의 관계
      */
     public function pricingOptions()
     {
-        return $this->hasMany(\Jiny\Service\Models\ServicePlan::class, 'service_id')
+        return $this->hasMany(\Jiny\Subscribe\Models\subscribePlan::class, 'subscribe_id')
             ->where('is_active', true)
             ->orderBy('sort_order');
     }
 
     /**
-     * 기본 서비스 플랜
+     * 기본 구독 플랜
      */
     public function defaultPricing()
     {
-        return $this->hasOne(\Jiny\Service\Models\ServicePlan::class, 'service_id')
+        return $this->hasOne(\Jiny\Subscribe\Models\subscribePlan::class, 'subscribe_id')
             ->where('is_active', true)
             ->orderBy('sort_order');
     }
@@ -202,7 +202,7 @@ class SiteService extends Model
     }
 
     /**
-     * 가격 범위 조회 (서비스 플랜 기반)
+     * 가격 범위 조회 (구독 플랜 기반)
      */
     public function scopePriceRangeFromOptions($query, $min = null, $max = null)
     {
@@ -225,7 +225,7 @@ class SiteService extends Model
     }
 
     /**
-     * 최저가격 (서비스 플랜 기반)
+     * 최저가격 (구독 플랜 기반)
      */
     public function getMinPriceAttribute()
     {
@@ -265,11 +265,11 @@ class SiteService extends Model
     }
 
     /**
-     * 서비스 가격들과의 관계
+     * 구독 가격들과의 관계
      */
     public function prices()
     {
-        return $this->hasMany(\Jiny\Service\Models\ServicePrice::class, 'service_id')
+        return $this->hasMany(\Jiny\Subscribe\Models\subscribePrice::class, 'subscribe_id')
             ->where('enable', true)
             ->orderBy('pos');
     }
@@ -279,7 +279,7 @@ class SiteService extends Model
      */
     public function activePrices()
     {
-        return $this->hasMany(\Jiny\Service\Models\ServicePrice::class, 'service_id')
+        return $this->hasMany(\Jiny\Subscribe\Models\subscribePrice::class, 'subscribe_id')
             ->active()
             ->valid()
             ->ordered();
@@ -290,7 +290,7 @@ class SiteService extends Model
      */
     public function defaultPrice()
     {
-        return $this->hasOne(\Jiny\Service\Models\ServicePrice::class, 'service_id')
+        return $this->hasOne(\Jiny\Subscribe\Models\subscribePrice::class, 'subscribe_id')
             ->where('enable', true)
             ->orderBy('pos');
     }
@@ -300,7 +300,7 @@ class SiteService extends Model
      */
     public function popularPrice()
     {
-        return $this->hasOne(\Jiny\Service\Models\ServicePrice::class, 'service_id')
+        return $this->hasOne(\Jiny\Subscribe\Models\subscribePrice::class, 'subscribe_id')
             ->where('is_popular', true)
             ->where('enable', true);
     }
@@ -310,15 +310,15 @@ class SiteService extends Model
      */
     public function recommendedPrice()
     {
-        return $this->hasOne(\Jiny\Service\Models\ServicePrice::class, 'service_id')
+        return $this->hasOne(\Jiny\Subscribe\Models\subscribePrice::class, 'subscribe_id')
             ->where('is_recommended', true)
             ->where('enable', true);
     }
 
     /**
-     * 최저 가격 (서비스 가격 기반)
+     * 최저 가격 (구독 가격 기반)
      */
-    public function getMinServicePriceAttribute()
+    public function getMinsubscribePriceAttribute()
     {
         $prices = $this->activePrices()->get();
 
@@ -330,9 +330,9 @@ class SiteService extends Model
     }
 
     /**
-     * 서비스 가격이 있는지 확인
+     * 구독 가격이 있는지 확인
      */
-    public function getHasServicePricesAttribute()
+    public function getHassubscribePricesAttribute()
     {
         return $this->prices()->count() > 0;
     }

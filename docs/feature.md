@@ -1,4 +1,4 @@
-# 구독형 서비스 관리 시스템 (Subscription Service Management)
+# 서비스 관리 시스템 (Service Management System)
 
 ## 패키지 의존성 (Package Dependencies)
 
@@ -12,8 +12,8 @@
 
 ```php
 // 관리자 라우트 예시
-Route::middleware(['admin'])->prefix('admin/service')->group(function () {
-    // 서비스 관리 라우트들
+Route::middleware(['admin'])->prefix('admin/subscribe')->group(function () {
+    // 구독 관리 라우트들
 });
 ```
 
@@ -25,12 +25,12 @@ Route::middleware(['admin'])->prefix('admin/service')->group(function () {
 
 ```php
 // 고객/파트너 라우트 예시
-Route::middleware(['jwt.auth'])->prefix('home/service')->group(function () {
-    // 고객 서비스 라우트들
+Route::middleware(['jwt.auth'])->prefix('home/subscribe')->group(function () {
+    // 고객 구독 라우트들
 });
 
 Route::middleware(['jwt.auth', 'partner.verify'])->prefix('partner')->group(function () {
-    // 파트너 서비스 라우트들
+    // 파트너 구독 라우트들
 });
 ```
 
@@ -40,13 +40,13 @@ Route::middleware(['jwt.auth', 'partner.verify'])->prefix('partner')->group(func
 ├── 테이블: users (중앙집중)
 ├── 인증: 세션 기반
 ├── 미들웨어: admin
-└── 접근: /admin/service/*
+└── 접근: /admin/subscribe/*
 
 고객 (Customer):
 ├── 테이블: users_001, users_002, ... users_099 (샤딩)
 ├── 인증: JWT 토큰
 ├── 미들웨어: jwt.auth
-└── 접근: /home/service/*
+└── 접근: /home/subscribe/*
 
 파트너 (Partner/Engineer):
 ├── 테이블: users_001, users_002, ... users_099 (샤딩)
@@ -58,14 +58,14 @@ Route::middleware(['jwt.auth', 'partner.verify'])->prefix('partner')->group(func
 
 ## 개요 (Overview)
 
-본 모듈은 SaaS(Software as a Service) 기반의 구독형 서비스를 효율적으로 운영하고 관리하기 위한 종합적인 플랫폼입니다. 현대적인 구독 경제 모델에 최적화된 기능들을 제공하여, 서비스 제공자가 고객 생애주기(Customer Lifecycle) 전반에 걸쳐 효과적인 서비스 운영이 가능하도록 설계되었습니다.
+본 모듈은 SaaS(Software as a subscribe) 기반의 구독형 구독를 효율적으로 운영하고 관리하기 위한 종합적인 플랫폼입니다. 현대적인 구독 경제 모델에 최적화된 기능들을 제공하여, 구독 제공자가 고객 생애주기(Customer Lifecycle) 전반에 걸쳐 효과적인 구독 운영이 가능하도록 설계되었습니다.
 
 Jiny 생태계의 기존 패키지들(`jiny/admin`, `jiny/auth`)과 완전히 통합되어 일관된 사용자 경험과 관리 체계를 제공합니다.
 
 ### 핵심 설계 철학
 
 1. **고객 중심 설계**: 고객의 구독 여정(Customer Journey)을 중심으로 한 직관적이고 편리한 사용자 경험 제공
-2. **확장 가능한 아키텍처**: 마이크로서비스 기반의 모듈형 구조로 비즈니스 성장에 따른 유연한 확장 지원
+2. **확장 가능한 아키텍처**: 마이크로구독 기반의 모듈형 구조로 비즈니스 성장에 따른 유연한 확장 지원
 3. **데이터 기반 의사결정**: 실시간 분석과 인사이트를 통한 비즈니스 최적화 지원
 4. **보안 우선**: 결제 정보와 개인데이터 보호를 위한 엔터프라이즈급 보안 구현
 
@@ -73,8 +73,8 @@ Jiny 생태계의 기존 패키지들(`jiny/admin`, `jiny/auth`)과 완전히 �
 
 ```
 ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│   Frontend UI   │────│  API Gateway    │────│  Microservices  │
-│  (Customer)     │    │                 │    │   - Service     │
+│   Frontend UI   │────│  API Gateway    │────│  Microsubscribes  │
+│  (Customer)     │    │                 │    │   - subscribe     │
 └─────────────────┘    │                 │    │   - Billing     │
                        │                 │    │   - Support     │
 ┌─────────────────┐    │                 │    │   - Analytics   │
@@ -96,19 +96,19 @@ Jiny 생태계의 기존 패키지들(`jiny/admin`, `jiny/auth`)과 완전히 �
 - **운영 효율성**: 자동화된 결제, 프로비저닝, 고객 지원 프로세스
 - **확장성**: 글로벌 시장 진출을 위한 다국가, 다통화, 다결제수단 지원
 
-## 1. 서비스 카탈로그 관리 (Service Catalog Management)
+## 1. 구독 카탈로그 관리 (subscribe Catalog Management)
 
 ### 1.1 설계 목적과 필요성
 
-서비스 카탈로그는 고객이 구독할 수 있는 모든 서비스 상품을 체계적으로 관리하고 제공하는 핵심 모듈입니다. 이는 단순한 상품 목록을 넘어서 고객의 구매 의사결정을 돕는 마케팅 도구이자, 내부 운영팀이 서비스를 효율적으로 관리할 수 있는 관리 도구로 기능합니다.
+구독 카탈로그는 고객이 구독할 수 있는 모든 구독 상품을 체계적으로 관리하고 제공하는 핵심 모듈입니다. 이는 단순한 상품 목록을 넘어서 고객의 구매 의사결정을 돕는 마케팅 도구이자, 내부 운영팀이 구독를 효율적으로 관리할 수 있는 관리 도구로 기능합니다.
 
-현대의 SaaS 비즈니스에서는 다양한 고객 세그먼트에 맞춤형 서비스를 제공해야 하므로, 유연하고 확장 가능한 서비스 카탈로그 시스템이 필수적입니다.
+현대의 SaaS 비즈니스에서는 다양한 고객 세그먼트에 맞춤형 구독를 제공해야 하므로, 유연하고 확장 가능한 구독 카탈로그 시스템이 필수적입니다.
 
-### 1.2 서비스 관리 (Service Management)
+### 1.2 구독 관리 (subscribe Management)
 
-#### 1.2.1 서비스 생명주기 관리
+#### 1.2.1 구독 생명주기 관리
 
-**설계 방향**: 서비스는 기획 단계부터 출시, 운영, 종료까지의 전체 생명주기를 체계적으로 관리해야 합니다.
+**설계 방향**: 구독는 기획 단계부터 출시, 운영, 종료까지의 전체 생명주기를 체계적으로 관리해야 합니다.
 
 ```
 기획 → 개발 → 베타 → 출시 → 성숙 → 업데이트 → 종료
@@ -117,31 +117,31 @@ Draft → Dev → Beta → Active → Mature → Updated → Deprecated
 ```
 
 **구현 상세**:
-- **Draft (초안)**: 서비스 기획 단계에서 내부 관리자만 접근 가능
+- **Draft (초안)**: 구독 기획 단계에서 내부 관리자만 접근 가능
 - **Development (개발)**: 개발팀과 QA팀이 테스트할 수 있는 상태
 - **Beta (베타)**: 선별된 고객들에게 제한적 공개
 - **Active (활성)**: 일반 고객들에게 완전 공개된 상태
-- **Mature (성숙)**: 안정화된 서비스로 신규 기능 추가 최소화
+- **Mature (성숙)**: 안정화된 구독로 신규 기능 추가 최소화
 - **Updated (업데이트)**: 주요 기능 개선이나 가격 변경이 있는 상태
 - **Deprecated (종료 예정)**: 신규 구독 중단, 기존 고객 이관 진행
 
-#### 1.2.2 서비스 메타데이터 관리
+#### 1.2.2 구독 메타데이터 관리
 
 **설계 방향**: SEO 최적화와 마케팅 효과를 위한 풍부한 메타데이터 관리
 
 ```php
-// 서비스 메타데이터 구조 예시
+// 구독 메타데이터 구조 예시
 [
     'basic_info' => [
-        'name' => '프리미엄 분석 서비스',
+        'name' => '프리미엄 분석 구독',
         'slug' => 'premium-analytics',
         'short_description' => '고급 비즈니스 인텔리전스 도구',
-        'full_description' => '상세 서비스 설명...',
+        'full_description' => '상세 구독 설명...',
         'category_id' => 1,
         'tags' => ['analytics', 'business-intelligence', 'reporting']
     ],
     'marketing' => [
-        'hero_image' => '/images/services/analytics-hero.jpg',
+        'hero_image' => '/images/subscribes/analytics-hero.jpg',
         'gallery' => ['/images/analytics-1.jpg', '/images/analytics-2.jpg'],
         'video_url' => 'https://youtube.com/watch?v=...',
         'features_highlight' => ['실시간 대시보드', 'AI 예측 분석', '커스텀 리포트']
@@ -157,7 +157,7 @@ Draft → Dev → Beta → Active → Mature → Updated → Deprecated
 
 #### 1.2.3 동적 페이지 빌더
 
-**설계 방향**: 마케팅팀이 개발자 없이도 매력적인 서비스 페이지를 생성할 수 있는 블록 기반 시스템
+**설계 방향**: 마케팅팀이 개발자 없이도 매력적인 구독 페이지를 생성할 수 있는 블록 기반 시스템
 
 **블록 타입 정의**:
 1. **Hero 블록**: 주요 메시지와 CTA (Call-to-Action)
@@ -176,7 +176,7 @@ Draft → Dev → Beta → Active → Mature → Updated → Deprecated
 
 #### 1.2.4 A/B 테스트 시스템
 
-**설계 방향**: 서비스 페이지의 전환율 최적화를 위한 과학적 테스트 환경 제공
+**설계 방향**: 구독 페이지의 전환율 최적화를 위한 과학적 테스트 환경 제공
 
 **테스트 시나리오**:
 - 헤드라인 문구 테스트
@@ -190,11 +190,11 @@ Draft → Dev → Beta → Active → Mature → Updated → Deprecated
 - 테스트 기간 자동 종료
 - 승리 버전 자동 적용 옵션
 
-### 1.3 서비스 카테고리 시스템
+### 1.3 구독 카테고리 시스템
 
 #### 1.3.1 계층형 카테고리 구조
 
-**설계 방향**: 복잡한 서비스 포트폴리오를 직관적으로 분류하고 탐색할 수 있는 구조
+**설계 방향**: 복잡한 구독 포트폴리오를 직관적으로 분류하고 탐색할 수 있는 구조
 
 ```
 비즈니스 도구
@@ -226,10 +226,10 @@ Draft → Dev → Beta → Active → Mature → Updated → Deprecated
 
 **자동 추천 알고리즘**:
 - 사용자 구매 이력 기반 협업 필터링
-- 서비스 간 유사도 계산 (Content-based Filtering)
+- 구독 간 유사도 계산 (Content-based Filtering)
 - 인기도와 평점을 고려한 하이브리드 추천
 
-### 1.4 서비스 티어 관리
+### 1.4 구독 티어 관리
 
 #### 1.4.1 티어 설계 전략
 
@@ -258,11 +258,11 @@ Draft → Dev → Beta → Active → Mature → Updated → Deprecated
 
 ### 1.5 데이터베이스 스키마 설계
 
-#### 1.5.1 서비스 테이블 구조
+#### 1.5.1 구독 테이블 구조
 
 ```sql
--- 서비스 기본 정보
-CREATE TABLE services (
+-- 구독 기본 정보
+CREATE TABLE subscribes (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
     uuid VARCHAR(36) UNIQUE NOT NULL,
     name VARCHAR(255) NOT NULL,
@@ -278,23 +278,23 @@ CREATE TABLE services (
     INDEX idx_status (status),
     INDEX idx_category (category_id),
     INDEX idx_featured (featured),
-    FOREIGN KEY (category_id) REFERENCES service_categories(id)
+    FOREIGN KEY (category_id) REFERENCES subscribe_categories(id)
 );
 
--- 서비스 미디어
-CREATE TABLE service_media (
+-- 구독 미디어
+CREATE TABLE subscribe_media (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
-    service_id BIGINT NOT NULL,
+    subscribe_id BIGINT NOT NULL,
     type ENUM('hero_image', 'gallery', 'video', 'icon'),
     url VARCHAR(500) NOT NULL,
     alt_text VARCHAR(255),
     sort_order INT DEFAULT 0,
-    FOREIGN KEY (service_id) REFERENCES services(id) ON DELETE CASCADE
+    FOREIGN KEY (subscribe_id) REFERENCES subscribes(id) ON DELETE CASCADE
 );
 
--- 서비스 SEO 정보
-CREATE TABLE service_seo (
-    service_id BIGINT PRIMARY KEY,
+-- 구독 SEO 정보
+CREATE TABLE subscribe_seo (
+    subscribe_id BIGINT PRIMARY KEY,
     meta_title VARCHAR(255),
     meta_description TEXT,
     keywords TEXT,
@@ -302,7 +302,7 @@ CREATE TABLE service_seo (
     og_description TEXT,
     og_image VARCHAR(500),
     canonical_url VARCHAR(500),
-    FOREIGN KEY (service_id) REFERENCES services(id) ON DELETE CASCADE
+    FOREIGN KEY (subscribe_id) REFERENCES subscribes(id) ON DELETE CASCADE
 );
 ```
 
@@ -372,14 +372,14 @@ $billing_cycles = [
 
 ```
 ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│   Service API   │───▶│  Usage Tracker  │───▶│  Billing Engine │
+│   subscribe API   │───▶│  Usage Tracker  │───▶│  Billing Engine │
 │                 │    │                 │    │                 │
 └─────────────────┘    └─────────────────┘    └─────────────────┘
          │                        │                        │
          ▼                        ▼                        ▼
 ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
 │   Usage Logs    │    │  Aggregation    │    │   Invoice Gen   │
-│                 │    │    Service      │    │                 │
+│                 │    │    subscribe      │    │                 │
 └─────────────────┘    └─────────────────┘    └─────────────────┘
 ```
 
@@ -716,7 +716,7 @@ ORDER BY total_revenue DESC;
 -- 가격 플랜
 CREATE TABLE pricing_plans (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
-    service_id BIGINT NOT NULL,
+    subscribe_id BIGINT NOT NULL,
     name VARCHAR(255) NOT NULL,
     slug VARCHAR(255) NOT NULL,
     description TEXT,
@@ -726,9 +726,9 @@ CREATE TABLE pricing_plans (
     trial_config_id BIGINT NULL, -- 무료 체험 설정 참조
     status ENUM('active', 'inactive', 'archived') DEFAULT 'active',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (service_id) REFERENCES services(id),
+    FOREIGN KEY (subscribe_id) REFERENCES subscribes(id),
     FOREIGN KEY (trial_config_id) REFERENCES trial_configurations(id),
-    UNIQUE KEY unique_plan (service_id, slug)
+    UNIQUE KEY unique_plan (subscribe_id, slug)
 );
 
 -- 무료 체험 설정
@@ -762,7 +762,7 @@ CREATE TABLE trial_configurations (
 CREATE TABLE user_trials (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
     user_id BIGINT NOT NULL,
-    service_id BIGINT NOT NULL,
+    subscribe_id BIGINT NOT NULL,
     trial_config_id BIGINT NOT NULL,
 
     -- 체험 기간
@@ -789,10 +789,10 @@ CREATE TABLE user_trials (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
     FOREIGN KEY (user_id) REFERENCES users(id),
-    FOREIGN KEY (service_id) REFERENCES services(id),
+    FOREIGN KEY (subscribe_id) REFERENCES subscribes(id),
     FOREIGN KEY (trial_config_id) REFERENCES trial_configurations(id),
 
-    INDEX idx_user_service (user_id, service_id),
+    INDEX idx_user_subscribe (user_id, subscribe_id),
     INDEX idx_status_end (status, scheduled_end_at),
     INDEX idx_conversion_probability (conversion_probability DESC)
 );
@@ -867,7 +867,7 @@ CREATE TABLE pricing_tiers (
 
 ### 3.1 설계 목적과 고객 여정
 
-구독 생명주기 관리는 고객이 서비스를 발견하고 구독하는 순간부터 해지하거나 장기 고객이 되기까지의 전체 여정을 최적화하는 핵심 모듈입니다. 효과적인 생명주기 관리는 고객 획득 비용(CAC)을 줄이고 고객 생애 가치(LTV)를 극대화합니다.
+구독 생명주기 관리는 고객이 구독를 발견하고 구독하는 순간부터 해지하거나 장기 고객이 되기까지의 전체 여정을 최적화하는 핵심 모듈입니다. 효과적인 생명주기 관리는 고객 획득 비용(CAC)을 줄이고 고객 생애 가치(LTV)를 극대화합니다.
 
 **고객 여정 단계**:
 ```
@@ -901,7 +901,7 @@ Discovery → Trial → Onboarding → Activation → Engagement → Renewal →
 
 3. **점진적 정보 수집**
    - 결제 시점에서만 상세 정보 요청
-   - 서비스 사용 중 필요에 따라 추가 정보 수집
+   - 구독 사용 중 필요에 따라 추가 정보 수집
 
 #### 3.2.2 멀티채널 인증 시스템
 
@@ -966,7 +966,7 @@ class OnboardingBuilder {
 
 **상태별 자동 액션**:
 - **Trial → Expired**: 체험 종료 3일 전 알림, 전환 인센티브 제공
-- **Active → Past Due**: 결제 실패 시 즉시 재시도, 48시간 후 서비스 제한
+- **Active → Past Due**: 결제 실패 시 즉시 재시도, 48시간 후 구독 제한
 - **Past Due → Cancelled**: 7일 유예 기간 후 자동 해지, 데이터 백업 안내
 
 ### 3.4 구독 변경 관리
@@ -1141,15 +1141,15 @@ CREATE TABLE organization_memberships (
 
 #### 4.1.1 아키텍처 원칙
 
-**마이크로서비스 아키텍처**: 각 도메인별로 독립적인 서비스로 분리하여 확장성과 유지보수성 확보
+**마이크로구독 아키텍처**: 각 도메인별로 독립적인 구독로 분리하여 확장성과 유지보수성 확보
 
 ```
 ┌──────────────────┐  ┌──────────────────┐  ┌──────────────────┐
-│   Service        │  │   Billing        │  │   Support        │
-│   Catalog        │  │   Service        │  │   Service        │
+│   subscribe        │  │   Billing        │  │   Support        │
+│   Catalog        │  │   subscribe        │  │   subscribe        │
 │                  │  │                  │  │                  │
 ├──────────────────┤  ├──────────────────┤  ├──────────────────┤
-│ - 서비스 관리     │  │ - 결제 처리       │  │ - 티켓 관리       │
+│ - 구독 관리     │  │ - 결제 처리       │  │ - 티켓 관리       │
 │ - 카테고리 관리   │  │ - 구독 관리       │  │ - 지식베이스      │
 │ - 가격 관리       │  │ - 인보이스 생성   │  │ - 실시간 채팅     │
 └──────────────────┘  └──────────────────┘  └──────────────────┘
@@ -1194,7 +1194,7 @@ query GetSubscriptionDetails($id: ID!) {
 
 **온보딩 단계별 UX**:
 1. **Welcome & Goal Setting** (30초)
-   - 환영 메시지와 서비스 가치 제안
+   - 환영 메시지와 구독 가치 제안
    - 사용자 목표 및 사용 사례 수집
 
 2. **Quick Wins** (2분)
@@ -1240,7 +1240,7 @@ query GetSubscriptionDetails($id: ID!) {
 
 #### 4.3.1 데이터 보호
 
-**개인정보 최소 수집 원칙**: 서비스 제공에 필요한 최소한의 정보만 수집
+**개인정보 최소 수집 원칙**: 구독 제공에 필요한 최소한의 정보만 수집
 
 ```php
 // 데이터 암호화 예시
@@ -1290,10 +1290,10 @@ class AuditLogger {
 
 ```php
 // 캐싱 전략 예시
-class ServiceCatalogCache {
-    public function getPopularServices() {
-        return Cache::remember('popular_services', 3600, function () {
-            return Service::where('featured', true)
+class subscribeCatalogCache {
+    public function getPopularsubscribes() {
+        return Cache::remember('popular_subscribes', 3600, function () {
+            return subscribe::where('featured', true)
                          ->where('status', 'active')
                          ->orderBy('popularity_score', 'desc')
                          ->take(10)
@@ -1313,8 +1313,8 @@ CREATE INDEX idx_subscriptions_user_status_active
 ON subscriptions(user_id, status)
 WHERE status IN ('active', 'trial');
 
-CREATE INDEX idx_usage_tracking_date_service
-ON usage_tracking(created_date, service_id, user_id);
+CREATE INDEX idx_usage_tracking_date_subscribe
+ON usage_tracking(created_date, subscribe_id, user_id);
 ```
 
 ### 4.5 모니터링 및 알림
@@ -1364,15 +1364,15 @@ $paymentMethods = [
 ];
 ```
 
-## 5. 위치 기반 서비스 관리 (Location-Based Service Management)
+## 5. 위치 기반 구독 관리 (Location-Based subscribe Management)
 
 ### 5.1 설계 목적과 필요성
 
-물리적 서비스(청소, 수리, 배송 등)는 디지털 서비스와 달리 지리적 제약과 이동 비용이 발생합니다. 효율적인 위치 기반 서비스 관리는 운영 비용을 최소화하고 고객 만족도를 극대화하는 핵심 요소입니다.
+물리적 구독(청소, 수리, 배송 등)는 디지털 구독와 달리 지리적 제약과 이동 비용이 발생합니다. 효율적인 위치 기반 구독 관리는 운영 비용을 최소화하고 고객 만족도를 극대화하는 핵심 요소입니다.
 
-### 5.2 서비스 지역 관리
+### 5.2 구독 지역 관리
 
-#### 5.2.1 서비스 권역 설정
+#### 5.2.1 구독 권역 설정
 
 **계층적 지역 구조**:
 ```
@@ -1383,17 +1383,17 @@ $paymentMethods = [
 │   │   │   └── 세부 지역 (Detailed Area)
 ```
 
-**지역별 서비스 설정**:
+**지역별 구독 설정**:
 ```php
-class ServiceAreaManager {
-    public function defineServiceArea($serviceId, $area) {
+class subscribeAreaManager {
+    public function definesubscribeArea($subscribeId, $area) {
         return [
-            'service_id' => $serviceId,
+            'subscribe_id' => $subscribeId,
             'country' => $area['country'],
             'province' => $area['province'],
             'city' => $area['city'],
-            'districts' => $area['districts'], // 서비스 가능 구역 배열
-            'excluded_areas' => $area['excluded'] ?? [], // 서비스 제외 지역
+            'districts' => $area['districts'], // 구독 가능 구역 배열
+            'excluded_areas' => $area['excluded'] ?? [], // 구독 제외 지역
             'travel_time_minutes' => $area['travel_time'] ?? 30,
             'additional_cost' => $area['additional_cost'] ?? 0
         ];
@@ -1406,8 +1406,8 @@ class ServiceAreaManager {
 **거리 기반 요금 체계**:
 ```php
 class LocationPricing {
-    public function calculateLocationSurcharge($serviceArea, $customerLocation) {
-        $baseArea = $serviceArea['base_location'];
+    public function calculateLocationSurcharge($subscribeArea, $customerLocation) {
+        $baseArea = $subscribeArea['base_location'];
         $distance = $this->calculateDistance($baseArea, $customerLocation);
 
         $surchargeRules = [
@@ -1428,14 +1428,14 @@ class LocationPricing {
 }
 ```
 
-### 5.3 지역별 서비스 운영
+### 5.3 지역별 구독 운영
 
-#### 5.3.1 서비스 가능 시간 관리
+#### 5.3.1 구독 가능 시간 관리
 
 **지역별 운영 시간**:
 ```php
 class RegionalOperationHours {
-    public function getServiceHours($location, $serviceType) {
+    public function getsubscribeHours($location, $subscribeType) {
         $baseHours = [
             'weekday' => ['start' => '09:00', 'end' => '18:00'],
             'saturday' => ['start' => '09:00', 'end' => '15:00'],
@@ -1458,13 +1458,13 @@ class RegionalOperationHours {
 
 ### 6.1 설계 목적과 필요성
 
-물리적 서비스는 정확한 시간 관리와 효율적인 스케줄링이 성공의 핵심입니다. 고객의 편의성과 서비스 제공자의 효율성을 동시에 만족하는 지능형 스케줄링 시스템이 필요합니다.
+물리적 구독는 정확한 시간 관리와 효율적인 스케줄링이 성공의 핵심입니다. 고객의 편의성과 구독 제공자의 효율성을 동시에 만족하는 지능형 스케줄링 시스템이 필요합니다.
 
 ### 6.2 정기 스케줄링 시스템
 
 #### 6.2.1 구독 기반 자동 스케줄링
 
-**정기 서비스 패턴 관리**:
+**정기 구독 패턴 관리**:
 ```php
 class RecurringScheduler {
     public function generateSchedule($subscription) {
@@ -1479,7 +1479,7 @@ class RecurringScheduler {
             $appointment = [
                 'subscription_id' => $subscription->id,
                 'scheduled_date' => $currentDate,
-                'duration_minutes' => $subscription->service->duration,
+                'duration_minutes' => $subscription->subscribe->duration,
                 'status' => 'scheduled',
                 'auto_generated' => true
             ];
@@ -1498,12 +1498,12 @@ class RecurringScheduler {
 **최적 시간대 추천**:
 ```php
 class IntelligentTimeSlotManager {
-    public function suggestOptimalTimeSlots($customer, $service, $date) {
+    public function suggestOptimalTimeSlots($customer, $subscribe, $date) {
         // 고객 선호도 분석
         $customerPreferences = $this->getCustomerPreferences($customer);
 
-        // 서비스 제공자 가용성
-        $providerAvailability = $this->getProviderAvailability($service, $date);
+        // 구독 제공자 가용성
+        $providerAvailability = $this->getProviderAvailability($subscribe, $date);
 
         // 교통 상황 고려
         $trafficAnalysis = $this->analyzeTrafficPatterns($customer->location, $date);
@@ -1512,7 +1512,7 @@ class IntelligentTimeSlotManager {
             'customer_preferences' => $customerPreferences,
             'provider_availability' => $providerAvailability,
             'traffic_data' => $trafficAnalysis,
-            'service_duration' => $service->duration
+            'subscribe_duration' => $subscribe->duration
         ]);
     }
 }
@@ -1541,7 +1541,7 @@ class AppointmentChangeManager {
         }
 
         // 새 시간대 가용성 확인
-        $availability = $this->checkTimeSlotAvailability($newDateTime, $appointment->service);
+        $availability = $this->checkTimeSlotAvailability($newDateTime, $appointment->subscribe);
 
         if (!$availability['available']) {
             return [
@@ -1556,19 +1556,19 @@ class AppointmentChangeManager {
 }
 ```
 
-## 7. 서비스 제공자 관리 (Service Provider Management)
+## 7. 구독 제공자 관리 (subscribe Provider Management)
 
 ### 7.1 설계 목적과 필요성
 
-물리적 서비스의 품질은 서비스 제공자(기술자, 청소원, 배송원 등)의 역량에 직접적으로 의존합니다. 체계적인 인력 관리와 성과 평가 시스템은 일관된 서비스 품질 보장의 핵심입니다.
+물리적 구독의 품질은 구독 제공자(기술자, 청소원, 배송원 등)의 역량에 직접적으로 의존합니다. 체계적인 인력 관리와 성과 평가 시스템은 일관된 구독 품질 보장의 핵심입니다.
 
-### 7.2 서비스 제공자 등록 및 관리
+### 7.2 구독 제공자 등록 및 관리
 
 #### 7.2.1 제공자 프로필 관리
 
 **종합적 프로필 시스템**:
 ```php
-class ServiceProviderProfile {
+class subscribeProviderProfile {
     public function createProfile($providerData) {
         return [
             'basic_info' => [
@@ -1578,8 +1578,8 @@ class ServiceProviderProfile {
                 'photo' => $providerData['photo'],
                 'id_verification' => $providerData['id_document']
             ],
-            'service_capabilities' => [
-                'service_types' => $providerData['services'], // ['aircon_cleaning', 'repair']
+            'subscribe_capabilities' => [
+                'subscribe_types' => $providerData['subscribes'], // ['aircon_cleaning', 'repair']
                 'certifications' => $providerData['certifications'],
                 'experience_years' => $providerData['experience'],
                 'specializations' => $providerData['specializations']
@@ -1631,7 +1631,7 @@ class ProviderSkillManager {
 }
 ```
 
-### 7.3 서비스 제공자 배정 시스템
+### 7.3 구독 제공자 배정 시스템
 
 #### 7.3.1 지능형 매칭 알고리즘
 
@@ -1685,38 +1685,38 @@ class ProviderMatchingEngine {
 }
 ```
 
-## 8. 서비스 품질 관리 및 체크리스트 (Quality Management & Checklists)
+## 8. 구독 품질 관리 및 체크리스트 (Quality Management & Checklists)
 
 ### 8.1 설계 목적과 필요성
 
-물리적 서비스에서 품질의 일관성은 고객 만족도와 브랜드 신뢰도에 직접적으로 영향을 미칩니다. 표준화된 서비스 프로세스와 체크리스트 시스템은 서비스 품질을 보장하고 지속적인 개선을 가능하게 합니다.
+물리적 구독에서 품질의 일관성은 고객 만족도와 브랜드 신뢰도에 직접적으로 영향을 미칩니다. 표준화된 구독 프로세스와 체크리스트 시스템은 구독 품질을 보장하고 지속적인 개선을 가능하게 합니다.
 
-### 8.2 서비스 표준화 시스템
+### 8.2 구독 표준화 시스템
 
-#### 8.2.1 서비스별 체크리스트 관리
+#### 8.2.1 구독별 체크리스트 관리
 
 **동적 체크리스트 생성**:
 ```php
-class ServiceChecklistManager {
-    public function generateChecklist($serviceType, $customerRequirements = []) {
-        $baseChecklist = $this->getBaseChecklist($serviceType);
+class subscribeChecklistManager {
+    public function generateChecklist($subscribeType, $customerRequirements = []) {
+        $baseChecklist = $this->getBaseChecklist($subscribeType);
         $customizations = $this->getCustomizations($customerRequirements);
 
         return [
-            'service_id' => $serviceType,
-            'version' => $this->getCurrentVersion($serviceType),
+            'subscribe_id' => $subscribeType,
+            'version' => $this->getCurrentVersion($subscribeType),
             'sections' => [
                 'preparation' => $this->buildPreparationSection($baseChecklist, $customizations),
                 'execution' => $this->buildExecutionSection($baseChecklist, $customizations),
                 'completion' => $this->buildCompletionSection($baseChecklist, $customizations),
                 'documentation' => $this->buildDocumentationSection($baseChecklist, $customizations)
             ],
-            'required_evidence' => $this->getRequiredEvidence($serviceType),
-            'quality_standards' => $this->getQualityStandards($serviceType)
+            'required_evidence' => $this->getRequiredEvidence($subscribeType),
+            'quality_standards' => $this->getQualityStandards($subscribeType)
         ];
     }
 
-    private function getBaseChecklist($serviceType) {
+    private function getBaseChecklist($subscribeType) {
         $checklists = [
             'aircon_cleaning' => [
                 'preparation' => [
@@ -1740,12 +1740,12 @@ class ServiceChecklistManager {
                     '고객 확인 및 서명',
                     '다음 방문 일정 안내',
                     '정리 정돈 및 폐기물 처리',
-                    '서비스 완료 보고서 작성'
+                    '구독 완료 보고서 작성'
                 ]
             ]
         ];
 
-        return $checklists[$serviceType] ?? [];
+        return $checklists[$subscribeType] ?? [];
     }
 }
 ```
@@ -1755,11 +1755,11 @@ class ServiceChecklistManager {
 **품질 측정 지표**:
 ```php
 class QualityAssuranceManager {
-    public function defineQualityMetrics($serviceType) {
+    public function defineQualityMetrics($subscribeType) {
         return [
             'time_standards' => [
                 'preparation_time' => ['min' => 5, 'max' => 15], // 분
-                'service_time' => ['min' => 30, 'max' => 60],
+                'subscribe_time' => ['min' => 30, 'max' => 60],
                 'cleanup_time' => ['min' => 5, 'max' => 10]
             ],
             'quality_checkpoints' => [
@@ -1772,7 +1772,7 @@ class QualityAssuranceManager {
                 'before_photos' => ['required' => true, 'min_count' => 2],
                 'after_photos' => ['required' => true, 'min_count' => 2],
                 'customer_signature' => ['required' => true],
-                'service_notes' => ['required' => true, 'min_length' => 50]
+                'subscribe_notes' => ['required' => true, 'min_length' => 50]
             ]
         ];
     }
@@ -1781,13 +1781,13 @@ class QualityAssuranceManager {
 
 ### 8.3 실시간 품질 모니터링
 
-#### 8.3.1 서비스 진행 상황 추적
+#### 8.3.1 구독 진행 상황 추적
 
 **실시간 체크리스트 진행 관리**:
 ```php
-class ServiceProgressTracker {
+class subscribeProgressTracker {
     public function trackChecklistProgress($appointmentId, $checklistItemId, $status, $evidence = null) {
-        $progress = ServiceProgress::updateOrCreate([
+        $progress = subscribeProgress::updateOrCreate([
             'appointment_id' => $appointmentId,
             'checklist_item_id' => $checklistItemId
         ], [
@@ -1814,27 +1814,27 @@ class ServiceProgressTracker {
 }
 ```
 
-### 8.4 서비스 완료 및 검증
+### 8.4 구독 완료 및 검증
 
 #### 8.4.1 고객 검수 프로세스
 
 **디지털 검수 시스템**:
 ```php
-class ServiceInspectionManager {
+class subscribeInspectionManager {
     public function initiateCustomerInspection($appointmentId) {
         $appointment = Appointment::find($appointmentId);
-        $checklist = $appointment->service_checklist;
+        $checklist = $appointment->subscribe_checklist;
 
         // 검수 항목 생성
         $inspectionItems = [
-            'service_completion' => [
-                'title' => '서비스 완료 확인',
+            'subscribe_completion' => [
+                'title' => '구독 완료 확인',
                 'items' => $this->getCompletionVerificationItems($checklist),
                 'required' => true
             ],
             'quality_assessment' => [
                 'title' => '품질 평가',
-                'items' => $this->getQualityAssessmentItems($appointment->service_type),
+                'items' => $this->getQualityAssessmentItems($appointment->subscribe_type),
                 'required' => true
             ],
             'additional_feedback' => [
@@ -1856,7 +1856,7 @@ class ServiceInspectionManager {
     }
 
     public function processCustomerApproval($inspectionId, $approvalData) {
-        $inspection = ServiceInspection::find($inspectionId);
+        $inspection = subscribeInspection::find($inspectionId);
 
         $result = [
             'inspection_id' => $inspectionId,
@@ -1871,7 +1871,7 @@ class ServiceInspectionManager {
         if ($approvalData['status'] === 'rejected') {
             $this->initiateReworkProcess($inspection, $approvalData['rejection_reasons']);
         } else {
-            $this->finalizeServiceCompletion($inspection, $result);
+            $this->finalizesubscribeCompletion($inspection, $result);
         }
 
         return $result;
@@ -1879,21 +1879,21 @@ class ServiceInspectionManager {
 }
 ```
 
-## 9. 물리적 서비스 추적 및 로지스틱스 (Physical Service Tracking & Logistics)
+## 9. 물리적 구독 추적 및 로지스틱스 (Physical subscribe Tracking & Logistics)
 
 ### 9.1 설계 목적과 필요성
 
-물리적 서비스는 서비스 제공자의 이동과 현장 작업이 포함되므로, 실시간 위치 추적과 효율적인 로지스틱스 관리가 필수입니다. 이는 고객 만족도 향상과 운영 효율성 증대에 직접적으로 기여합니다.
+물리적 구독는 구독 제공자의 이동과 현장 작업이 포함되므로, 실시간 위치 추적과 효율적인 로지스틱스 관리가 필수입니다. 이는 고객 만족도 향상과 운영 효율성 증대에 직접적으로 기여합니다.
 
 ### 9.2 실시간 위치 추적 시스템
 
-#### 9.2.1 서비스 제공자 위치 관리
+#### 9.2.1 구독 제공자 위치 관리
 
 **GPS 기반 실시간 추적**:
 ```php
-class LocationTrackingService {
-    public function startServiceTracking($appointmentId, $providerId) {
-        $tracking = ServiceTracking::create([
+class LocationTrackingsubscribe {
+    public function startsubscribeTracking($appointmentId, $providerId) {
+        $tracking = subscribeTracking::create([
             'appointment_id' => $appointmentId,
             'provider_id' => $providerId,
             'status' => 'dispatched',
@@ -1947,7 +1947,7 @@ class RouteOptimizationEngine {
             return [
                 'appointment_id' => $appointment->id,
                 'customer_location' => $appointment->customer->location,
-                'service_duration' => $appointment->service->duration,
+                'subscribe_duration' => $appointment->subscribe->duration,
                 'preferred_time' => $appointment->preferred_time,
                 'priority' => $appointment->priority,
                 'travel_time_from_previous' => null // 계산됨
@@ -1977,14 +1977,14 @@ class RouteOptimizationEngine {
 }
 ```
 
-### 9.3 서비스 상태 관리
+### 9.3 구독 상태 관리
 
-#### 9.3.1 서비스 생명주기 추적
+#### 9.3.1 구독 생명주기 추적
 
 **상태 기반 워크플로우**:
 ```php
-class ServiceStatusManager {
-    public function updateServiceStatus($appointmentId, $newStatus, $metadata = []) {
+class subscribeStatusManager {
+    public function updatesubscribeStatus($appointmentId, $newStatus, $metadata = []) {
         $appointment = Appointment::find($appointmentId);
         $validTransitions = $this->getValidStatusTransitions($appointment->status);
 
@@ -1998,7 +1998,7 @@ class ServiceStatusManager {
         $appointment->update(['status' => $newStatus]);
 
         // 상태 변경 기록
-        ServiceStatusLog::create([
+        subscribeStatusLog::create([
             'appointment_id' => $appointmentId,
             'previous_status' => $previousStatus,
             'new_status' => $newStatus,
@@ -2038,14 +2038,14 @@ class ServiceStatusManager {
 
 **다채널 실시간 알림**:
 ```php
-class ServiceNotificationManager {
+class subscribeNotificationManager {
     public function sendStatusNotification($appointmentId, $status, $customMessage = null) {
-        $appointment = Appointment::with(['customer', 'provider', 'service'])->find($appointmentId);
+        $appointment = Appointment::with(['customer', 'provider', 'subscribe'])->find($appointmentId);
 
         $notificationData = [
             'appointment_id' => $appointmentId,
             'customer_name' => $appointment->customer->name,
-            'service_name' => $appointment->service->name,
+            'subscribe_name' => $appointment->subscribe->name,
             'provider_name' => $appointment->provider->name,
             'status' => $status,
             'estimated_arrival' => $appointment->estimated_arrival,
@@ -2099,31 +2099,31 @@ class ServiceNotificationManager {
 }
 ```
 
-### 9.5 서비스 데이터 분석
+### 9.5 구독 데이터 분석
 
 #### 9.5.1 성과 분석 및 최적화
 
 **운영 효율성 분석**:
 ```php
-class ServiceAnalyticsEngine {
-    public function generateOperationalReport($dateRange, $serviceType = null) {
+class subscribeAnalyticsEngine {
+    public function generateOperationalReport($dateRange, $subscribeType = null) {
         return [
-            'efficiency_metrics' => $this->calculateEfficiencyMetrics($dateRange, $serviceType),
-            'quality_metrics' => $this->calculateQualityMetrics($dateRange, $serviceType),
-            'customer_satisfaction' => $this->calculateSatisfactionMetrics($dateRange, $serviceType),
-            'provider_performance' => $this->calculateProviderMetrics($dateRange, $serviceType),
-            'route_optimization' => $this->calculateRouteEfficiency($dateRange, $serviceType)
+            'efficiency_metrics' => $this->calculateEfficiencyMetrics($dateRange, $subscribeType),
+            'quality_metrics' => $this->calculateQualityMetrics($dateRange, $subscribeType),
+            'customer_satisfaction' => $this->calculateSatisfactionMetrics($dateRange, $subscribeType),
+            'provider_performance' => $this->calculateProviderMetrics($dateRange, $subscribeType),
+            'route_optimization' => $this->calculateRouteEfficiency($dateRange, $subscribeType)
         ];
     }
 
-    private function calculateEfficiencyMetrics($dateRange, $serviceType) {
+    private function calculateEfficiencyMetrics($dateRange, $subscribeType) {
         return [
-            'average_service_time' => $this->getAverageServiceTime($dateRange, $serviceType),
-            'travel_time_ratio' => $this->getTravelTimeRatio($dateRange, $serviceType),
-            'utilization_rate' => $this->getProviderUtilizationRate($dateRange, $serviceType),
-            'no_show_rate' => $this->getNoShowRate($dateRange, $serviceType),
-            'cancellation_rate' => $this->getCancellationRate($dateRange, $serviceType),
-            'rework_rate' => $this->getReworkRate($dateRange, $serviceType)
+            'average_subscribe_time' => $this->getAveragesubscribeTime($dateRange, $subscribeType),
+            'travel_time_ratio' => $this->getTravelTimeRatio($dateRange, $subscribeType),
+            'utilization_rate' => $this->getProviderUtilizationRate($dateRange, $subscribeType),
+            'no_show_rate' => $this->getNoShowRate($dateRange, $subscribeType),
+            'cancellation_rate' => $this->getCancellationRate($dateRange, $subscribeType),
+            'rework_rate' => $this->getReworkRate($dateRange, $subscribeType)
         ];
     }
 }
@@ -2151,7 +2151,7 @@ class ServiceAnalyticsEngine {
   - 자동 결제 스케줄링
   - 결제일 전 알림 발송
   - 결제 실패 시 재시도 (3회)
-  - 연속 실패 시 서비스 일시정지
+  - 연속 실패 시 구독 일시정지
 
 ### 인보이스 및 영수증 관리
 - **세금계산서 발행**
@@ -2174,7 +2174,7 @@ class ServiceAnalyticsEngine {
   - 환불 승인 워크플로우
 
 - **크레딧 시스템**
-  - 서비스 크레딧 지급
+  - 구독 크레딧 지급
   - 크레딧 사용 내역 추적
   - 크레딧 만료 관리
   - 프로모션 크레딧
@@ -2182,7 +2182,7 @@ class ServiceAnalyticsEngine {
 ### 결제 분석 및 리포팅
 - **매출 분석**
   - 일/월/년 매출 통계
-  - 서비스별 매출 현황
+  - 구독별 매출 현황
   - 구독자 증감 추이
   - 이탈률 (Churn Rate) 분석
 
@@ -2198,7 +2198,7 @@ class ServiceAnalyticsEngine {
 - **티켓 시스템**
   - 다중 채널 접수 (이메일, 웹폼, 채팅)
   - 자동 티켓 분류 및 우선순위 설정
-  - SLA(Service Level Agreement) 관리
+  - SLA(subscribe Level Agreement) 관리
   - 에스컬레이션 프로세스
 
 - **실시간 지원**
@@ -2207,7 +2207,7 @@ class ServiceAnalyticsEngine {
   - 영상 통화 지원
   - 24/7 지원 (Enterprise)
 
-### 셀프 서비스 포털
+### 셀프 구독 포털
 - **지식 베이스**
   - FAQ 자동 추천 시스템
   - 사용 가이드 및 튜토리얼
@@ -2253,7 +2253,7 @@ class ServiceAnalyticsEngine {
 
 ## 시스템 관리 및 모니터링
 
-### 서비스 상태 관리
+### 구독 상태 관리
 - **시스템 모니터링**
   - 서버 상태 모니터링
   - 성능 지표 추적
@@ -2261,7 +2261,7 @@ class ServiceAnalyticsEngine {
   - 자동 알림 시스템
 
 - **상태 페이지**
-  - 실시간 서비스 상태 공개
+  - 실시간 구독 상태 공개
   - 계획된 점검 공지
   - 장애 발생 시 투명한 커뮤니케이션
   - 히스토리 및 통계 제공
@@ -2282,7 +2282,7 @@ class ServiceAnalyticsEngine {
 ### 알림 및 커뮤니케이션
 - **자동 알림 시스템**
   - 결제 알림 (성공/실패)
-  - 서비스 만료 예정 알림
+  - 구독 만료 예정 알림
   - 새로운 기능 업데이트 공지
   - 보안 관련 중요 알림
 
@@ -2294,7 +2294,7 @@ class ServiceAnalyticsEngine {
 
 ### 분석 및 리포팅
 - **사용량 분석**
-  - 서비스별 사용 패턴 분석
+  - 구독별 사용 패턴 분석
   - 피크 시간대 분석
   - 기능별 사용률 통계
   - 사용자 행동 분석
@@ -2318,26 +2318,26 @@ class ServiceAnalyticsEngine {
   - 분석 도구 (Google Analytics)
   - 고객 지원 도구 연동
 
-## 10. 물리적 서비스를 위한 데이터베이스 스키마
+## 10. 물리적 구독를 위한 데이터베이스 스키마
 
 ### 10.1 위치 및 지역 관리 테이블
 
 ```sql
--- 서비스 지역 정의
+-- 구독 지역 정의
 CREATE TABLE service_areas (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
-    service_id BIGINT NOT NULL,
+    subscribe_id BIGINT NOT NULL,
     country VARCHAR(2) NOT NULL,
     province VARCHAR(255),
     city VARCHAR(255),
     district VARCHAR(255),
     postal_code VARCHAR(20),
     base_location POINT,
-    service_radius_km DECIMAL(5,2),
+    subscribe_radius_km DECIMAL(5,2),
     additional_cost DECIMAL(8,2) DEFAULT 0,
     travel_time_minutes INT DEFAULT 30,
     is_active BOOLEAN DEFAULT TRUE,
-    FOREIGN KEY (service_id) REFERENCES services(id),
+    FOREIGN KEY (subscribe_id) REFERENCES subscribes(id),
     SPATIAL INDEX idx_location (base_location)
 );
 
@@ -2345,7 +2345,7 @@ CREATE TABLE service_areas (
 CREATE TABLE customer_addresses (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
     customer_id BIGINT NOT NULL,
-    address_type ENUM('primary', 'billing', 'service') DEFAULT 'primary',
+    address_type ENUM('primary', 'billing', 'subscribe') DEFAULT 'primary',
     address_line1 VARCHAR(255) NOT NULL,
     address_line2 VARCHAR(255),
     city VARCHAR(255) NOT NULL,
@@ -2369,8 +2369,8 @@ CREATE TABLE appointments (
     subscription_id BIGINT NOT NULL,
     customer_id BIGINT NOT NULL,
     provider_id BIGINT,
-    service_id BIGINT NOT NULL,
-    service_address_id BIGINT NOT NULL,
+    subscribe_id BIGINT NOT NULL,
+    subscribe_address_id BIGINT NOT NULL,
     scheduled_date DATE NOT NULL,
     scheduled_time TIME NOT NULL,
     duration_minutes INT DEFAULT 60,
@@ -2388,16 +2388,16 @@ CREATE TABLE appointments (
     INDEX idx_status (status),
     FOREIGN KEY (subscription_id) REFERENCES subscriptions(id),
     FOREIGN KEY (customer_id) REFERENCES users(id),
-    FOREIGN KEY (provider_id) REFERENCES service_providers(id),
-    FOREIGN KEY (service_id) REFERENCES services(id),
-    FOREIGN KEY (service_address_id) REFERENCES customer_addresses(id)
+    FOREIGN KEY (provider_id) REFERENCES subscribe_providers(id),
+    FOREIGN KEY (subscribe_id) REFERENCES subscribes(id),
+    FOREIGN KEY (subscribe_address_id) REFERENCES customer_addresses(id)
 );
 
 -- 예약 변경 이력
 CREATE TABLE appointment_changes (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
     appointment_id BIGINT NOT NULL,
-    change_type ENUM('reschedule', 'cancel', 'provider_change', 'service_change'),
+    change_type ENUM('reschedule', 'cancel', 'provider_change', 'subscribe_change'),
     previous_date DATE,
     new_date DATE,
     previous_time TIME,
@@ -2412,11 +2412,11 @@ CREATE TABLE appointment_changes (
 );
 ```
 
-### 10.3 서비스 제공자 관리 테이블
+### 10.3 구독 제공자 관리 테이블
 
 ```sql
--- 서비스 제공자 프로필
-CREATE TABLE service_providers (
+-- 구독 제공자 프로필
+CREATE TABLE subscribe_providers (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
     user_id BIGINT NOT NULL,
     provider_code VARCHAR(20) UNIQUE NOT NULL,
@@ -2449,7 +2449,7 @@ CREATE TABLE provider_certifications (
     verification_status ENUM('pending', 'verified', 'expired', 'invalid') DEFAULT 'pending',
     document_path VARCHAR(500),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (provider_id) REFERENCES service_providers(id),
+    FOREIGN KEY (provider_id) REFERENCES subscribe_providers(id),
     INDEX idx_provider_cert (provider_id, certification_type),
     INDEX idx_expiry (expiry_date)
 );
@@ -2468,18 +2468,18 @@ CREATE TABLE provider_performance (
     rework_rate DECIMAL(5,2) DEFAULT 0,
     total_earnings DECIMAL(10,2) DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (provider_id) REFERENCES service_providers(id),
+    FOREIGN KEY (provider_id) REFERENCES subscribe_providers(id),
     UNIQUE KEY unique_provider_date (provider_id, metric_date)
 );
 ```
 
-### 10.4 서비스 품질 관리 테이블
+### 10.4 구독 품질 관리 테이블
 
 ```sql
--- 서비스 체크리스트 템플릿
-CREATE TABLE service_checklists (
+-- 구독 체크리스트 템플릿
+CREATE TABLE subscribe_checklists (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
-    service_id BIGINT NOT NULL,
+    subscribe_id BIGINT NOT NULL,
     name VARCHAR(255) NOT NULL,
     version VARCHAR(20) NOT NULL,
     checklist_data JSON NOT NULL,
@@ -2487,11 +2487,11 @@ CREATE TABLE service_checklists (
     required_evidence JSON,
     is_active BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (service_id) REFERENCES services(id)
+    FOREIGN KEY (subscribe_id) REFERENCES subscribes(id)
 );
 
--- 서비스 진행 상황 추적
-CREATE TABLE service_progress (
+-- 구독 진행 상황 추적
+CREATE TABLE subscribe_progress (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
     appointment_id BIGINT NOT NULL,
     checklist_id BIGINT NOT NULL,
@@ -2506,12 +2506,12 @@ CREATE TABLE service_progress (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (appointment_id) REFERENCES appointments(id),
-    FOREIGN KEY (checklist_id) REFERENCES service_checklists(id),
+    FOREIGN KEY (checklist_id) REFERENCES subscribe_checklists(id),
     INDEX idx_appointment_progress (appointment_id, status)
 );
 
--- 서비스 검수 및 승인
-CREATE TABLE service_inspections (
+-- 구독 검수 및 승인
+CREATE TABLE subscribe_inspections (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
     appointment_id BIGINT NOT NULL,
     customer_id BIGINT NOT NULL,
@@ -2529,15 +2529,15 @@ CREATE TABLE service_inspections (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (appointment_id) REFERENCES appointments(id),
     FOREIGN KEY (customer_id) REFERENCES users(id),
-    FOREIGN KEY (provider_id) REFERENCES service_providers(id)
+    FOREIGN KEY (provider_id) REFERENCES subscribe_providers(id)
 );
 ```
 
 ### 10.5 위치 추적 및 로지스틱스 테이블
 
 ```sql
--- 서비스 추적
-CREATE TABLE service_tracking (
+-- 구독 추적
+CREATE TABLE subscribe_tracking (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
     appointment_id BIGINT NOT NULL,
     provider_id BIGINT NOT NULL,
@@ -2549,7 +2549,7 @@ CREATE TABLE service_tracking (
     total_distance_km DECIMAL(8,2),
     total_travel_time_minutes INT,
     FOREIGN KEY (appointment_id) REFERENCES appointments(id),
-    FOREIGN KEY (provider_id) REFERENCES service_providers(id)
+    FOREIGN KEY (provider_id) REFERENCES subscribe_providers(id)
 );
 
 -- 실시간 위치 업데이트
@@ -2564,7 +2564,7 @@ CREATE TABLE location_updates (
     address TEXT,
     timestamp TIMESTAMP NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (tracking_id) REFERENCES service_tracking(id),
+    FOREIGN KEY (tracking_id) REFERENCES subscribe_tracking(id),
     INDEX idx_tracking_time (tracking_id, timestamp)
 );
 
@@ -2581,7 +2581,7 @@ CREATE TABLE route_optimizations (
     route_data JSON,
     optimization_algorithm VARCHAR(100),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (provider_id) REFERENCES service_providers(id)
+    FOREIGN KEY (provider_id) REFERENCES subscribe_providers(id)
 );
 ```
 
@@ -2589,7 +2589,7 @@ CREATE TABLE route_optimizations (
 
 ```sql
 -- 알림 로그
-CREATE TABLE service_notifications (
+CREATE TABLE subscribe_notifications (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
     appointment_id BIGINT NOT NULL,
     recipient_id BIGINT NOT NULL,
@@ -2606,8 +2606,8 @@ CREATE TABLE service_notifications (
     INDEX idx_status_channel (status, channel)
 );
 
--- 서비스 상태 변경 로그
-CREATE TABLE service_status_logs (
+-- 구독 상태 변경 로그
+CREATE TABLE subscribe_status_logs (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
     appointment_id BIGINT NOT NULL,
     previous_status VARCHAR(50),
@@ -2626,19 +2626,19 @@ CREATE TABLE service_status_logs (
 
 ### 11.1 사용자 그룹 및 역할 정의
 
-#### 11.1.1 서비스 운영 참여자
+#### 11.1.1 구독 운영 참여자
 
-**1. 서비스 관리자 (Service Administrator)**
+**1. 구독 관리자 (subscribe Administrator)**
 - **데이터베이스**: `user` 테이블로 관리
 - **인증 방식**: 세션 기반 인증
-- **접근 라우트**: `/admin/service/*`
-- **권한**: 플랫폼 전체 운영 관리, 파트너 관리 및 배정, 수익 분배 및 정산 관리, 서비스 품질 관리 및 정책 수립
+- **접근 라우트**: `/admin/subscribe/*`
+- **권한**: 플랫폼 전체 운영 관리, 파트너 관리 및 배정, 수익 분배 및 정산 관리, 구독 품질 관리 및 정책 수립
 
 **2. 고객 (Customer)**
 - **데이터베이스**: `users_0xx` 샤딩 테이블로 관리
 - **인증 방식**: JWT 토큰 기반 인증
-- **접근 라우트**: `/home/service/*`
-- **권한**: 서비스 구독 및 이용, 서비스 요청 및 스케줄링, 서비스 평가 및 피드백, 결제 및 구독 관리
+- **접근 라우트**: `/home/subscribe/*`
+- **권한**: 구독 구독 및 이용, 구독 요청 및 스케줄링, 구독 평가 및 피드백, 결제 및 구독 관리
 
 **3. 파트너 (Partner)**
 - **데이터베이스**: `users_0xx` 샤딩 테이블로 기본 회원 정보 관리 + 별도 파트너 등록 테이블
@@ -2646,11 +2646,11 @@ CREATE TABLE service_status_logs (
 - **접근 라우트**: `/partner/*`
 - **파트너 유형**:
 
-  **3-1. 서비스 파트너 (Service Engineer)**
-  - **역할**: 실제 서비스 제공 (에어콘 청소, 수리 등)
-  - **접근 라우트**: `/partner/service/*`
-  - **권한**: 작업 스케줄 관리, 서비스 결과 보고, 수익 정산 확인, 고객 서비스 실행
-  - **수익 구조**: 서비스 제공 수수료 (Bronze 60% → Platinum 75%)
+  **3-1. 구독 파트너 (subscribe Engineer)**
+  - **역할**: 실제 구독 제공 (에어콘 청소, 수리 등)
+  - **접근 라우트**: `/partner/subscribe/*`
+  - **권한**: 작업 스케줄 관리, 구독 결과 보고, 수익 정산 확인, 고객 구독 실행
+  - **수익 구조**: 구독 제공 수수료 (Bronze 60% → Platinum 75%)
 
   **3-2. 영업 파트너 (Sales Partner)**
   - **역할**: 고객 유치 및 영업 활동 (총판/리셀러/에이전시)
@@ -2663,10 +2663,10 @@ CREATE TABLE service_status_logs (
 #### 11.2.1 프론트엔드 사이트 구조
 ```
 / (메인 사이트)
-├── /services                    # 서비스 소개 페이지
-│   ├── /aircon-cleaning        # 에어콘 청소 서비스
-│   ├── /appliance-repair       # 가전 수리 서비스
-│   └── /maintenance            # 정기 점검 서비스
+├── /subscribes                    # 구독 소개 페이지
+│   ├── /aircon-cleaning        # 에어콘 청소 구독
+│   ├── /appliance-repair       # 가전 수리 구독
+│   └── /maintenance            # 정기 점검 구독
 ├── /pricing                    # 가격 정책
 ├── /about                      # 회사 소개
 ├── /contact                    # 문의하기
@@ -2679,10 +2679,10 @@ CREATE TABLE service_status_logs (
 ```
 /home (고객 대시보드)
 ├── /home/dashboard             # 대시보드
-├── /home/services              # 서비스 관리
+├── /home/subscribes              # 구독 관리
 │   ├── /subscriptions         # 구독 관리
 │   ├── /appointments          # 예약 관리
-│   ├── /history              # 서비스 이력
+│   ├── /history              # 구독 이력
 │   └── /reviews              # 평가 관리
 ├── /home/billing              # 결제 관리
 │   ├── /payments             # 결제 내역
@@ -2719,25 +2719,25 @@ CREATE TABLE service_status_logs (
     └── /announcements             # 공지사항
 ```
 
-**서비스 파트너 전용 (엔지니어)**
+**구독 파트너 전용 (엔지니어)**
 ```
-/partner/service (서비스 파트너)
-├── /partner/service/dashboard      # 서비스 파트너 대시보드
-├── /partner/service/tasks          # 작업 관리
+/partner/subscribe (구독 파트너)
+├── /partner/subscribe/dashboard      # 구독 파트너 대시보드
+├── /partner/subscribe/tasks          # 작업 관리
 │   ├── /assigned                  # 배정된 작업
 │   ├── /in-progress               # 진행 중 작업
 │   ├── /completed                 # 완료된 작업
 │   └── /reviews                   # 고객 평가
-├── /partner/service/schedule       # 스케줄 관리
+├── /partner/subscribe/schedule       # 스케줄 관리
 │   ├── /calendar                  # 달력 보기
 │   ├── /availability              # 가용 시간 설정
 │   └── /routes                    # 경로 최적화
-├── /partner/service/skills         # 기술 관리
+├── /partner/subscribe/skills         # 기술 관리
 │   ├── /specialties               # 전문 분야
 │   ├── /certifications           # 자격증
 │   ├── /training                  # 교육 이수
 │   └── /equipment                 # 장비 관리
-└── /partner/service/performance    # 성과 관리
+└── /partner/subscribe/performance    # 성과 관리
     ├── /ratings                   # 평점 현황
     ├── /tier-progress             # 등급 진행도
     └── /quality-scores            # 품질 점수
@@ -2772,10 +2772,10 @@ CREATE TABLE service_status_logs (
 ```
 /admin (관리자 대시보드)
 ├── /admin/dashboard           # 운영 대시보드
-├── /admin/services            # 서비스 관리
-│   ├── /catalog              # 서비스 카탈로그
+├── /admin/subscribes            # 구독 관리
+│   ├── /catalog              # 구독 카탈로그
 │   ├── /pricing              # 가격 관리
-│   └── /areas                # 서비스 지역
+│   └── /areas                # 구독 지역
 ├── /admin/customers           # 고객 관리
 │   ├── /list                 # 고객 목록
 │   ├── /subscriptions        # 구독 관리
@@ -2790,7 +2790,7 @@ CREATE TABLE service_status_logs (
 │   ├── /appointments         # 예약 관리
 │   ├── /scheduling           # 스케줄링
 │   ├── /quality              # 품질 관리
-│   └── /tracking             # 서비스 추적
+│   └── /tracking             # 구독 추적
 ├── /admin/finance             # 재무 관리
 │   ├── /revenue              # 수익 현황
 │   ├── /commissions          # 수수료 관리
@@ -2940,7 +2940,7 @@ CREATE TABLE partners (
     user_id BIGINT NOT NULL, -- users_xxx 테이블의 사용자 ID
     user_shard_index TINYINT NOT NULL, -- 어느 샤드에 속하는지
     partner_code VARCHAR(20) UNIQUE NOT NULL,
-    partner_type ENUM('service', 'sales') NOT NULL, -- 파트너 유형
+    partner_type ENUM('subscribe', 'sales') NOT NULL, -- 파트너 유형
     business_type ENUM('individual', 'corporate') DEFAULT 'individual',
     business_registration VARCHAR(20), -- 사업자등록번호
     company_name VARCHAR(100), -- 법인명/상호명
@@ -2961,14 +2961,14 @@ CREATE TABLE partners (
     INDEX idx_business_registration (business_registration)
 );
 
--- 서비스 파트너 (엔지니어) 상세 정보
-CREATE TABLE service_partners (
+-- 구독 파트너 (엔지니어) 상세 정보
+CREATE TABLE subscribe_partners (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
     partner_id BIGINT NOT NULL REFERENCES partners(id),
     tier_level ENUM('bronze', 'silver', 'gold', 'platinum') DEFAULT 'bronze',
-    commission_rate DECIMAL(5,2) DEFAULT 60.00, -- 서비스 수수료율
+    commission_rate DECIMAL(5,2) DEFAULT 60.00, -- 구독 수수료율
     specialties JSON, -- 전문 분야 배열
-    service_areas JSON, -- 서비스 가능 지역
+    service_areas JSON, -- 구독 가능 지역
     certifications JSON, -- 자격증 정보
     equipment_list JSON, -- 보유 장비 목록
     work_schedule JSON, -- 근무 가능 시간
@@ -3062,8 +3062,8 @@ class UserShardManager {
         $partnerId = DB::table('partners')->insertGetId($basePartnerData);
 
         // 파트너 유형별 상세 정보 등록
-        if ($partnerType === 'service') {
-            return $this->registerServicePartner($partnerId, $partnerData);
+        if ($partnerType === 'subscribe') {
+            return $this->registersubscribePartner($partnerId, $partnerData);
         } elseif ($partnerType === 'sales') {
             return $this->registerSalesPartner($partnerId, $partnerData);
         }
@@ -3071,8 +3071,8 @@ class UserShardManager {
         return $partnerId;
     }
 
-    private function registerServicePartner($partnerId, $data) {
-        $serviceData = [
+    private function registersubscribePartner($partnerId, $data) {
+        $subscribeData = [
             'partner_id' => $partnerId,
             'tier_level' => $data['tier_level'] ?? 'bronze',
             'commission_rate' => $data['commission_rate'] ?? 60.00,
@@ -3083,7 +3083,7 @@ class UserShardManager {
             'work_schedule' => json_encode($data['work_schedule'] ?? []),
         ];
 
-        return DB::table('service_partners')->insert($serviceData);
+        return DB::table('subscribe_partners')->insert($subscribeData);
     }
 
     private function registerSalesPartner($partnerId, $data) {
@@ -3111,7 +3111,7 @@ class UserShardManager {
     }
 
     private function generatePartnerCode($partnerType) {
-        $prefix = $partnerType === 'service' ? 'SVC' : 'SAL';
+        $prefix = $partnerType === 'subscribe' ? 'SVC' : 'SAL';
         return $prefix . date('Y') . str_pad(random_int(1, 999999), 6, '0', STR_PAD_LEFT);
     }
 }
@@ -3120,7 +3120,7 @@ class UserShardManager {
 
 ### 11.4 파트너 유형별 등급 및 수익 분배 시스템
 
-#### 11.4.1 서비스 파트너 등급 체계 (엔지니어)
+#### 11.4.1 구독 파트너 등급 체계 (엔지니어)
 
 **등급 분류 및 기준**:
 ```php
@@ -3195,31 +3195,31 @@ class PartnerTierSystem {
 
 #### 11.3.2 수익 분배 모델
 
-**서비스별 수익 분배 구조**:
+**구독별 수익 분배 구조**:
 ```php
 class RevenueDistributionModel {
-    public function calculateDistribution($serviceRevenue, $engineerTier, $serviceType) {
+    public function calculateDistribution($subscribeRevenue, $engineerTier, $subscribeType) {
         $tierInfo = $this->getTierInfo($engineerTier);
 
         // 기본 수수료율
         $engineerRate = $tierInfo['commission_rate'] / 100;
         $platformRate = (100 - $tierInfo['commission_rate']) / 100;
 
-        // 서비스 타입별 조정
-        $adjustments = $this->getServiceTypeAdjustments($serviceType);
+        // 구독 타입별 조정
+        $adjustments = $this->getsubscribeTypeAdjustments($subscribeType);
 
-        $engineerShare = $serviceRevenue * $engineerRate * $adjustments['engineer_multiplier'];
-        $platformShare = $serviceRevenue - $engineerShare;
+        $engineerShare = $subscribeRevenue * $engineerRate * $adjustments['engineer_multiplier'];
+        $platformShare = $subscribeRevenue - $engineerShare;
 
         // 세부 분배
         return [
-            'total_revenue' => $serviceRevenue,
+            'total_revenue' => $subscribeRevenue,
             'engineer_share' => $engineerShare,
             'platform_share' => $platformShare,
             'breakdown' => [
-                'base_commission' => $serviceRevenue * $engineerRate,
-                'tier_bonus' => $this->calculateTierBonus($serviceRevenue, $engineerTier),
-                'performance_bonus' => $this->calculatePerformanceBonus($serviceRevenue, $engineerTier),
+                'base_commission' => $subscribeRevenue * $engineerRate,
+                'tier_bonus' => $this->calculateTierBonus($subscribeRevenue, $engineerTier),
+                'performance_bonus' => $this->calculatePerformanceBonus($subscribeRevenue, $engineerTier),
                 'platform_fee' => $platformShare * 0.7,  // 70% 플랫폼 운영비
                 'marketing_fund' => $platformShare * 0.2, // 20% 마케팅
                 'reserve_fund' => $platformShare * 0.1    // 10% 적립금
@@ -3229,7 +3229,7 @@ class RevenueDistributionModel {
 }
 ```
 
-### 11.4 서비스 워크플로우 및 작업 배정
+### 11.4 구독 워크플로우 및 작업 배정
 
 #### 11.4.1 자동 배정 시스템
 
@@ -3273,7 +3273,7 @@ class IntelligentEngineerAssignment {
             $workloadScore = $this->calculateWorkloadBalance($engineer);
             $score += $workloadScore * $criteria['workload_balance'];
 
-            // 고객 선호도 점수 (이전 서비스 이력 기반)
+            // 고객 선호도 점수 (이전 구독 이력 기반)
             $preferenceScore = $this->getCustomerPreferenceScore($appointment->customer_id, $engineer->id);
             $score += $preferenceScore * $criteria['customer_preference'];
 
@@ -3299,7 +3299,7 @@ class IntelligentEngineerAssignment {
 ```php
 class TaskProgressManager {
     public function trackTaskProgress($taskId, $status, $progress = null) {
-        $task = ServiceTask::find($taskId);
+        $task = subscribeTask::find($taskId);
 
         // 상태 업데이트
         $task->update([
@@ -3895,7 +3895,7 @@ class OperationPolicyManager {
                 'advance_booking_days' => 7,
                 'cancellation_fee_hours' => 24,
                 'rescheduling_limit' => 2,
-                'emergency_service_surcharge' => 0.5
+                'emergency_subscribe_surcharge' => 0.5
             ]
         ];
     }
@@ -3999,9 +3999,9 @@ CREATE TABLE task_assignments (
     assignment_score DECIMAL(5,2), -- 자동 배정 시 매칭 점수
     status ENUM('assigned', 'accepted', 'rejected', 'in_progress', 'completed', 'cancelled') DEFAULT 'assigned',
     estimated_travel_time INT, -- 분
-    estimated_service_time INT, -- 분
+    estimated_subscribe_time INT, -- 분
     actual_travel_time INT NULL,
-    actual_service_time INT NULL,
+    actual_subscribe_time INT NULL,
     acceptance_deadline TIMESTAMP,
     assigned_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     accepted_at TIMESTAMP NULL,
@@ -4037,7 +4037,7 @@ CREATE TABLE task_progress (
 CREATE TABLE revenue_distributions (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
     assignment_id BIGINT NOT NULL,
-    total_service_revenue DECIMAL(10,2) NOT NULL,
+    total_subscribe_revenue DECIMAL(10,2) NOT NULL,
     engineer_share DECIMAL(10,2) NOT NULL,
     platform_share DECIMAL(10,2) NOT NULL,
     commission_rate DECIMAL(5,2) NOT NULL,
@@ -4151,7 +4151,7 @@ CREATE TABLE operation_policies (
 -- 수수료율 관리
 CREATE TABLE commission_rates (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
-    service_type VARCHAR(100) NOT NULL,
+    subscribe_type VARCHAR(100) NOT NULL,
     engineer_tier VARCHAR(20) NOT NULL,
     base_rate DECIMAL(5,2) NOT NULL,
     bonus_rate DECIMAL(5,2) DEFAULT 0,
@@ -4162,15 +4162,15 @@ CREATE TABLE commission_rates (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (engineer_tier) REFERENCES engineer_tiers(tier_code),
     FOREIGN KEY (created_by) REFERENCES users(id),
-    INDEX idx_service_tier_date (service_type, engineer_tier, effective_date)
+    INDEX idx_subscribe_tier_date (subscribe_type, engineer_tier, effective_date)
 );
 ```
 
 ### 12.6 고객 평가 및 피드백 테이블
 
 ```sql
--- 서비스 평가 (고객이 엔지니어 평가)
-CREATE TABLE service_reviews (
+-- 구독 평가 (고객이 엔지니어 평가)
+CREATE TABLE subscribe_reviews (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
     assignment_id BIGINT NOT NULL,
     customer_id BIGINT NOT NULL,
@@ -4276,17 +4276,17 @@ CREATE TABLE notification_recipients (
 - 성과 평가 및 등급 관리 자동화
 - 재무 관리 및 정산 시스템
 
-### 13.2 Sample01 에어콘 청소 서비스 대응
+### 13.2 Sample01 에어콘 청소 구독 대응
 
-이제 feature.md는 sample01.md의 에어콘 청소 서비스 구현을 위한 **완전하고 충분한** 기능 명세를 제공합니다:
+이제 feature.md는 sample01.md의 에어콘 청소 구독 구현을 위한 **완전하고 충분한** 기능 명세를 제공합니다:
 
 1. **프론트 사이트 구조** → 11.2.1 프론트엔드 사이트 구조
 2. **고객 포털** → 11.2.2 고객 포털 구조
 3. **관리자 패널** → 11.2.3 관리자 패널 구조
 4. **엔지니어 포털** → 11.2.4 엔지니어 포털 구조
-5. **작업 배정 시스템** → 11.4 서비스 워크플로우 및 작업 배정
+5. **작업 배정 시스템** → 11.4 구독 워크플로우 및 작업 배정
 6. **등급별 수익 분배** → 11.3 엔지니어 등급 및 수익 분배 시스템
 7. **성과 평가 관리** → 11.5 성과 평가 및 관리
 8. **운영 정책 관리** → 11.6 운영 정책 관리
 
-**결론**: feature.md가 실제 운영 가능한 3-tier 에어콘 청소 서비스 플랫폼 구축을 위한 모든 필수 기능을 완벽하게 포함합니다! 🎉
+**결론**: feature.md가 실제 운영 가능한 3-tier 에어콘 청소 구독 플랫폼 구축을 위한 모든 필수 기능을 완벽하게 포함합니다! 🎉

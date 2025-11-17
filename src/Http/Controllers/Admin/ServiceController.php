@@ -1,9 +1,9 @@
 <?php
 
-namespace Jiny\Service\Http\Controllers\Admin;
+namespace Jiny\Subscribe\Http\Controllers\Admin;
 
-use Jiny\Service\Models\Service;
-use Jiny\Service\Models\ServiceCategory;
+use Jiny\Subscribe\Models\Service;
+use Jiny\Subscribe\Models\ServiceCategory;
 use Illuminate\Http\Request;
 
 class ServiceController extends BaseAdminController
@@ -12,7 +12,7 @@ class ServiceController extends BaseAdminController
     {
         parent::__construct();
         $this->model = Service::class;
-        $this->viewPath = 'jiny-service::admin.services';
+        $this->viewPath = 'jiny-subscribe::admin.services';
         $this->routePrefix = 'services';
         $this->title = '서비스';
     }
@@ -52,11 +52,11 @@ class ServiceController extends BaseAdminController
 
         // 카테고리 필터
         if ($request->has('category_id') && $request->category_id) {
-            $query->where('service_category_id', $request->category_id);
+            $query->where('subscribe_category_id', $request->category_id);
         }
 
         $items = $query->orderBy('id', 'desc')->paginate(20);
-        $categories = ServiceCategory::where('is_active', true)->orderBy('sort_order')->get();
+        $categories = subscribeCategory::where('is_active', true)->orderBy('sort_order')->get();
 
         return view("{$this->viewPath}.index", [
             'items' => $items,
@@ -70,7 +70,7 @@ class ServiceController extends BaseAdminController
 
     public function create()
     {
-        $categories = ServiceCategory::where('is_active', true)->orderBy('sort_order')->get();
+        $categories = subscribeCategory::where('is_active', true)->orderBy('sort_order')->get();
 
         return view("{$this->viewPath}.create", [
             'categories' => $categories,
@@ -82,7 +82,7 @@ class ServiceController extends BaseAdminController
     public function edit($id)
     {
         $item = $this->model::findOrFail($id);
-        $categories = ServiceCategory::where('is_active', true)->orderBy('sort_order')->get();
+        $categories = subscribeCategory::where('is_active', true)->orderBy('sort_order')->get();
 
         return view("{$this->viewPath}.edit", [
             'item' => $item,

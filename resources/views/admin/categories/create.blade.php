@@ -1,4 +1,4 @@
-@extends($layout ?? 'jiny-service::layouts.admin.sidebar')
+@extends($layout ?? 'jiny-subscribe::layouts.admin.sidebar')
 
 @section('title', $config['title'])
 
@@ -13,7 +13,7 @@
                     <p class="text-muted mb-0">{{ $config['subtitle'] }}</p>
                 </div>
                 <div>
-                    <a href="{{ route('admin.service.categories.index') }}" class="btn btn-outline-secondary">
+                    <a href="{{ route('admin.subscribe.categories.index') }}" class="btn btn-outline-secondary">
                         <i class="fe fe-arrow-left me-2"></i>목록으로
                     </a>
                 </div>
@@ -29,7 +29,7 @@
                     <h5 class="mb-0">카테고리 정보</h5>
                 </div>
                 <div class="card-body">
-                    <form method="POST" action="{{ route('admin.service.categories.store') }}">
+                    <form method="POST" action="{{ route('admin.subscribe.categories.store') }}">
                         @csrf
 
                         <div class="row">
@@ -184,7 +184,7 @@
                         </div>
 
                         <div class="d-flex justify-content-between">
-                            <a href="{{ route('admin.service.categories.index') }}" class="btn btn-secondary">
+                            <a href="{{ route('admin.subscribe.categories.index') }}" class="btn btn-secondary">
                                 <i class="fe fe-x me-2"></i>취소
                             </a>
                             <button type="submit" class="btn btn-primary">

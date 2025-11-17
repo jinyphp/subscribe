@@ -1,10 +1,10 @@
 <?php
 
-namespace Jiny\Service\Http\Controllers\Admin\ServiceSubscriptionLog;
+namespace Jiny\Subscribe\Http\Controllers\Admin\subscribeSubscriptionLog;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Jiny\Service\Models\ServiceSubscriptionLog;
+use Jiny\Subscribe\Models\subscribeSubscriptionLog;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 
@@ -19,7 +19,7 @@ class StatsController extends Controller
         $startDate = $this->getStartDate($period);
         $endDate = now();
 
-        $query = ServiceSubscriptionLog::whereBetween('service_subscription_logs.created_at', [$startDate, $endDate]);
+        $query = subscribeSubscriptionLog::whereBetween('subscribe_subscription_logs.created_at', [$startDate, $endDate]);
 
         if ($action) {
             $query->where('action', $action);
@@ -27,7 +27,7 @@ class StatsController extends Controller
 
         // 일별 통계
         $dailyStats = $query->clone()
-                           ->selectRaw('strftime("%Y-%m-%d", service_subscription_logs.created_at) as date, COUNT(*) as count')
+                           ->selectRaw('strftime("%Y-%m-%d", subscribe_subscription_logs.created_at) as date, COUNT(*) as count')
                            ->groupBy('date')
                            ->orderBy('date')
                            ->get();
@@ -51,24 +51,24 @@ class StatsController extends Controller
                                  ->groupBy('processed_by')
                                  ->get();
 
-        // 서비스별 통계
-        $serviceStats = $query->clone()
-                             ->join('services', 'service_subscription_logs.service_id', '=', 'services.id')
-                             ->selectRaw('services.title, COUNT(*) as count')
-                             ->groupBy('services.id', 'services.title')
+        // 구독별 통계
+        $subscribeStats = $query->clone()
+                             ->join('subscribes', 'subscribe_subscription_logs.subscribe_id', '=', 'subscribes.id')
+                             ->selectRaw('subscribes.title, COUNT(*) as count')
+                             ->groupBy('subscribes.id', 'subscribes.title')
                              ->orderBy('count', 'desc')
                              ->limit(10)
                              ->get();
 
         // 시간대별 통계
         $hourlyStats = $query->clone()
-                            ->selectRaw('strftime("%H", service_subscription_logs.created_at) as hour, COUNT(*) as count')
+                            ->selectRaw('strftime("%H", subscribe_subscription_logs.created_at) as hour, COUNT(*) as count')
                             ->groupBy('hour')
                             ->orderBy('hour')
                             ->get();
 
         // 금액 통계 (결제 관련 액션만)
-        $paymentStats = ServiceSubscriptionLog::whereBetween('service_subscription_logs.created_at', [$startDate, $endDate])
+        $paymentStats = subscribeSubscriptionLog::whereBetween('subscribe_subscription_logs.created_at', [$startDate, $endDate])
                                              ->whereIn('action', ['payment_success', 'payment_failed', 'refund'])
                                              ->selectRaw('
                                                  action,
@@ -79,12 +79,12 @@ class StatsController extends Controller
                                              ->groupBy('action')
                                              ->get();
 
-        return view('jiny-service::admin.service_subscription_log.stats', compact(
+        return view('jiny-subscribe::admin.service_subscription_log.stats', compact(
             'dailyStats',
             'actionStats',
             'resultStats',
             'processedByStats',
-            'serviceStats',
+            'subscribeStats',
             'hourlyStats',
             'paymentStats',
             'period',
@@ -115,8 +115,8 @@ class StatsController extends Controller
         $startDate = $this->getStartDate($period);
         $endDate = now();
 
-        $query = ServiceSubscriptionLog::with(['serviceUser', 'service'])
-                                       ->whereBetween('service_subscription_logs.created_at', [$startDate, $endDate]);
+        $query = subscribeSubscriptionLog::with(['subscribeUser', 'subscribe'])
+                                       ->whereBetween('subscribe_subscription_logs.created_at', [$startDate, $endDate]);
 
         if ($action) {
             $query->where('action', $action);
@@ -149,7 +149,7 @@ class StatsController extends Controller
                 '사용자UUID',
                 '사용자이름',
                 '사용자이메일',
-                '서비스',
+                '구독',
                 '액션',
                 '액션제목',
                 '액션설명',
@@ -166,9 +166,9 @@ class StatsController extends Controller
                 fputcsv($file, [
                     $log->id,
                     $log->user_uuid,
-                    $log->serviceUser->user_name ?? '',
-                    $log->serviceUser->user_email ?? '',
-                    $log->service->title ?? '',
+                    $log->subscribeUser->user_name ?? '',
+                    $log->subscribeUser->user_email ?? '',
+                    $log->subscribe->title ?? '',
                     $log->action,
                     $log->action_title,
                     $log->action_description,

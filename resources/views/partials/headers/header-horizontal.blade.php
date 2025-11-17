@@ -201,6 +201,6 @@
 
 <nav class="navbar navbar-expand-lg navbar-default py-0 py-lg-2">
     <div class="container px-0">
-        @includeIf('jiny-service::partials.navs.horizontal.top', ['menuItems' => Site::menuItems('horizontal')])
+        @includeIf('jiny-subscribe::partials.navs.horizontal.top', ['menuItems' => Site::menuItems('horizontal')])
     </div>
 </nav>

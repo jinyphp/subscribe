@@ -4,8 +4,8 @@
 Jiny 생태계 패키지 기반 전체 라우트 등록 및 미들웨어 구성
 
 ### 패키지별 라우트 구조
-- **jiny/admin**: `/admin/service/*` (admin 미들웨어)
-- **jiny/auth**: `/home/service/*` (jwt.auth 미들웨어)
+- **jiny/admin**: `/admin/subscribe/*` (admin 미들웨어)
+- **jiny/auth**: `/home/subscribe/*` (jwt.auth 미들웨어)
 - **jiny/auth + 검증**: `/partner/*` (jwt.auth + partner.verify)
 
 ## 의존관계

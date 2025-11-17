@@ -1,32 +1,32 @@
 <?php
 
-namespace Jiny\Service\Http\Controllers\Admin\PlanDetail;
+namespace Jiny\Subscribe\Http\Controllers\Admin\PlanDetail;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Jiny\Service\Models\ServicePlan;
-use Jiny\Service\Models\ServicePlanDetail;
+use Jiny\Subscribe\Models\subscribePlan;
+use Jiny\Subscribe\Models\subscribePlanDetail;
 
 class EditController extends Controller
 {
     public function __invoke(Request $request, $planId, $detailId)
     {
-        $plan = ServicePlan::with('service')->findOrFail($planId);
+        $plan = subscribePlan::with('subscribe')->findOrFail($planId);
 
-        $detail = ServicePlanDetail::where('service_plan_id', $planId)
+        $detail = subscribePlanDetail::where('subscribe_plan_id', $planId)
                     ->findOrFail($detailId);
 
         // 상세 타입 옵션
-        $detailTypes = ServicePlanDetail::getDetailTypes();
+        $detailTypes = subscribePlanDetail::getDetailTypes();
 
         // 값 타입 옵션
-        $valueTypes = ServicePlanDetail::getValueTypes();
+        $valueTypes = subscribePlanDetail::getValueTypes();
 
         // 카테고리 옵션
-        $categories = ServicePlanDetail::getCategories();
+        $categories = subscribePlanDetail::getCategories();
 
         // 기존 그룹명들 (현재 플랜의)
-        $existingGroups = ServicePlanDetail::where('service_plan_id', $planId)
+        $existingGroups = subscribePlanDetail::where('subscribe_plan_id', $planId)
                             ->whereNotNull('group_name')
                             ->distinct()
                             ->pluck('group_name')
@@ -69,7 +69,7 @@ class EditController extends Controller
             }
         }
 
-        return view('jiny-service::admin.plan_detail.edit', compact(
+        return view('jiny-subscribe::admin.plan_detail.edit', compact(
             'plan',
             'detail',
             'detailTypes',

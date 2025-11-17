@@ -1,19 +1,19 @@
 <?php
 
-namespace Jiny\Service\Http\Controllers\Admin\PlanPrice;
+namespace Jiny\Subscribe\Http\Controllers\Admin\PlanPrice;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Jiny\Service\Models\ServicePlan;
-use Jiny\Service\Models\ServicePlanPrice;
+use Jiny\Subscribe\Models\subscribePlan;
+use Jiny\Subscribe\Models\subscribePlanPrice;
 
 class EditController extends Controller
 {
     public function __invoke(Request $request, $planId, $priceId)
     {
-        $plan = ServicePlan::with('service')->findOrFail($planId);
+        $plan = subscribePlan::with('subscribe')->findOrFail($planId);
 
-        $price = ServicePlanPrice::where('service_plan_id', $planId)
+        $price = subscribePlanPrice::where('subscribe_plan_id', $planId)
                    ->findOrFail($priceId);
 
         // 결제 주기 옵션
@@ -44,7 +44,7 @@ class EditController extends Controller
             'custom_integration' => '커스텀 연동',
         ];
 
-        return view('jiny-service::admin.plan_price.edit', compact(
+        return view('jiny-subscribe::admin.plan_price.edit', compact(
             'plan',
             'price',
             'billingPeriods',

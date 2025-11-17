@@ -1,4 +1,4 @@
-@extends($layout ?? 'jiny-service::layouts.admin.sidebar')
+@extends($layout ?? 'jiny-subscribe::layouts.admin.sidebar')
 
 @section('title', $config['title'])
 
@@ -13,10 +13,10 @@
                     <p class="text-muted mb-0">{{ $config['subtitle'] }}</p>
                 </div>
                 <div>
-                    <a href="{{ route('admin.service.dashboard') }}" class="btn btn-outline-secondary me-2">
+                    <a href="{{ route('admin.subscribe.dashboard') }}" class="btn btn-outline-secondary me-2">
                         <i class="fe fe-arrow-left me-2"></i>대시보드
                     </a>
-                    <a href="{{ route('admin.service.categories.create') }}" class="btn btn-primary">
+                    <a href="{{ route('admin.subscribe.categories.create') }}" class="btn btn-primary">
                         <i class="fe fe-plus me-2"></i>새 카테고리 생성
                     </a>
                 </div>
@@ -116,7 +116,7 @@
     <!-- 필터 -->
     <div class="card mb-4">
         <div class="card-body">
-            <form method="GET" action="{{ route('admin.service.categories.index') }}">
+            <form method="GET" action="{{ route('admin.subscribe.categories.index') }}">
                 <div class="row">
                     <div class="col-md-4">
                         <div class="form-group">
@@ -152,7 +152,7 @@
                         <button type="submit" class="btn btn-outline-primary me-2">
                             <i class="fe fe-search me-1"></i>검색
                         </button>
-                        <a href="{{ route('admin.service.categories.index') }}" class="btn btn-outline-secondary">
+                        <a href="{{ route('admin.subscribe.categories.index') }}" class="btn btn-outline-secondary">
                             <i class="fe fe-refresh-cw me-1"></i>초기화
                         </a>
                     </div>
@@ -175,7 +175,7 @@
                                 <th width="50">ID</th>
                                 <th>카테고리 정보</th>
                                 <th>상위 카테고리</th>
-                                <th width="100">서비스 수</th>
+                                <th width="100">구독 수</th>
                                 <th width="80">정렬</th>
                                 <th width="100">상태</th>
                                 <th width="150">등록일</th>
@@ -216,7 +216,7 @@
                                     @endif
                                 </td>
                                 <td>
-                                    <span class="badge bg-primary">{{ $category->service_count }}</span>
+                                    <span class="badge bg-primary">{{ $category->subscribe_count }}</span>
                                 </td>
                                 <td>
                                     <span class="text-muted">{{ $category->pos }}</span>
@@ -235,7 +235,7 @@
                                 </td>
                                 <td>
                                     <div class="btn-group btn-group-sm">
-                                        <a href="{{ route('admin.service.categories.edit', $category->id) }}"
+                                        <a href="{{ route('admin.subscribe.categories.edit', $category->id) }}"
                                            class="btn btn-outline-primary"
                                            title="수정">
                                             <i class="fe fe-edit"></i>
@@ -271,7 +271,7 @@
                     <i class="fe fe-folder fe-3x text-muted mb-3"></i>
                     <h5 class="text-muted">등록된 카테고리가 없습니다</h5>
                     <p class="text-muted">새 카테고리를 생성해보세요.</p>
-                    <a href="{{ route('admin.service.categories.create') }}" class="btn btn-primary">
+                    <a href="{{ route('admin.subscribe.categories.create') }}" class="btn btn-primary">
                         <i class="fe fe-plus me-2"></i>새 카테고리 생성
                     </a>
                 </div>
@@ -292,7 +292,7 @@
                 <p>이 카테고리를 삭제하시겠습니까?</p>
                 <p class="text-danger small">
                     <i class="fe fe-alert-triangle me-1"></i>
-                    카테고리에 속한 서비스나 하위 카테고리가 있으면 삭제할 수 없습니다.
+                    카테고리에 속한 구독나 하위 카테고리가 있으면 삭제할 수 없습니다.
                 </p>
             </div>
             <div class="modal-footer">
@@ -339,7 +339,7 @@
 function deleteCategory(id) {
     const modal = new bootstrap.Modal(document.getElementById('deleteModal'));
     const form = document.getElementById('deleteForm');
-    form.action = `/admin/service/categories/${id}`;
+    form.action = `/admin/subscribe/categories/${id}`;
     modal.show();
 }
 </script>

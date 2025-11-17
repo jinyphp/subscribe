@@ -1,18 +1,18 @@
 <?php
 
-namespace Jiny\Service\Http\Controllers\Admin\Process;
+namespace Jiny\Subscribe\Http\Controllers\Admin\Process;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Jiny\Service\Models\ServiceUser;
-use Jiny\Service\Models\ServiceSubscriptionLog;
+use Jiny\Subscribe\Models\subscribeUser;
+use Jiny\Subscribe\Models\subscribeSubscriptionLog;
 
 class CancelController extends Controller
 {
     /**
      * 구독 취소
      */
-    public function cancel(Request $request, $serviceUserId)
+    public function cancel(Request $request, $subscribeUserId)
     {
         $request->validate([
             'cancel_reason' => 'nullable|string|max:500',
@@ -22,10 +22,10 @@ class CancelController extends Controller
             'admin_notes' => 'nullable|string|max:1000',
         ]);
 
-        $serviceUser = ServiceUser::findOrFail($serviceUserId);
+        $subscribeUser = subscribeUser::findOrFail($subscribeUserId);
 
         // 이미 취소된 구독인지 확인
-        if ($serviceUser->status === 'cancelled') {
+        if ($subscribeUser->status === 'cancelled') {
             return response()->json([
                 'success' => false,
                 'message' => '이미 취소된 구독입니다.'
@@ -33,14 +33,14 @@ class CancelController extends Controller
         }
 
         try {
-            \DB::transaction(function () use ($request, $serviceUser) {
-                $originalStatus = $serviceUser->status;
-                $originalExpiresAt = $serviceUser->expires_at;
+            \DB::transaction(function () use ($request, $subscribeUser) {
+                $originalStatus = $subscribeUser->status;
+                $originalExpiresAt = $subscribeUser->expires_at;
 
                 // 즉시 취소 또는 기간 만료 후 취소
                 if ($request->immediate_cancel) {
                     // 즉시 취소: 상태를 취소로 변경하고 만료일을 현재로 설정
-                    $serviceUser->update([
+                    $subscribeUser->update([
                         'status' => 'cancelled',
                         'expires_at' => now(),
                         'cancelled_at' => now(),
@@ -50,7 +50,7 @@ class CancelController extends Controller
                     ]);
                 } else {
                     // 기간 만료 후 취소: 자동 갱신만 비활성화
-                    $serviceUser->update([
+                    $subscribeUser->update([
                         'auto_renewal' => false,
                         'cancel_reason' => $request->cancel_reason ?: '관리자에 의한 취소 예약',
                     ]);
@@ -58,26 +58,26 @@ class CancelController extends Controller
 
                 // 환불 요청이 있는 경우
                 if ($request->refund_request && $request->refund_amount > 0) {
-                    $serviceUser->increment('refund_amount', $request->refund_amount);
-                    $serviceUser->update(['refunded_at' => now()]);
+                    $subscribeUser->increment('refund_amount', $request->refund_amount);
+                    $subscribeUser->update(['refunded_at' => now()]);
 
                     // 환불 로그 기록
-                    ServiceSubscriptionLog::logRefund(
-                        $serviceUser->id,
+                    subscribeSubscriptionLog::logRefund(
+                        $subscribeUser->id,
                         $request->refund_amount,
                         $request->cancel_reason
                     );
                 }
 
                 // 취소 로그 기록
-                ServiceSubscriptionLog::logCancel(
-                    $serviceUser->id,
+                subscribeSubscriptionLog::logCancel(
+                    $subscribeUser->id,
                     $request->cancel_reason
                 );
 
                 // 관리자 액션 로그 추가
-                ServiceSubscriptionLog::logAdminAction(
-                    $serviceUser->id,
+                subscribeSubscriptionLog::logAdminAction(
+                    $subscribeUser->id,
                     $request->immediate_cancel ? '즉시 구독 취소' : '구독 취소 예약',
                     $request->admin_notes ?: '관리자가 구독을 취소했습니다.',
                     auth()->id(),
@@ -93,11 +93,11 @@ class CancelController extends Controller
                 'success' => true,
                 'message' => $message,
                 'data' => [
-                    'service_user_id' => $serviceUser->id,
-                    'status' => $serviceUser->status,
-                    'expires_at' => $serviceUser->expires_at,
-                    'cancelled_at' => $serviceUser->cancelled_at,
-                    'auto_renewal' => $serviceUser->auto_renewal,
+                    'subscribe_user_id' => $subscribeUser->id,
+                    'status' => $subscribeUser->status,
+                    'expires_at' => $subscribeUser->expires_at,
+                    'cancelled_at' => $subscribeUser->cancelled_at,
+                    'auto_renewal' => $subscribeUser->auto_renewal,
                 ]
             ]);
 
@@ -112,7 +112,7 @@ class CancelController extends Controller
     /**
      * 취소된 구독 재활성화
      */
-    public function reactivate(Request $request, $serviceUserId)
+    public function reactivate(Request $request, $subscribeUserId)
     {
         $request->validate([
             'reactivate_reason' => 'nullable|string|max:500',
@@ -120,10 +120,10 @@ class CancelController extends Controller
             'admin_notes' => 'nullable|string|max:1000',
         ]);
 
-        $serviceUser = ServiceUser::findOrFail($serviceUserId);
+        $subscribeUser = subscribeUser::findOrFail($subscribeUserId);
 
         // 취소된 구독인지 확인
-        if ($serviceUser->status !== 'cancelled') {
+        if ($subscribeUser->status !== 'cancelled') {
             return response()->json([
                 'success' => false,
                 'message' => '취소된 구독만 재활성화할 수 있습니다.'
@@ -131,8 +131,8 @@ class CancelController extends Controller
         }
 
         try {
-            \DB::transaction(function () use ($request, $serviceUser) {
-                $originalExpiresAt = $serviceUser->expires_at;
+            \DB::transaction(function () use ($request, $subscribeUser) {
+                $originalExpiresAt = $subscribeUser->expires_at;
 
                 // 만료일 연장 (옵션)
                 $newExpiresAt = $originalExpiresAt;
@@ -144,18 +144,18 @@ class CancelController extends Controller
                 }
 
                 // 구독 재활성화
-                $serviceUser->update([
+                $subscribeUser->update([
                     'status' => 'active',
                     'expires_at' => $newExpiresAt,
                     'cancelled_at' => null,
                     'cancel_reason' => null,
                     'auto_renewal' => true,
-                    'next_billing_at' => $serviceUser->billing_cycle !== 'lifetime' ? $newExpiresAt : null,
+                    'next_billing_at' => $subscribeUser->billing_cycle !== 'lifetime' ? $newExpiresAt : null,
                 ]);
 
                 // 재활성화 로그 기록
-                ServiceSubscriptionLog::logAdminAction(
-                    $serviceUser->id,
+                subscribeSubscriptionLog::logAdminAction(
+                    $subscribeUser->id,
                     '구독 재활성화',
                     $request->reactivate_reason ?: '관리자가 구독을 재활성화했습니다.',
                     auth()->id(),
@@ -167,10 +167,10 @@ class CancelController extends Controller
                 'success' => true,
                 'message' => '구독이 성공적으로 재활성화되었습니다.',
                 'data' => [
-                    'service_user_id' => $serviceUser->id,
-                    'status' => $serviceUser->status,
-                    'expires_at' => $serviceUser->expires_at,
-                    'auto_renewal' => $serviceUser->auto_renewal,
+                    'subscribe_user_id' => $subscribeUser->id,
+                    'status' => $subscribeUser->status,
+                    'expires_at' => $subscribeUser->expires_at,
+                    'auto_renewal' => $subscribeUser->auto_renewal,
                 ]
             ]);
 

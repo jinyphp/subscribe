@@ -55,7 +55,7 @@
         </div>
 
         <!-- Unified Navigation -->
-        @includeIf('jiny-service::partials.navs.nav-default.top', [
+        @includeIf('jiny-subscribe::partials.navs.nav-default.top', [
             'menuItems' => Site::menuItems('simple'),
             'alignment' => 'left'
         ])

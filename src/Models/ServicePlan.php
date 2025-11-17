@@ -1,6 +1,6 @@
 <?php
 
-namespace Jiny\Service\Models;
+namespace Jiny\Subscribe\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -11,10 +11,10 @@ class ServicePlan extends Model
 {
     use SoftDeletes;
 
-    protected $table = 'service_plans';
+    protected $table = 'subscribe_plans';
 
     protected $fillable = [
-        'service_id',
+        'subscribe_id',
         'plan_name',
         'plan_code',
         'description',
@@ -84,24 +84,24 @@ class ServicePlan extends Model
     ];
 
     // Relationships
-    public function service(): BelongsTo
+    public function subscribe(): BelongsTo
     {
-        return $this->belongsTo(Service::class, 'service_id');
+        return $this->belongsTo(subscribe::class, 'subscribe_id');
     }
 
-    public function serviceUsers(): HasMany
+    public function subscribeUsers(): HasMany
     {
-        return $this->hasMany(ServiceUser::class, 'plan_name', 'plan_name');
+        return $this->hasMany(subscribeUser::class, 'plan_name', 'plan_name');
     }
 
     public function prices(): HasMany
     {
-        return $this->hasMany(ServicePlanPrice::class, 'service_plan_id');
+        return $this->hasMany(subscribePlanPrice::class, 'subscribe_plan_id');
     }
 
     public function details(): HasMany
     {
-        return $this->hasMany(ServicePlanDetail::class, 'service_plan_id');
+        return $this->hasMany(subscribePlanDetail::class, 'subscribe_plan_id');
     }
 
     public function activePrices(): HasMany
@@ -150,9 +150,9 @@ class ServicePlan extends Model
         return $query->where('is_popular', true);
     }
 
-    public function scopeByService($query, $serviceId)
+    public function scopeBysubscribe($query, $subscribeId)
     {
-        return $query->where('service_id', $serviceId);
+        return $query->where('subscribe_id', $subscribeId);
     }
 
     public function scopeByType($query, $type)

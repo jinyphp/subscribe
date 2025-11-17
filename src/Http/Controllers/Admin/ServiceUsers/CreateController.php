@@ -1,18 +1,18 @@
 <?php
 
-namespace Jiny\Service\Http\Controllers\Admin\ServiceUsers;
+namespace Jiny\Subscribe\Http\Controllers\Admin\subscribeUsers;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Jiny\Service\Models\Service;
-use Jiny\Service\Models\ServicePlan;
+use Jiny\Subscribe\Models\subscribe;
+use Jiny\Subscribe\Models\subscribePlan;
 
 class CreateController extends Controller
 {
     public function __invoke(Request $request)
     {
         // 폼에 필요한 데이터
-        $services = Service::where('enable', true)->orderBy('title')->get();
+        $subscribes = subscribe::where('enable', true)->orderBy('title')->get();
 
         $statusOptions = [
             'pending' => '대기',
@@ -50,8 +50,8 @@ class CreateController extends Controller
             $userShardOptions[$shard] = $shard;
         }
 
-        return view('jiny-service::admin.service_users.create', compact(
-            'services',
+        return view('jiny-subscribe::admin.service_users.create', compact(
+            'subscribes',
             'statusOptions',
             'billingCycleOptions',
             'paymentStatusOptions',

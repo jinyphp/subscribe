@@ -1,4 +1,4 @@
-@extends('jiny-service::layouts.admin.sidebar')
+@extends('jiny-subscribe::layouts.admin.sidebar')
 
 @section('content')
 <div class="container-fluid">
@@ -8,10 +8,10 @@
             <div class="d-flex justify-content-between align-items-center">
                 <div>
                     <h2 class="mb-1">상세 정보 수정</h2>
-                    <p class="text-muted mb-0">{{ $service->title }} - {{ $detail->title }} 상세 정보를 수정합니다.</p>
+                    <p class="text-muted mb-0">{{ $subscribe->title }} - {{ $detail->title }} 상세 정보를 수정합니다.</p>
                 </div>
                 <div>
-                    <a href="{{ route('admin.site.services.detail.index', $service->id) }}" class="btn btn-outline-secondary">
+                    <a href="{{ route('admin.site.subscribes.detail.index', $subscribe->id) }}" class="btn btn-outline-secondary">
                         <i class="fe fe-arrow-left me-2"></i>목록으로
                     </a>
                 </div>
@@ -20,7 +20,7 @@
     </div>
 
     <!-- 폼 -->
-    <form method="POST" action="{{ route('admin.site.services.detail.update', [$service->id, $detail->id]) }}">
+    <form method="POST" action="{{ route('admin.site.subscribes.detail.update', [$subscribe->id, $detail->id]) }}">
         @csrf
         @method('PUT')
         <div class="row">

@@ -1,20 +1,20 @@
 <?php
 
-namespace Jiny\Service\Http\Controllers\Admin\ServiceDetail;
+namespace Jiny\Subscribe\Http\Controllers\Admin\subscribeDetail;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Jiny\Service\Models\SiteService;
-use Jiny\Service\Models\ServicePlanDetail;
+use Jiny\Subscribe\Models\Sitesubscribe;
+use Jiny\Subscribe\Models\subscribePlanDetail;
 
 class IndexController extends Controller
 {
-    public function __invoke(Request $request, $serviceId)
+    public function __invoke(Request $request, $subscribeId)
     {
-        $service = SiteService::findOrFail($serviceId);
+        $subscribe = Sitesubscribe::findOrFail($subscribeId);
 
-        // 서비스 상세 정보 목록 조회
-        $query = ServicePlanDetail::where('service_id', $serviceId)
+        // 구독 상세 정보 목록 조회
+        $query = subscribePlanDetail::where('subscribe_id', $subscribeId)
                     ->orderBy('category')
                     ->orderBy('group_name')
                     ->orderBy('group_order')
@@ -69,18 +69,18 @@ class IndexController extends Controller
 
         // 통계 정보
         $stats = [
-            'total' => ServicePlanDetail::where('service_id', $serviceId)->count(),
-            'active' => ServicePlanDetail::where('service_id', $serviceId)->where('enable', true)->count(),
-            'features' => ServicePlanDetail::where('service_id', $serviceId)->where('detail_type', 'feature')->count(),
-            'limitations' => ServicePlanDetail::where('service_id', $serviceId)->where('detail_type', 'limitation')->count(),
+            'total' => subscribePlanDetail::where('subscribe_id', $subscribeId)->count(),
+            'active' => subscribePlanDetail::where('subscribe_id', $subscribeId)->where('enable', true)->count(),
+            'features' => subscribePlanDetail::where('subscribe_id', $subscribeId)->where('detail_type', 'feature')->count(),
+            'limitations' => subscribePlanDetail::where('subscribe_id', $subscribeId)->where('detail_type', 'limitation')->count(),
         ];
 
         // 필터 옵션들
-        $detailTypes = ServicePlanDetail::getDetailTypes();
-        $categories = ServicePlanDetail::getCategories();
+        $detailTypes = subscribePlanDetail::getDetailTypes();
+        $categories = subscribePlanDetail::getCategories();
 
-        // 그룹명 목록 (현재 서비스의 실제 그룹들)
-        $groups = ServicePlanDetail::where('service_id', $serviceId)
+        // 그룹명 목록 (현재 구독의 실제 그룹들)
+        $groups = subscribePlanDetail::where('subscribe_id', $subscribeId)
                     ->whereNotNull('group_name')
                     ->distinct()
                     ->pluck('group_name')
@@ -88,8 +88,8 @@ class IndexController extends Controller
                     ->sort()
                     ->values();
 
-        return view('jiny-service::admin.service_detail.index', compact(
-            'service',
+        return view('jiny-subscribe::admin.service_detail.index', compact(
+            'subscribe',
             'details',
             'stats',
             'detailTypes',

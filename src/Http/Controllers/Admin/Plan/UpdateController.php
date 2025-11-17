@@ -1,22 +1,22 @@
 <?php
 
-namespace Jiny\Service\Http\Controllers\Admin\Plan;
+namespace Jiny\Subscribe\Http\Controllers\Admin\Plan;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Jiny\Service\Models\ServicePlan;
+use Jiny\Subscribe\Models\subscribePlan;
 use Illuminate\Support\Str;
 
 class UpdateController extends Controller
 {
     public function __invoke(Request $request, $id)
     {
-        $plan = ServicePlan::findOrFail($id);
+        $plan = subscribePlan::findOrFail($id);
 
         $request->validate([
-            'service_id' => 'required|exists:services,id',
+            'subscribe_id' => 'required|exists:subscribes,id',
             'plan_name' => 'required|string|max:255',
-            'plan_code' => 'required|string|max:255|unique:service_plans,plan_code,' . $plan->id,
+            'plan_code' => 'required|string|max:255|unique:subscribe_plans,plan_code,' . $plan->id,
             'description' => 'nullable|string',
             'plan_type' => 'required|in:basic,standard,premium,enterprise,custom',
             'billing_type' => 'required|in:subscription,one_time,usage_based,hybrid',
@@ -42,7 +42,7 @@ class UpdateController extends Controller
         ]);
 
         $data = $request->only([
-            'service_id', 'plan_name', 'plan_code', 'description',
+            'subscribe_id', 'plan_name', 'plan_code', 'description',
             'plan_type', 'billing_type', 'setup_fee', 'trial_period_days',
             'max_users', 'max_projects', 'storage_limit_gb', 'api_calls_per_month',
             'sort_order', 'color_code', 'icon'
@@ -118,7 +118,7 @@ class UpdateController extends Controller
         $data['trial_period_days'] = $data['trial_period_days'] ?: 0;
 
         // 구독자가 있는 플랜의 경우 중요한 변경사항 확인
-        $subscribersCount = $plan->serviceUsers()->count();
+        $subscribersCount = $plan->subscribeUsers()->count();
         if ($subscribersCount > 0) {
             // 가격 변경이 있는 경우 로그 기록
             $priceChanged = false;
@@ -142,7 +142,7 @@ class UpdateController extends Controller
         $plan->update($data);
 
         return redirect()
-            ->route('admin.service.plan.index')
-            ->with('success', '서비스 플랜이 성공적으로 수정되었습니다.');
+            ->route('admin.subscribe.plan.index')
+            ->with('success', '구독 플랜이 성공적으로 수정되었습니다.');
     }
 }

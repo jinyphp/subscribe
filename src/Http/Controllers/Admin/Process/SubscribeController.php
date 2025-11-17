@@ -1,13 +1,13 @@
 <?php
 
-namespace Jiny\Service\Http\Controllers\Admin\Process;
+namespace Jiny\Subscribe\Http\Controllers\Admin\Process;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Jiny\Service\Models\ServiceUser;
-use Jiny\Service\Models\ServicePlan;
-use Jiny\Service\Models\ServicePayment;
-use Jiny\Service\Models\ServiceSubscriptionLog;
+use Jiny\Subscribe\Models\subscribeUser;
+use Jiny\Subscribe\Models\subscribePlan;
+use Jiny\Subscribe\Models\subscribePayment;
+use Jiny\Subscribe\Models\subscribeSubscriptionLog;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
 
@@ -19,13 +19,13 @@ class SubscribeController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'user_uuid' => 'required|string|max:255|unique:site_service_users,user_uuid',
+            'user_uuid' => 'required|string|max:255|unique:site_subscribe_users,user_uuid',
             'user_email' => 'required|email|max:255',
             'user_name' => 'required|string|max:255',
             'user_shard' => 'nullable|string|max:255',
             'user_id' => 'nullable|integer',
-            'service_id' => 'required|exists:site_services,id',
-            'plan_code' => 'required|exists:site_service_plans,plan_code',
+            'subscribe_id' => 'required|exists:site_subscribes,id',
+            'plan_code' => 'required|exists:site_subscribe_plans,plan_code',
             'billing_cycle' => 'required|in:monthly,quarterly,yearly,lifetime',
             'payment_method' => 'nullable|string|max:50',
             'auto_renewal' => 'boolean',
@@ -33,8 +33,8 @@ class SubscribeController extends Controller
         ]);
 
         // 플랜 정보 조회
-        $plan = ServicePlan::where('plan_code', $request->plan_code)
-                          ->where('service_id', $request->service_id)
+        $plan = subscribePlan::where('plan_code', $request->plan_code)
+                          ->where('subscribe_id', $request->subscribe_id)
                           ->where('is_active', true)
                           ->first();
 
@@ -61,7 +61,7 @@ class SubscribeController extends Controller
         }
 
         try {
-            \DB::transaction(function () use ($request, $plan, &$serviceUser, &$payment) {
+            \DB::transaction(function () use ($request, $plan, &$subscribeUser, &$payment) {
 
                 // 구독 사용자 생성
                 $startDate = now();
@@ -80,14 +80,14 @@ class SubscribeController extends Controller
                     $nextBillingAt = $request->billing_cycle !== 'lifetime' ? $expiresAt : null;
                 }
 
-                $serviceUser = ServiceUser::create([
+                $subscribeUser = subscribeUser::create([
                     'user_uuid' => $request->user_uuid,
                     'user_email' => $request->user_email,
                     'user_name' => $request->user_name,
                     'user_shard' => $request->user_shard,
                     'user_id' => $request->user_id,
-                    'service_id' => $request->service_id,
-                    'service_title' => $plan->service->name,
+                    'subscribe_id' => $request->subscribe_id,
+                    'subscribe_title' => $plan->subscribe->name,
                     'status' => $useTrialPeriod ? 'trial' : 'active',
                     'billing_cycle' => $request->billing_cycle,
                     'started_at' => $startDate,
@@ -107,11 +107,11 @@ class SubscribeController extends Controller
 
                 // 유료 플랜인 경우 결제 레코드 생성
                 if (!$useTrialPeriod && $plan->calculatePrice($request->billing_cycle) > 0) {
-                    $payment = ServicePayment::create([
-                        'service_user_id' => $serviceUser->id,
+                    $payment = subscribePayment::create([
+                        'subscribe_user_id' => $subscribeUser->id,
                         'user_uuid' => $request->user_uuid,
-                        'service_id' => $request->service_id,
-                        'order_id' => 'SUB-' . $serviceUser->id . '-' . time(),
+                        'subscribe_id' => $request->subscribe_id,
+                        'order_id' => 'SUB-' . $subscribeUser->id . '-' . time(),
                         'amount' => $plan->calculatePrice($request->billing_cycle),
                         'tax_amount' => 0,
                         'discount_amount' => 0,
@@ -130,8 +130,8 @@ class SubscribeController extends Controller
                 }
 
                 // 구독 로그 기록
-                ServiceSubscriptionLog::logSubscribe(
-                    $serviceUser->id,
+                subscribeSubscriptionLog::logSubscribe(
+                    $subscribeUser->id,
                     $plan->plan_name,
                     $expiresAt
                 );
@@ -141,11 +141,11 @@ class SubscribeController extends Controller
                 'success' => true,
                 'message' => '구독이 성공적으로 생성되었습니다.',
                 'data' => [
-                    'service_user_id' => $serviceUser->id,
-                    'user_uuid' => $serviceUser->user_uuid,
-                    'plan_name' => $serviceUser->plan_name,
-                    'status' => $serviceUser->status,
-                    'expires_at' => $serviceUser->expires_at,
+                    'subscribe_user_id' => $subscribeUser->id,
+                    'user_uuid' => $subscribeUser->user_uuid,
+                    'plan_name' => $subscribeUser->plan_name,
+                    'status' => $subscribeUser->status,
+                    'expires_at' => $subscribeUser->expires_at,
                     'payment_id' => $payment->id ?? null,
                 ]
             ]);

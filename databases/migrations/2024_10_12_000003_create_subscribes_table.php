@@ -14,7 +14,7 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('services', function (Blueprint $table) {
+        Schema::create('subscribes', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
             $table->timestamp('deleted_at')->nullable();
@@ -28,9 +28,9 @@ return new class extends Migration
             $table->text('description')->nullable();
             $table->longText('content')->nullable();
             $table->string('category')->nullable();
-            $table->unsignedBigInteger('category_id')->nullable(); // Foreign key to service_categories
+            $table->unsignedBigInteger('category_id')->nullable(); // Foreign key to subscribe_categories
 
-            // 서비스 정보
+            // 구독 정보
             $table->decimal('price', 10, 2)->nullable();
             $table->decimal('sale_price', 10, 2)->nullable(); // 할인 판매가
             $table->string('duration')->nullable(); // 예: "1-2주", "30일"
@@ -39,9 +39,9 @@ return new class extends Migration
             $table->string('image', 500)->nullable();
             $table->text('images')->nullable(); // JSON 배열
 
-            // 서비스 상세 정보
-            $table->text('features')->nullable(); // JSON 배열 - 서비스 특징
-            $table->text('process')->nullable(); // JSON 배열 - 서비스 프로세스
+            // 구독 상세 정보
+            $table->text('features')->nullable(); // JSON 배열 - 구독 특징
+            $table->text('process')->nullable(); // JSON 배열 - 구독 프로세스
             $table->text('requirements')->nullable(); // JSON 배열 - 요구사항
             $table->text('deliverables')->nullable(); // JSON 배열 - 결과물
             $table->string('tags')->nullable();
@@ -54,7 +54,7 @@ return new class extends Migration
             $table->string('manager')->nullable();
 
             // Foreign key constraints
-            $table->foreign('category_id')->references('id')->on('service_categories')->onDelete('set null');
+            $table->foreign('category_id')->references('id')->on('subscribe_categories')->onDelete('set null');
 
             // Indexes
             $table->index(['enable', 'deleted_at']);
@@ -64,13 +64,13 @@ return new class extends Migration
             $table->index(['category_id', 'deleted_at']);
         });
 
-        // Insert default services
-        DB::table('services')->insert([
+        // Insert default subscribes
+        DB::table('subscribes')->insert([
             [
                 'slug' => 'web-development',
                 'title' => '웹사이트 개발',
-                'description' => '반응형 웹사이트 및 웹 애플리케이션 개발 서비스',
-                'content' => '<h3>서비스 내용</h3><p>최신 기술 스택을 활용한 웹사이트 개발</p><ul><li>React, Vue.js 등 모던 프레임워크</li><li>반응형 디자인</li><li>SEO 최적화</li><li>성능 최적화</li></ul>',
+                'description' => '반응형 웹사이트 및 웹 애플리케이션 개발 구독',
+                'content' => '<h3>구독 내용</h3><p>최신 기술 스택을 활용한 웹사이트 개발</p><ul><li>React, Vue.js 등 모던 프레임워크</li><li>반응형 디자인</li><li>SEO 최적화</li><li>성능 최적화</li></ul>',
                 'category' => 'web-development',
                 'category_id' => 1,
                 'price' => 1000000.00,
@@ -81,7 +81,7 @@ return new class extends Migration
                 'requirements' => json_encode(['도메인', '호스팅', '콘텐츠 제공']),
                 'deliverables' => json_encode(['완성된 웹사이트', '소스코드', '사용자 매뉴얼']),
                 'tags' => 'HTML,CSS,JavaScript,PHP,Laravel',
-                'meta_title' => '전문 웹사이트 개발 서비스',
+                'meta_title' => '전문 웹사이트 개발 구독',
                 'meta_description' => '최신 기술로 반응형 웹사이트를 개발해드립니다.',
                 'enable' => true,
                 'featured' => true,
@@ -104,7 +104,7 @@ return new class extends Migration
                 'requirements' => json_encode(['앱 아이디어', '필요 기능 명세', '디자인 가이드']),
                 'deliverables' => json_encode(['완성된 앱', '소스코드', '앱스토어 등록']),
                 'tags' => 'React Native,Flutter,iOS,Android',
-                'meta_title' => '모바일 앱 개발 전문 서비스',
+                'meta_title' => '모바일 앱 개발 전문 구독',
                 'meta_description' => 'iOS와 Android 앱을 전문적으로 개발해드립니다.',
                 'enable' => true,
                 'featured' => true,
@@ -127,7 +127,7 @@ return new class extends Migration
                 'requirements' => json_encode(['프로젝트 목표', '타겟 사용자 정보', '참고 자료']),
                 'deliverables' => json_encode(['디자인 파일', '프로토타입', '디자인 가이드']),
                 'tags' => 'Figma,Sketch,Adobe XD,UI,UX',
-                'meta_title' => '전문 UI/UX 디자인 서비스',
+                'meta_title' => '전문 UI/UX 디자인 구독',
                 'meta_description' => '사용자 중심의 UI/UX 디자인을 제공합니다.',
                 'enable' => true,
                 'featured' => false,
@@ -145,6 +145,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('services');
+        Schema::dropIfExists('subscribes');
     }
 };

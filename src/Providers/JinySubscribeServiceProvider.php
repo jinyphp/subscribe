@@ -1,11 +1,11 @@
 <?php
 
-namespace Jiny\Service\Providers;
+namespace Jiny\Subscribe\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Route;
 
-class JinyServiceServiceProvider extends ServiceProvider
+class JinySubscribeServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
@@ -15,7 +15,7 @@ class JinyServiceServiceProvider extends ServiceProvider
     public function boot(): void
     {
         // Load views with namespace
-        $this->loadViewsFrom(__DIR__.'/../../resources/views', 'jiny-service');
+        $this->loadViewsFrom(__DIR__.'/../../resources/views', 'jiny-subscribe');
 
         // Load migrations
         $this->loadMigrationsFrom(__DIR__.'/../../databases/migrations');
@@ -26,8 +26,8 @@ class JinyServiceServiceProvider extends ServiceProvider
         // Publish assets if needed
         if ($this->app->runningInConsole()) {
             $this->publishes([
-                __DIR__.'/../../resources/views' => resource_path('views/vendor/jiny-service'),
-            ], 'jiny-service-views');
+                __DIR__.'/../../resources/views' => resource_path('views/vendor/jiny-subscribe'),
+            ], 'jiny-subscribe-views');
         }
     }
 
@@ -40,8 +40,12 @@ class JinyServiceServiceProvider extends ServiceProvider
         Route::middleware(['web', 'admin'])
             ->group(__DIR__.'/../../routes/admin.php');
 
-        // Load web routes (commented out due to missing controllers)
-        // Route::middleware(['web'])
-        //     ->group(__DIR__.'/../../routes/web.php');
+        // Load web routes
+        Route::middleware(['web'])
+            ->group(__DIR__.'/../../routes/web.php');
+
+        // Load home routes
+        Route::middleware(['web'])
+            ->group(__DIR__.'/../../routes/home.php');
     }
 }

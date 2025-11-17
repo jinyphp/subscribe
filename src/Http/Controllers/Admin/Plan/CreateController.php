@@ -1,17 +1,17 @@
 <?php
 
-namespace Jiny\Service\Http\Controllers\Admin\Plan;
+namespace Jiny\Subscribe\Http\Controllers\Admin\Plan;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Jiny\Service\Models\SiteService;
+use Jiny\Subscribe\Models\Sitesubscribe;
 
 class CreateController extends Controller
 {
     public function __invoke(Request $request)
     {
-        // 서비스 목록 조회
-        $services = SiteService::select('id', 'title')
+        // 구독 목록 조회
+        $subscribes = Sitesubscribe::select('id', 'title')
                               ->where('enable', true)
                               ->orderBy('title')
                               ->get();
@@ -45,8 +45,8 @@ class CreateController extends Controller
             'custom_integrations' => 'Custom Integrations'
         ];
 
-        return view('jiny-service::admin.plan.create', compact(
-            'services',
+        return view('jiny-subscribe::admin.plan.create', compact(
+            'subscribes',
             'planTypes',
             'billingTypes',
             'defaultFeatures'

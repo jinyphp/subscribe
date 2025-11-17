@@ -1,28 +1,28 @@
 <?php
 
-namespace Jiny\Service\Http\Controllers\Admin\ServiceDetail;
+namespace Jiny\Subscribe\Http\Controllers\Admin\subscribeDetail;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Jiny\Service\Models\SiteService;
-use Jiny\Service\Models\ServicePlanDetail;
+use Jiny\Subscribe\Models\Sitesubscribe;
+use Jiny\Subscribe\Models\subscribePlanDetail;
 
 class EditController extends Controller
 {
-    public function __invoke(Request $request, $serviceId, $detailId)
+    public function __invoke(Request $request, $subscribeId, $detailId)
     {
-        $service = SiteService::findOrFail($serviceId);
+        $subscribe = Sitesubscribe::findOrFail($subscribeId);
 
-        $detail = ServicePlanDetail::where('service_id', $serviceId)
+        $detail = subscribePlanDetail::where('subscribe_id', $subscribeId)
                      ->findOrFail($detailId);
 
         // 필터 옵션들
-        $detailTypes = ServicePlanDetail::getDetailTypes();
-        $valueTypes = ServicePlanDetail::getValueTypes();
-        $categories = ServicePlanDetail::getCategories();
+        $detailTypes = subscribePlanDetail::getDetailTypes();
+        $valueTypes = subscribePlanDetail::getValueTypes();
+        $categories = subscribePlanDetail::getCategories();
 
         // 기존 그룹명 목록 (자동완성용)
-        $existingGroups = ServicePlanDetail::where('service_id', $serviceId)
+        $existingGroups = subscribePlanDetail::where('subscribe_id', $subscribeId)
                             ->whereNotNull('group_name')
                             ->distinct()
                             ->pluck('group_name')
@@ -30,8 +30,8 @@ class EditController extends Controller
                             ->sort()
                             ->values();
 
-        return view('jiny-service::admin.service_detail.edit', compact(
-            'service',
+        return view('jiny-subscribe::admin.service_detail.edit', compact(
+            'subscribe',
             'detail',
             'detailTypes',
             'valueTypes',

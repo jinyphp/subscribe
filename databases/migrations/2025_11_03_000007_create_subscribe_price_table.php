@@ -13,13 +13,13 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('service_price', function (Blueprint $table) {
+        Schema::create('subscribe_price', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
             $table->timestamp('deleted_at')->nullable();
 
-            // 서비스 연결
-            $table->unsignedBigInteger('service_id');
+            // 구독 연결
+            $table->unsignedBigInteger('subscribe_id');
 
             // 가격 기본 정보
             $table->string('name'); // 가격 옵션명 (예: "기본", "스탠다드", "프리미엄")
@@ -65,10 +65,10 @@ return new class extends Migration
             $table->boolean('enable')->default(true); // 활성 상태
 
             // Foreign key constraints
-            $table->foreign('service_id')->references('id')->on('services')->onDelete('cascade');
+            $table->foreign('subscribe_id')->references('id')->on('subscribes')->onDelete('cascade');
 
             // Indexes
-            $table->index(['service_id', 'deleted_at']);
+            $table->index(['subscribe_id', 'deleted_at']);
             $table->index(['enable', 'deleted_at']);
             $table->index(['is_popular', 'deleted_at']);
             $table->index(['is_recommended', 'deleted_at']);
@@ -76,7 +76,7 @@ return new class extends Migration
             $table->index(['valid_from', 'valid_until']);
 
             // Unique constraints
-            $table->unique(['service_id', 'code'], 'service_price_code_unique');
+            $table->unique(['subscribe_id', 'code'], 'subscribe_price_code_unique');
         });
     }
 
@@ -87,6 +87,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('service_price');
+        Schema::dropIfExists('subscribe_price');
     }
 };

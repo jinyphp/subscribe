@@ -1,24 +1,24 @@
 <?php
 
-namespace Jiny\Service\Http\Controllers\Admin\ServiceUsers;
+namespace Jiny\Subscribe\Http\Controllers\Admin\subscribeUsers;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
-use Jiny\Service\Models\ServiceCategory;
-use Jiny\Service\Models\Service;
-use Jiny\Service\Models\ServicePlan;
+use Jiny\Subscribe\Models\subscribeCategory;
+use Jiny\Subscribe\Models\subscribe;
+use Jiny\Subscribe\Models\subscribePlan;
 
 class HierarchyController extends Controller
 {
     /**
-     * 서비스 카테고리 목록 조회
+     * 구독 카테고리 목록 조회
      */
     public function getCategories(): JsonResponse
     {
         try {
-            $categories = ServiceCategory::where('enable', true)
+            $categories = subscribeCategory::where('enable', true)
                 ->whereNull('deleted_at')
                 ->orderBy('pos')
                 ->orderBy('title')
@@ -40,50 +40,50 @@ class HierarchyController extends Controller
     }
 
     /**
-     * 특정 카테고리의 서비스 목록 조회
+     * 특정 카테고리의 구독 목록 조회
      */
-    public function getServicesByCategory(Request $request): JsonResponse
+    public function getsubscribesByCategory(Request $request): JsonResponse
     {
         $request->validate([
-            'category_id' => 'required|integer|exists:service_categories,id'
+            'category_id' => 'required|integer|exists:subscribe_categories,id'
         ]);
 
         try {
             $categoryId = $request->input('category_id');
 
-            $services = Service::where('category_id', $categoryId)
+            $subscribes = subscribe::where('category_id', $categoryId)
                 ->where('enable', true)
                 ->orderBy('title')
                 ->get(['id', 'title', 'description', 'price', 'sale_price', 'image']);
 
             return response()->json([
                 'success' => true,
-                'services' => $services
+                'subscribes' => $subscribes
             ]);
 
         } catch (\Exception $e) {
-            Log::error('Services fetch error: ' . $e->getMessage());
+            Log::error('subscribes fetch error: ' . $e->getMessage());
 
             return response()->json([
                 'success' => false,
-                'message' => '서비스 목록을 불러오는 중 오류가 발생했습니다.'
+                'message' => '구독 목록을 불러오는 중 오류가 발생했습니다.'
             ], 500);
         }
     }
 
     /**
-     * 특정 서비스의 플랜 목록 조회
+     * 특정 구독의 플랜 목록 조회
      */
-    public function getPlansByService(Request $request): JsonResponse
+    public function getPlansBysubscribe(Request $request): JsonResponse
     {
         $request->validate([
-            'service_id' => 'required|integer|exists:services,id'
+            'subscribe_id' => 'required|integer|exists:subscribes,id'
         ]);
 
         try {
-            $serviceId = $request->input('service_id');
+            $subscribeId = $request->input('subscribe_id');
 
-            $plans = ServicePlan::where('service_id', $serviceId)
+            $plans = subscribePlan::where('subscribe_id', $subscribeId)
                 ->where('is_active', true)
                 ->orderBy('sort_order')
                 ->orderBy('monthly_price')
@@ -115,7 +115,7 @@ class HierarchyController extends Controller
     public function getPricesByPlan(Request $request): JsonResponse
     {
         $request->validate([
-            'plan_id' => 'required|integer|exists:service_plans,id',
+            'plan_id' => 'required|integer|exists:subscribe_plans,id',
             'billing_cycle' => 'sometimes|string|in:monthly,quarterly,yearly,lifetime'
         ]);
 
@@ -123,7 +123,7 @@ class HierarchyController extends Controller
             $planId = $request->input('plan_id');
             $billingCycle = $request->input('billing_cycle');
 
-            $plan = ServicePlan::findOrFail($planId);
+            $plan = subscribePlan::findOrFail($planId);
 
             // 기본 가격 정보
             $prices = [
@@ -231,8 +231,8 @@ class HierarchyController extends Controller
     public function getFullHierarchy(): JsonResponse
     {
         try {
-            $categories = ServiceCategory::with([
-                'services' => function($query) {
+            $categories = subscribeCategory::with([
+                'subscribes' => function($query) {
                     $query->where('enable', true)
                           ->select('id', 'category_id', 'title', 'description', 'price', 'sale_price')
                           ->orderBy('title');
@@ -254,7 +254,7 @@ class HierarchyController extends Controller
 
             return response()->json([
                 'success' => false,
-                'message' => '서비스 계층구조를 불러오는 중 오류가 발생했습니다.'
+                'message' => '구독 계층구조를 불러오는 중 오류가 발생했습니다.'
             ], 500);
         }
     }
@@ -265,7 +265,7 @@ class HierarchyController extends Controller
     public function calculatePrice(Request $request): JsonResponse
     {
         $request->validate([
-            'plan_id' => 'required|integer|exists:service_plans,id',
+            'plan_id' => 'required|integer|exists:subscribe_plans,id',
             'billing_cycle' => 'required|string|in:monthly,quarterly,yearly,lifetime'
         ]);
 
@@ -273,7 +273,7 @@ class HierarchyController extends Controller
             $planId = $request->input('plan_id');
             $billingCycle = $request->input('billing_cycle');
 
-            $plan = ServicePlan::findOrFail($planId);
+            $plan = subscribePlan::findOrFail($planId);
 
             $price = match($billingCycle) {
                 'monthly' => $plan->monthly_price,

@@ -1,28 +1,28 @@
 <?php
 
-namespace Jiny\Service\Http\Controllers\Admin\Users;
+namespace Jiny\Subscribe\Http\Controllers\Admin\Users;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Jiny\Service\Models\SiteService;
-use Jiny\Service\Models\ServicePlan;
+use Jiny\Subscribe\Models\Sitesubscribe;
+use Jiny\Subscribe\Models\subscribePlan;
 
 class CreateController extends Controller
 {
     public function __invoke(Request $request)
     {
-        // 활성화된 서비스 목록
-        $services = SiteService::where('is_active', true)
+        // 활성화된 구독 목록
+        $subscribes = Sitesubscribe::where('is_active', true)
                               ->orderBy('name')
                               ->get();
 
         // 활성화된 플랜 목록
-        $plans = ServicePlan::with('service')
+        $plans = subscribePlan::with('subscribe')
                            ->where('is_active', true)
                            ->orderBy('sort_order')
                            ->orderBy('monthly_price')
                            ->get()
-                           ->groupBy('service_id');
+                           ->groupBy('subscribe_id');
 
         // 상태 옵션
         $statusOptions = [
@@ -57,8 +57,8 @@ class CreateController extends Controller
             $userShards[$shardName] = $shardName;
         }
 
-        return view('jiny-service::admin.users.create', compact(
-            'services',
+        return view('jiny-subscribe::admin.users.create', compact(
+            'subscribes',
             'plans',
             'statusOptions',
             'billingCycles',

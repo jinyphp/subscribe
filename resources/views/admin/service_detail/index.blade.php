@@ -1,4 +1,4 @@
-@extends('jiny-service::layouts.admin.sidebar')
+@extends('jiny-subscribe::layouts.admin.sidebar')
 
 @section('content')
 <div class="container-fluid">
@@ -7,14 +7,14 @@
         <div class="col-12">
             <div class="d-flex justify-content-between align-items-center">
                 <div>
-                    <h2 class="mb-1">{{ $service->title }} - 상세 정보 관리</h2>
-                    <p class="text-muted mb-0">서비스의 상세 기능과 정보를 관리합니다.</p>
+                    <h2 class="mb-1">{{ $subscribe->title }} - 상세 정보 관리</h2>
+                    <p class="text-muted mb-0">구독의 상세 기능과 정보를 관리합니다.</p>
                 </div>
                 <div>
-                    <a href="{{ route('admin.site.services.show', $service->id) }}" class="btn btn-outline-secondary me-2">
-                        <i class="fe fe-arrow-left me-2"></i>서비스 상세
+                    <a href="{{ route('admin.site.subscribes.show', $subscribe->id) }}" class="btn btn-outline-secondary me-2">
+                        <i class="fe fe-arrow-left me-2"></i>구독 상세
                     </a>
-                    <a href="{{ route('admin.site.services.detail.create', $service->id) }}" class="btn btn-primary">
+                    <a href="{{ route('admin.site.subscribes.detail.create', $subscribe->id) }}" class="btn btn-primary">
                         <i class="fe fe-plus me-2"></i>상세 정보 추가
                     </a>
                 </div>
@@ -22,20 +22,20 @@
         </div>
     </div>
 
-    <!-- 서비스 정보 카드 -->
+    <!-- 구독 정보 카드 -->
     <div class="card mb-4">
         <div class="card-body">
             <div class="row">
                 <div class="col-md-8">
-                    <h5 class="mb-1">{{ $service->title }}</h5>
-                    <p class="text-muted mb-2">{{ $service->category ?? '-' }} | {{ $service->code }}</p>
-                    <p class="mb-0">{{ $service->description }}</p>
+                    <h5 class="mb-1">{{ $subscribe->title }}</h5>
+                    <p class="text-muted mb-2">{{ $subscribe->category ?? '-' }} | {{ $subscribe->code }}</p>
+                    <p class="mb-0">{{ $subscribe->description }}</p>
                 </div>
                 <div class="col-md-4 text-end">
-                    <span class="badge bg-{{ $service->enable ? 'success' : 'secondary' }} mb-2">
-                        {{ $service->enable ? '활성' : '비활성' }}
+                    <span class="badge bg-{{ $subscribe->enable ? 'success' : 'secondary' }} mb-2">
+                        {{ $subscribe->enable ? '활성' : '비활성' }}
                     </span>
-                    @if($service->featured)
+                    @if($subscribe->featured)
                         <span class="badge bg-warning text-dark mb-2">추천</span>
                     @endif
                 </div>
@@ -118,7 +118,7 @@
     <!-- 필터 및 검색 -->
     <div class="card mb-4">
         <div class="card-body">
-            <form method="GET" action="{{ route('admin.site.services.detail.index', $service->id) }}">
+            <form method="GET" action="{{ route('admin.site.subscribes.detail.index', $subscribe->id) }}">
                 <div class="row">
                     <div class="col-md-3">
                         <div class="form-group">
@@ -195,7 +195,7 @@
                         <button type="submit" class="btn btn-primary me-2">
                             <i class="fe fe-search me-1"></i>검색
                         </button>
-                        <a href="{{ route('admin.site.services.detail.index', $service->id) }}" class="btn btn-outline-secondary">
+                        <a href="{{ route('admin.site.subscribes.detail.index', $subscribe->id) }}" class="btn btn-outline-secondary">
                             <i class="fe fe-refresh-cw me-1"></i>초기화
                         </a>
                     </div>
@@ -284,7 +284,7 @@
                                 </td>
                                 <td>
                                     <div class="btn-group btn-group-sm">
-                                        <a href="{{ route('admin.site.services.detail.edit', [$service->id, $detail->id]) }}"
+                                        <a href="{{ route('admin.site.subscribes.detail.edit', [$subscribe->id, $detail->id]) }}"
                                            class="btn btn-outline-primary"
                                            title="수정">
                                             <i class="fe fe-edit"></i>
@@ -311,8 +311,8 @@
                 <div class="text-center py-4">
                     <i class="fe fe-info fe-3x text-muted mb-3"></i>
                     <h5 class="text-muted">등록된 상세 정보가 없습니다</h5>
-                    <p class="text-muted mb-4">서비스의 상세 기능과 정보를 추가해보세요.</p>
-                    <a href="{{ route('admin.site.services.detail.create', $service->id) }}" class="btn btn-primary">
+                    <p class="text-muted mb-4">구독의 상세 기능과 정보를 추가해보세요.</p>
+                    <a href="{{ route('admin.site.subscribes.detail.create', $subscribe->id) }}" class="btn btn-primary">
                         <i class="fe fe-plus me-2"></i>첫 번째 상세 정보 추가
                     </a>
                 </div>
@@ -348,7 +348,7 @@
 <script>
 function deleteDetail(detailId) {
     const deleteForm = document.getElementById('deleteForm');
-    deleteForm.action = `{{ route('admin.site.services.detail.index', $service->id) }}/${detailId}`;
+    deleteForm.action = `{{ route('admin.site.subscribes.detail.index', $subscribe->id) }}/${detailId}`;
 
     const deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
     deleteModal.show();

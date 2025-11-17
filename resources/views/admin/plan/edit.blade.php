@@ -1,4 +1,4 @@
-@extends('jiny-service::layouts.admin.sidebar')
+@extends('jiny-subscribe::layouts.admin.sidebar')
 
 @section('content')
 <div class="container-fluid">
@@ -11,10 +11,10 @@
                     <p class="text-muted mb-0">플랜의 설정과 가격 정보를 수정합니다.</p>
                 </div>
                 <div>
-                    <a href="{{ route('admin.service.plan.show', $plan->id) }}" class="btn btn-outline-info me-2">
+                    <a href="{{ route('admin.subscribe.plan.show', $plan->id) }}" class="btn btn-outline-info me-2">
                         <i class="fe fe-eye me-2"></i>상세보기
                     </a>
-                    <a href="{{ route('admin.service.plan.index') }}" class="btn btn-outline-secondary">
+                    <a href="{{ route('admin.subscribe.plan.index') }}" class="btn btn-outline-secondary">
                         <i class="fe fe-arrow-left me-2"></i>목록으로
                     </a>
                 </div>
@@ -60,8 +60,8 @@
     </div>
     @endif
 
-    <!-- 서비스 플랜 수정 폼 -->
-    <form method="POST" action="{{ route('admin.service.plan.update', $plan->id) }}">
+    <!-- 구독 플랜 수정 폼 -->
+    <form method="POST" action="{{ route('admin.subscribe.plan.update', $plan->id) }}">
         @csrf
         @method('PUT')
 
@@ -76,28 +76,28 @@
                     <div class="card-body">
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="service_id" class="form-label">서비스 <span class="text-danger">*</span></label>
+                                <label for="subscribe_id" class="form-label">구독 <span class="text-danger">*</span></label>
                                 <div class="d-flex">
-                                    <select name="service_id" id="service_id" class="form-control @error('service_id') is-invalid @enderror" required>
-                                        <option value="">서비스를 선택하세요</option>
-                                        @foreach($services as $service)
-                                            <option value="{{ $service->id }}"
-                                                {{ (old('service_id', $plan->service_id) == $service->id) ? 'selected' : '' }}>
-                                                {{ $service->title }}
+                                    <select name="subscribe_id" id="subscribe_id" class="form-control @error('subscribe_id') is-invalid @enderror" required>
+                                        <option value="">구독를 선택하세요</option>
+                                        @foreach($subscribes as $subscribe)
+                                            <option value="{{ $subscribe->id }}"
+                                                {{ (old('subscribe_id', $plan->subscribe_id) == $subscribe->id) ? 'selected' : '' }}>
+                                                {{ $subscribe->title }}
                                             </option>
                                         @endforeach
                                     </select>
-                                    <a href="{{ route('admin.site.services.index') }}" class="btn btn-outline-info ml-2" title="서비스 관리">
+                                    <a href="{{ route('admin.site.subscribes.index') }}" class="btn btn-outline-info ml-2" title="구독 관리">
                                         ⚙️
                                     </a>
                                 </div>
-                                @if($services->count() === 0)
+                                @if($subscribes->count() === 0)
                                     <small class="text-muted">
                                         ℹ️
-                                        사용 가능한 서비스가 없습니다. <a href="{{ route('admin.site.services.index') }}">서비스를 먼저 생성하세요</a>
+                                        사용 가능한 구독가 없습니다. <a href="{{ route('admin.site.subscribes.index') }}">구독를 먼저 생성하세요</a>
                                     </small>
                                 @endif
-                                @error('service_id')
+                                @error('subscribe_id')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
@@ -420,10 +420,10 @@
                             <button type="submit" class="btn btn-primary">
                                 <i class="fe fe-save me-2"></i>변경사항 저장
                             </button>
-                            <a href="{{ route('admin.service.plan.show', $plan->id) }}" class="btn btn-outline-info">
+                            <a href="{{ route('admin.subscribe.plan.show', $plan->id) }}" class="btn btn-outline-info">
                                 <i class="fe fe-eye me-2"></i>상세보기
                             </a>
-                            <a href="{{ route('admin.service.plan.index') }}" class="btn btn-outline-secondary">
+                            <a href="{{ route('admin.subscribe.plan.index') }}" class="btn btn-outline-secondary">
                                 <i class="fe fe-x me-2"></i>취소
                             </a>
 
@@ -464,7 +464,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
-                <form id="deleteForm" method="POST" action="{{ route('admin.service.plan.destroy', $plan->id) }}" style="display: inline;">
+                <form id="deleteForm" method="POST" action="{{ route('admin.subscribe.plan.destroy', $plan->id) }}" style="display: inline;">
                     @csrf
                     @method('DELETE')
                     <button type="submit" class="btn btn-danger">삭제</button>

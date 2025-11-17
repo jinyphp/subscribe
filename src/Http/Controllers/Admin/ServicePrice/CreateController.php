@@ -1,17 +1,17 @@
 <?php
 
-namespace Jiny\Service\Http\Controllers\Admin\ServicePrice;
+namespace Jiny\Subscribe\Http\Controllers\Admin\subscribePrice;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Jiny\Service\Models\SiteService;
+use Jiny\Subscribe\Models\Sitesubscribe;
 
 class CreateController extends Controller
 {
-    public function __invoke(Request $request, $serviceId)
+    public function __invoke(Request $request, $subscribeId)
     {
-        $service = SiteService::findOrFail($serviceId);
+        $subscribe = Sitesubscribe::findOrFail($subscribeId);
 
-        return view('jiny-service::admin.service_price.create', compact('service'));
+        return view('jiny-subscribe::admin.service_price.create', compact('subscribe'));
     }
 }

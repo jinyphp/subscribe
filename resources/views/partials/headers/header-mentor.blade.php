@@ -55,7 +55,7 @@
         </div>
 
         <!-- Button Collapse -->
-        @includeIf('jiny-service::partials.navs.nav-default.top', [
+        @includeIf('jiny-subscribe::partials.navs.nav-default.top', [
             'menuItems' => Site::menuItems('mentor'),
             'alignment' => 'center'
         ])

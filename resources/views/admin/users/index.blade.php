@@ -1,15 +1,15 @@
-@extends('jiny-service::layouts.admin.sidebar')
+@extends('jiny-subscribe::layouts.admin.sidebar')
 
 @section('content')
 <div class="container-fluid">
     <!-- Header -->
     <div class="row mb-4">
         <div class="col-md-8">
-            <h1 class="h3 mb-0 text-gray-800">서비스 구독 사용자 관리</h1>
-            <p class="mb-0 text-muted">서비스를 구독 중인 사용자들을 관리합니다.</p>
+            <h1 class="h3 mb-0 text-gray-800">구독 구독 사용자 관리</h1>
+            <p class="mb-0 text-muted">구독를 구독 중인 사용자들을 관리합니다.</p>
         </div>
         <div class="col-md-4 text-right">
-            <a href="{{ route('admin.service.users.create') }}" class="btn btn-primary">
+            <a href="{{ route('admin.subscribe.users.create') }}" class="btn btn-primary">
                 <i class="fas fa-plus"></i> 새 구독 사용자 추가
             </a>
         </div>
@@ -85,16 +85,16 @@
     <!-- Filters -->
     <div class="card shadow mb-4">
         <div class="card-body">
-            <form method="GET" action="{{ route('admin.service.users.index') }}">
+            <form method="GET" action="{{ route('admin.subscribe.users.index') }}">
                 <div class="row">
                     <div class="col-md-3 mb-3">
-                        <label for="service_id" class="form-label">서비스</label>
-                        <select name="service_id" id="service_id" class="form-control">
-                            <option value="">전체 서비스</option>
-                            @foreach($services as $service)
-                                <option value="{{ $service->id }}"
-                                    {{ request('service_id') == $service->id ? 'selected' : '' }}>
-                                    {{ $service->name }}
+                        <label for="subscribe_id" class="form-label">구독</label>
+                        <select name="subscribe_id" id="subscribe_id" class="form-control">
+                            <option value="">전체 구독</option>
+                            @foreach($subscribes as $subscribe)
+                                <option value="{{ $subscribe->id }}"
+                                    {{ request('subscribe_id') == $subscribe->id ? 'selected' : '' }}>
+                                    {{ $subscribe->name }}
                                 </option>
                             @endforeach
                         </select>
@@ -148,7 +148,7 @@
                         <button type="submit" class="btn btn-outline-primary mr-2">
                             <i class="fas fa-search"></i> 검색
                         </button>
-                        <a href="{{ route('admin.service.users.index') }}" class="btn btn-outline-secondary">
+                        <a href="{{ route('admin.subscribe.users.index') }}" class="btn btn-outline-secondary">
                             <i class="fas fa-undo"></i> 초기화
                         </a>
                     </div>
@@ -168,7 +168,7 @@
                     <thead>
                         <tr>
                             <th>사용자 정보</th>
-                            <th>서비스/플랜</th>
+                            <th>구독/플랜</th>
                             <th>상태</th>
                             <th>결제 정보</th>
                             <th>구독 기간</th>
@@ -193,7 +193,7 @@
                             </td>
                             <td>
                                 <div>
-                                    <strong>{{ $user->service->name ?? $user->service_title }}</strong>
+                                    <strong>{{ $user->subscribe->name ?? $user->subscribe_title }}</strong>
                                     <br>
                                     <span class="badge badge-{{
                                         strpos($user->plan_name, 'Basic') !== false ? 'secondary' :
@@ -279,7 +279,7 @@
                             </td>
                             <td>
                                 <div class="btn-group-vertical btn-group-sm" role="group">
-                                    <a href="{{ route('admin.service.users.edit', $user->id) }}"
+                                    <a href="{{ route('admin.subscribe.users.edit', $user->id) }}"
                                        class="btn btn-outline-primary btn-sm" title="상세 보기/수정">
                                         <i class="fas fa-edit"></i> 관리
                                     </a>
@@ -303,7 +303,7 @@
                             <td colspan="7" class="text-center py-4">
                                 <i class="fas fa-inbox fa-3x text-gray-300 mb-3"></i>
                                 <p class="text-muted">등록된 구독 사용자가 없습니다.</p>
-                                <a href="{{ route('admin.service.users.create') }}" class="btn btn-primary">
+                                <a href="{{ route('admin.subscribe.users.create') }}" class="btn btn-primary">
                                     첫 번째 구독 사용자 추가
                                 </a>
                             </td>
@@ -338,7 +338,7 @@
                                 {{ $activity->user_name }} ({{ $activity->user_email }})
                             </div>
                             <div class="text-xs text-gray-600">
-                                {{ $activity->service->name ?? $activity->service_title }} - {{ $activity->plan_name }}
+                                {{ $activity->subscribe->name ?? $activity->subscribe_title }} - {{ $activity->plan_name }}
                             </div>
                         </div>
                         <div class="col-auto">
@@ -378,13 +378,13 @@
 <script>
 function extendSubscription(userId) {
     // You can implement a modal for extension or redirect to a page
-    window.location.href = `/admin/service/users/${userId}/edit#extend`;
+    window.location.href = `/admin/subscribe/users/${userId}/edit#extend`;
 }
 
 function reactivateSubscription(userId) {
     if (confirm('이 구독을 재활성화하시겠습니까?')) {
         // Implement reactivation logic
-        fetch(`/admin/service/process/cancel/${userId}/reactivate`, {
+        fetch(`/admin/subscribe/process/cancel/${userId}/reactivate`, {
             method: 'POST',
             headers: {
                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),

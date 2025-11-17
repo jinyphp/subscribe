@@ -1,13 +1,13 @@
 <?php
 
-namespace Jiny\Service\Models;
+namespace Jiny\Subscribe\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Database\Factories\ServiceUserFactory;
+use Database\Factories\subscribeUserFactory;
 
 class ServiceUser extends Model
 {
@@ -18,10 +18,10 @@ class ServiceUser extends Model
      */
     protected static function newFactory()
     {
-        return ServiceUserFactory::new();
+        return subscribeUserFactory::new();
     }
 
-    protected $table = 'service_users';
+    protected $table = 'subscribe_users';
 
     protected $fillable = [
         'user_uuid',
@@ -29,8 +29,8 @@ class ServiceUser extends Model
         'user_id',
         'user_email',
         'user_name',
-        'service_id',
-        'service_title',
+        'subscribe_id',
+        'subscribe_title',
         'status',
         'billing_cycle',
         'started_at',
@@ -77,19 +77,19 @@ class ServiceUser extends Model
     ];
 
     // Relationships
-    public function service(): BelongsTo
+    public function subscribe(): BelongsTo
     {
-        return $this->belongsTo(Service::class, 'service_id');
+        return $this->belongsTo(subscribe::class, 'subscribe_id');
     }
 
     public function payments(): HasMany
     {
-        return $this->hasMany(ServicePayment::class, 'service_user_id');
+        return $this->hasMany(subscribePayment::class, 'subscribe_user_id');
     }
 
     public function subscriptionLogs(): HasMany
     {
-        return $this->hasMany(ServiceSubscriptionLog::class, 'service_user_id');
+        return $this->hasMany(subscribeSubscriptionLog::class, 'subscribe_user_id');
     }
 
     // Scopes
@@ -115,9 +115,9 @@ class ServiceUser extends Model
         return $query->where('user_uuid', $userUuid);
     }
 
-    public function scopeByService($query, $serviceId)
+    public function scopeBysubscribe($query, $subscribeId)
     {
-        return $query->where('service_id', $serviceId);
+        return $query->where('subscribe_id', $subscribeId);
     }
 
     // Accessors & Mutators
@@ -204,7 +204,7 @@ class ServiceUser extends Model
         // 로그 기록
         $this->subscriptionLogs()->create([
             'user_uuid' => $this->user_uuid,
-            'service_id' => $this->service_id,
+            'subscribe_id' => $this->subscribe_id,
             'action' => 'extend',
             'action_title' => '구독 연장',
             'action_description' => "{$days}일 연장",
@@ -230,7 +230,7 @@ class ServiceUser extends Model
         // 로그 기록
         $this->subscriptionLogs()->create([
             'user_uuid' => $this->user_uuid,
-            'service_id' => $this->service_id,
+            'subscribe_id' => $this->subscribe_id,
             'action' => 'cancel',
             'action_title' => '구독 취소',
             'action_description' => $reason ?: '구독이 취소되었습니다.',
@@ -252,7 +252,7 @@ class ServiceUser extends Model
         // 로그 기록
         $this->subscriptionLogs()->create([
             'user_uuid' => $this->user_uuid,
-            'service_id' => $this->service_id,
+            'subscribe_id' => $this->subscribe_id,
             'action' => 'activate',
             'action_title' => '구독 활성화',
             'action_description' => '구독이 활성화되었습니다.',

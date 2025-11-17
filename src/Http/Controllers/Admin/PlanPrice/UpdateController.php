@@ -1,24 +1,24 @@
 <?php
 
-namespace Jiny\Service\Http\Controllers\Admin\PlanPrice;
+namespace Jiny\Subscribe\Http\Controllers\Admin\PlanPrice;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Jiny\Service\Models\ServicePlan;
-use Jiny\Service\Models\ServicePlanPrice;
+use Jiny\Subscribe\Models\subscribePlan;
+use Jiny\Subscribe\Models\subscribePlanPrice;
 
 class UpdateController extends Controller
 {
     public function __invoke(Request $request, $planId, $priceId)
     {
-        $plan = ServicePlan::findOrFail($planId);
+        $plan = subscribePlan::findOrFail($planId);
 
-        $price = ServicePlanPrice::where('service_plan_id', $planId)
+        $price = subscribePlanPrice::where('subscribe_plan_id', $planId)
                    ->findOrFail($priceId);
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'code' => 'nullable|string|max:255|unique:service_plan_price,code,' . $priceId,
+            'code' => 'nullable|string|max:255|unique:subscribe_plan_price,code,' . $priceId,
             'description' => 'nullable|string',
             'price' => 'required|numeric|min:0',
             'sale_price' => 'nullable|numeric|min:0',
@@ -56,14 +56,14 @@ class UpdateController extends Controller
 
         // 중복 인기/추천 옵션 체크
         if ($validated['is_popular']) {
-            ServicePlanPrice::where('service_plan_id', $planId)
+            subscribePlanPrice::where('subscribe_plan_id', $planId)
                 ->where('id', '!=', $priceId)
                 ->where('is_popular', true)
                 ->update(['is_popular' => false]);
         }
 
         if ($validated['is_recommended']) {
-            ServicePlanPrice::where('service_plan_id', $planId)
+            subscribePlanPrice::where('subscribe_plan_id', $planId)
                 ->where('id', '!=', $priceId)
                 ->where('is_recommended', true)
                 ->update(['is_recommended' => false]);
@@ -72,7 +72,7 @@ class UpdateController extends Controller
         $price->update($validated);
 
         return redirect()
-            ->route('admin.service.plan.price.index', $planId)
+            ->route('admin.subscribe.plan.price.index', $planId)
             ->with('success', '플랜 가격 옵션이 성공적으로 수정되었습니다.');
     }
 }

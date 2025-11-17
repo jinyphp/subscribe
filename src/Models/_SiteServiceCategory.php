@@ -1,16 +1,16 @@
 <?php
 
-namespace Jiny\Service\Models;
+namespace Jiny\Subscribe\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class SiteServiceCategory extends Model
+class SitesubscribeCategory extends Model
 {
     use HasFactory, SoftDeletes;
 
-    protected $table = 'service_categories';
+    protected $table = 'subscribe_categories';
 
     protected $fillable = [
         'enable',
@@ -42,7 +42,7 @@ class SiteServiceCategory extends Model
      */
     public function parent()
     {
-        return $this->belongsTo(SiteServiceCategory::class, 'parent_id');
+        return $this->belongsTo(SitesubscribeCategory::class, 'parent_id');
     }
 
     /**
@@ -50,7 +50,7 @@ class SiteServiceCategory extends Model
      */
     public function children()
     {
-        return $this->hasMany(SiteServiceCategory::class, 'parent_id')
+        return $this->hasMany(SitesubscribeCategory::class, 'parent_id')
             ->where('enable', true)
             ->orderBy('pos');
     }
@@ -64,11 +64,11 @@ class SiteServiceCategory extends Model
     }
 
     /**
-     * 이 카테고리에 속한 서비스들
+     * 이 카테고리에 속한 구독들
      */
-    public function services()
+    public function subscribes()
     {
-        return $this->hasMany(SiteService::class, 'category_id')
+        return $this->hasMany(Sitesubscribe::class, 'category_id')
             ->where('enable', true);
     }
 
@@ -165,10 +165,10 @@ class SiteServiceCategory extends Model
     }
 
     /**
-     * 카테고리에 속한 서비스 개수
+     * 카테고리에 속한 구독 개수
      */
-    public function getServicesCountAttribute()
+    public function getsubscribesCountAttribute()
     {
-        return $this->services()->count();
+        return $this->subscribes()->count();
     }
 }

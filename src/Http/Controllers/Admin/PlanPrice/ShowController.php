@@ -1,23 +1,23 @@
 <?php
 
-namespace Jiny\Service\Http\Controllers\Admin\PlanPrice;
+namespace Jiny\Subscribe\Http\Controllers\Admin\PlanPrice;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Jiny\Service\Models\ServicePlan;
-use Jiny\Service\Models\ServicePlanPrice;
+use Jiny\Subscribe\Models\subscribePlan;
+use Jiny\Subscribe\Models\subscribePlanPrice;
 
 class ShowController extends Controller
 {
     public function __invoke(Request $request, $planId, $priceId)
     {
-        $plan = ServicePlan::with('service')->findOrFail($planId);
+        $plan = subscribePlan::with('subscribe')->findOrFail($planId);
 
-        $price = ServicePlanPrice::where('service_plan_id', $planId)
+        $price = subscribePlanPrice::where('subscribe_plan_id', $planId)
                    ->findOrFail($priceId);
 
         // 같은 결제 주기의 다른 가격 옵션들
-        $relatedPrices = ServicePlanPrice::where('service_plan_id', $planId)
+        $relatedPrices = subscribePlanPrice::where('subscribe_plan_id', $planId)
                            ->where('billing_period', $price->billing_period)
                            ->where('id', '!=', $priceId)
                            ->enabled()
@@ -27,7 +27,7 @@ class ShowController extends Controller
         // 가격 비교 데이터
         $priceComparison = $this->getPriceComparison($planId, $price);
 
-        return view('jiny-service::admin.plan_price.show', compact(
+        return view('jiny-subscribe::admin.plan_price.show', compact(
             'plan',
             'price',
             'relatedPrices',
@@ -37,7 +37,7 @@ class ShowController extends Controller
 
     protected function getPriceComparison($planId, $currentPrice)
     {
-        $allPrices = ServicePlanPrice::where('service_plan_id', $planId)
+        $allPrices = subscribePlanPrice::where('subscribe_plan_id', $planId)
                        ->enabled()
                        ->get();
 

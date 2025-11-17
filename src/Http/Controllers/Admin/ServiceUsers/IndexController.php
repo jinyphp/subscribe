@@ -1,11 +1,11 @@
 <?php
 
-namespace Jiny\Service\Http\Controllers\Admin\ServiceUsers;
+namespace Jiny\Subscribe\Http\Controllers\Admin\subscribeUsers;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Jiny\Service\Models\ServiceUser;
-use Jiny\Service\Models\Service;
+use Jiny\Subscribe\Models\subscribeUser;
+use Jiny\Subscribe\Models\subscribe;
 
 class IndexController extends Controller
 {
@@ -14,12 +14,12 @@ class IndexController extends Controller
         // 검색 및 필터 파라미터
         $search = $request->get('search');
         $status = $request->get('status');
-        $service_id = $request->get('service_id');
+        $subscribe_id = $request->get('subscribe_id');
         $billing_cycle = $request->get('billing_cycle');
         $payment_status = $request->get('payment_status');
 
         // 기본 쿼리
-        $query = ServiceUser::with(['service'])
+        $query = subscribeUser::with(['subscribe'])
                             ->orderBy('created_at', 'desc');
 
         // 검색 조건
@@ -43,9 +43,9 @@ class IndexController extends Controller
             }
         }
 
-        // 서비스 필터
-        if ($service_id) {
-            $query->where('service_id', $service_id);
+        // 구독 필터
+        if ($subscribe_id) {
+            $query->where('subscribe_id', $subscribe_id);
         }
 
         // 결제 주기 필터
@@ -59,13 +59,13 @@ class IndexController extends Controller
         }
 
         // 페이지네이션
-        $serviceUsers = $query->paginate(20);
+        $subscribeUsers = $query->paginate(20);
 
         // 통계 데이터
         $stats = $this->getStatistics();
 
         // 필터용 데이터
-        $services = Service::where('enable', true)->orderBy('title')->get();
+        $subscribes = subscribe::where('enable', true)->orderBy('title')->get();
         $statusOptions = [
             'active' => '활성',
             'suspended' => '일시정지',
@@ -87,10 +87,10 @@ class IndexController extends Controller
             'refunded' => '환불 완료'
         ];
 
-        return view('jiny-service::admin.service_users.index', compact(
-            'serviceUsers',
+        return view('jiny-subscribe::admin.service_users.index', compact(
+            'subscribeUsers',
             'stats',
-            'services',
+            'subscribes',
             'statusOptions',
             'billingCycleOptions',
             'paymentStatusOptions'
@@ -99,18 +99,18 @@ class IndexController extends Controller
 
     private function getStatistics()
     {
-        $total = ServiceUser::count();
-        $active = ServiceUser::where('status', 'active')->count();
-        $expired = ServiceUser::expired()->count();
-        $expiringSoon = ServiceUser::expiringSoon()->count();
-        $thisMonth = ServiceUser::whereMonth('created_at', now()->month)
+        $total = subscribeUser::count();
+        $active = subscribeUser::where('status', 'active')->count();
+        $expired = subscribeUser::expired()->count();
+        $expiringSoon = subscribeUser::expiringSoon()->count();
+        $thisMonth = subscribeUser::whereMonth('created_at', now()->month)
                                ->whereYear('created_at', now()->year)
                                ->count();
 
-        $totalRevenue = ServiceUser::where('status', 'active')
+        $totalRevenue = subscribeUser::where('status', 'active')
                                   ->sum('monthly_price');
 
-        $pendingPayments = ServiceUser::where('payment_status', 'pending')
+        $pendingPayments = subscribeUser::where('payment_status', 'pending')
                                      ->where('status', 'active')
                                      ->count();
 

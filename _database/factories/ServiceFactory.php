@@ -3,16 +3,16 @@
 namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Jiny\Service\Models\Service;
+use Jiny\Subscribe\Models\subscribe;
 
-class ServiceFactory extends Factory
+class subscribeFactory extends Factory
 {
-    protected $model = Service::class;
+    protected $model = subscribe::class;
 
     public function definition(): array
     {
         return [
-            'title' => $this->faker->words(3, true) . ' Service',
+            'title' => $this->faker->words(3, true) . ' subscribe',
             'description' => $this->faker->paragraph(),
             'status' => $this->faker->randomElement(['active', 'inactive', 'draft']),
             'category' => $this->faker->randomElement(['web-development', 'mobile-app', 'consulting', 'design', 'marketing']),
@@ -31,7 +31,7 @@ class ServiceFactory extends Factory
     }
 
     /**
-     * 활성 서비스 상태
+     * 활성 구독 상태
      */
     public function active(): self
     {
@@ -43,7 +43,7 @@ class ServiceFactory extends Factory
     }
 
     /**
-     * 비활성 서비스 상태
+     * 비활성 구독 상태
      */
     public function inactive(): self
     {
@@ -55,7 +55,7 @@ class ServiceFactory extends Factory
     }
 
     /**
-     * 추천 서비스
+     * 추천 구독
      */
     public function featured(): self
     {
@@ -68,7 +68,7 @@ class ServiceFactory extends Factory
     }
 
     /**
-     * 구독형 서비스
+     * 구독형 구독
      */
     public function subscription(): self
     {
@@ -81,7 +81,7 @@ class ServiceFactory extends Factory
     }
 
     /**
-     * 일회성 서비스
+     * 일회성 구독
      */
     public function oneTime(): self
     {

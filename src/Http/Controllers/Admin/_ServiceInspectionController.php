@@ -1,10 +1,10 @@
 <?php
 
-namespace Jiny\Service\Http\Controllers\Admin;
+namespace Jiny\Subscribe\Http\Controllers\Admin;
 
-use Jiny\Service\Models\ServiceInspection;
-use Jiny\Service\Models\Appointment;
-use Jiny\Service\Models\ServiceProvider;
+use Jiny\Subscribe\Models\ServiceInspection;
+use Jiny\Subscribe\Models\Appointment;
+use Jiny\Subscribe\Models\ServiceProvider;
 use App\Models\User;
 use Illuminate\Http\Request;
 
@@ -14,7 +14,7 @@ class ServiceInspectionController extends BaseAdminController
     {
         parent::__construct();
         $this->model = ServiceInspection::class;
-        $this->viewPath = 'jiny-service::admin.service-inspections';
+        $this->viewPath = 'jiny-subscribe::admin.service-inspections';
         $this->routePrefix = 'service-inspections';
         $this->title = '서비스 검수 관리';
     }
@@ -45,7 +45,7 @@ class ServiceInspectionController extends BaseAdminController
 
     public function index(Request $request)
     {
-        $query = $this->model::with(['appointment.service', 'customer', 'provider.user']);
+        $query = $this->model::with(['appointment.subscribe', 'customer', 'provider.user']);
 
         // 검색 기능
         if ($request->has('search') && $request->search) {
@@ -116,13 +116,13 @@ class ServiceInspectionController extends BaseAdminController
 
     public function create()
     {
-        $appointments = Appointment::with(['customer', 'service'])
-            ->whereDoesntHave('serviceInspections')
+        $appointments = Appointment::with(['customer', 'subscribe'])
+            ->whereDoesntHave('subscribeInspections')
             ->whereIn('status', ['completed', 'verified'])
             ->orderBy('actual_end_time', 'desc')
             ->get();
 
-        $providers = ServiceProvider::with('user')->where('status', 'active')->get();
+        $providers = subscribeProvider::with('user')->where('status', 'active')->get();
 
         return view("{$this->viewPath}.create", [
             'appointments' => $appointments,
@@ -134,9 +134,9 @@ class ServiceInspectionController extends BaseAdminController
 
     public function edit($id)
     {
-        $item = $this->model::with(['appointment.service', 'customer', 'provider.user'])->findOrFail($id);
-        $appointments = Appointment::with(['customer', 'service'])->whereIn('status', ['completed', 'verified'])->orderBy('actual_end_time', 'desc')->get();
-        $providers = ServiceProvider::with('user')->where('status', 'active')->get();
+        $item = $this->model::with(['appointment.subscribe', 'customer', 'provider.user'])->findOrFail($id);
+        $appointments = Appointment::with(['customer', 'subscribe'])->whereIn('status', ['completed', 'verified'])->orderBy('actual_end_time', 'desc')->get();
+        $providers = subscribeProvider::with('user')->where('status', 'active')->get();
 
         return view("{$this->viewPath}.edit", [
             'item' => $item,
@@ -288,7 +288,7 @@ class ServiceInspectionController extends BaseAdminController
      */
     public function overdueInspections()
     {
-        $overdueInspections = $this->model::with(['appointment.service', 'customer', 'provider.user'])
+        $overdueInspections = $this->model::with(['appointment.subscribe', 'customer', 'provider.user'])
             ->where('deadline', '<', now())
             ->where('inspection_status', 'pending')
             ->orderBy('deadline')
@@ -335,7 +335,7 @@ class ServiceInspectionController extends BaseAdminController
             'end_date' => 'required|date|after_or_equal:start_date'
         ]);
 
-        $inspections = $this->model::with(['appointment.service', 'customer', 'provider.user'])
+        $inspections = $this->model::with(['appointment.subscribe', 'customer', 'provider.user'])
             ->whereBetween('created_at', [$request->start_date, $request->end_date])
             ->get();
 

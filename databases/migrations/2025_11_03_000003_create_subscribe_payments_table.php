@@ -11,13 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('service_payments', function (Blueprint $table) {
+        Schema::create('subscribe_payments', function (Blueprint $table) {
             $table->id();
 
             // 연관 정보
-            $table->unsignedBigInteger('service_user_id')->index();
+            $table->unsignedBigInteger('subscribe_user_id')->index();
             $table->string('user_uuid')->index();
-            $table->unsignedBigInteger('service_id')->index();
+            $table->unsignedBigInteger('subscribe_id')->index();
 
             // 결제 식별 정보
             $table->string('payment_uuid')->unique();
@@ -90,15 +90,15 @@ return new class extends Migration
 
             // 인덱스
             $table->index(['user_uuid', 'status']);
-            $table->index(['service_id', 'status']);
+            $table->index(['subscribe_id', 'status']);
             $table->index(['payment_method', 'status']);
             $table->index(['payment_type', 'billing_cycle']);
             $table->index(['status', 'due_date']);
             $table->index(['created_at', 'status']);
 
             // 외래키
-            $table->foreign('service_user_id')->references('id')->on('service_users')->onDelete('cascade');
-            $table->foreign('service_id')->references('id')->on('services')->onDelete('cascade');
+            $table->foreign('subscribe_user_id')->references('id')->on('subscribe_users')->onDelete('cascade');
+            $table->foreign('subscribe_id')->references('id')->on('subscribes')->onDelete('cascade');
         });
     }
 
@@ -107,6 +107,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('service_payments');
+        Schema::dropIfExists('subscribe_payments');
     }
 };

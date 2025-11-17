@@ -1,4 +1,4 @@
-@extends('jiny-service::layouts.admin.sidebar')
+@extends('jiny-subscribe::layouts.admin.sidebar')
 
 @section('content')
 <div class="container-fluid">
@@ -11,7 +11,7 @@
                     <p class="text-muted mb-0">플랜의 상세 정보와 구독 현황을 확인합니다.</p>
                 </div>
                 <div>
-                    <a href="{{ route('admin.service.plan.index') }}" class="btn btn-outline-secondary me-2">
+                    <a href="{{ route('admin.subscribe.plan.index') }}" class="btn btn-outline-secondary me-2">
                         <i class="fe fe-arrow-left me-2"></i>목록으로
                     </a>
                     <div class="btn-group me-2">
@@ -20,18 +20,18 @@
                         </button>
                         <ul class="dropdown-menu">
                             <li>
-                                <a class="dropdown-item" href="{{ route('admin.service.plan.detail.index', $plan->id) }}">
+                                <a class="dropdown-item" href="{{ route('admin.subscribe.plan.detail.index', $plan->id) }}">
                                     <i class="fe fe-list me-2"></i>상세 기능 관리
                                 </a>
                             </li>
                             <li>
-                                <a class="dropdown-item" href="{{ route('admin.service.plan.price.index', $plan->id) }}">
+                                <a class="dropdown-item" href="{{ route('admin.subscribe.plan.price.index', $plan->id) }}">
                                     <i class="fe fe-dollar-sign me-2"></i>가격 옵션 관리
                                 </a>
                             </li>
                         </ul>
                     </div>
-                    <a href="{{ route('admin.service.plan.edit', $plan->id) }}" class="btn btn-primary">
+                    <a href="{{ route('admin.subscribe.plan.edit', $plan->id) }}" class="btn btn-primary">
                         <i class="fe fe-edit me-2"></i>수정하기
                     </a>
                 </div>
@@ -130,8 +130,8 @@
                                 <p class="text-gray-800">{{ $plan->plan_code }}</p>
                             </div>
                             <div class="form-group">
-                                <label class="font-weight-bold">서비스</label>
-                                <p class="text-gray-800">{{ $plan->service->title ?? '-' }}</p>
+                                <label class="font-weight-bold">구독</label>
+                                <p class="text-gray-800">{{ $plan->subscribe->title ?? '-' }}</p>
                             </div>
                             <div class="form-group">
                                 <label class="font-weight-bold">플랜 타입</label>
@@ -218,7 +218,7 @@
             <div class="card mb-4">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">플랜 상세 기능</h5>
-                    <a href="{{ route('admin.service.plan.detail.index', $plan->id) }}" class="btn btn-sm btn-outline-primary">
+                    <a href="{{ route('admin.subscribe.plan.detail.index', $plan->id) }}" class="btn btn-sm btn-outline-primary">
                         <i class="fe fe-edit me-1"></i>관리
                     </a>
                 </div>
@@ -289,7 +289,7 @@
             <div class="card mb-4">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">가격 옵션</h5>
-                    <a href="{{ route('admin.service.plan.price.index', $plan->id) }}" class="btn btn-sm btn-outline-primary">
+                    <a href="{{ route('admin.subscribe.plan.price.index', $plan->id) }}" class="btn btn-sm btn-outline-primary">
                         <i class="fe fe-dollar-sign me-1"></i>관리
                     </a>
                 </div>

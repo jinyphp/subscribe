@@ -13,7 +13,7 @@
                 @if(isset($item['id'])) aria-labelledby="{{ $item['id'] }}" @endif>
                 @if(isset($item['children']) && is_array($item['children']))
                     @foreach($item['children'] as $child)
-                        @include('jiny-service::partials.navs.nav-default.menu-item', ['item' => $child])
+                        @include('jiny-subscribe::partials.navs.nav-default.menu-item', ['item' => $child])
                     @endforeach
                 @endif
             </ul>
@@ -31,7 +31,7 @@
                  @if(isset($item['id'])) aria-labelledby="{{ $item['id'] }}" @endif>
                 @if(isset($item['children']) && is_array($item['children']))
                     @foreach($item['children'] as $child)
-                        @include('jiny-service::partials.navs.nav-default.menu-item', ['item' => $child])
+                        @include('jiny-subscribe::partials.navs.nav-default.menu-item', ['item' => $child])
                     @endforeach
                 @endif
             </div>
@@ -50,7 +50,7 @@
                 @if(isset($item['data_bs_popper'])) data-bs-popper="{{ $item['data_bs_popper'] }}" @endif>
                 @if(isset($item['children']) && is_array($item['children']))
                     @foreach($item['children'] as $child)
-                        @include('jiny-service::partials.navs.nav-default.menu-item', ['item' => $child])
+                        @include('jiny-subscribe::partials.navs.nav-default.menu-item', ['item' => $child])
                     @endforeach
                 @endif
             </ul>

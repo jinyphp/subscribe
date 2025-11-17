@@ -2,7 +2,7 @@
 <div class="collapse navbar-collapse" id="navbar-default">
     <ul class="navbar-nav @@navbarAuto">
         @foreach($menuItems  as $menuItem)
-            @include('jiny-service::partials.navs.simple.menu-item', ['item' => $menuItem])
+            @include('jiny-subscribe::partials.navs.simple.menu-item', ['item' => $menuItem])
         @endforeach
     </ul>
 </div>

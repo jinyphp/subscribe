@@ -1,4 +1,4 @@
-@extends($layout ?? 'jiny-service::layouts.admin.sidebar')
+@extends($layout ?? 'jiny-subscribe::layouts.admin.sidebar')
 
 @section('title', $config['title'])
 
@@ -13,8 +13,8 @@
                     <p class="text-muted mb-0">{{ $config['subtitle'] }}</p>
                 </div>
                 <div>
-                    <a href="{{ route('admin.site.services.create') }}" class="btn btn-primary">
-                        <i class="fe fe-plus me-2"></i>새 서비스 등록
+                    <a href="{{ route('admin.site.subscribes.create') }}" class="btn btn-primary">
+                        <i class="fe fe-plus me-2"></i>새 구독 등록
                     </a>
                 </div>
             </div>
@@ -33,7 +33,7 @@
                             </div>
                         </div>
                         <div class="flex-grow-1 ms-3">
-                            <h6 class="mb-0">전체 서비스</h6>
+                            <h6 class="mb-0">전체 구독</h6>
                             <h4 class="mb-0">{{ $stats['total'] }}</h4>
                         </div>
                     </div>
@@ -50,7 +50,7 @@
                             </div>
                         </div>
                         <div class="flex-grow-1 ms-3">
-                            <h6 class="mb-0">서비스 중</h6>
+                            <h6 class="mb-0">구독 중</h6>
                             <h4 class="mb-0">{{ $stats['published'] }}</h4>
                         </div>
                     </div>
@@ -84,7 +84,7 @@
                             </div>
                         </div>
                         <div class="flex-grow-1 ms-3">
-                            <h6 class="mb-0">추천 서비스</h6>
+                            <h6 class="mb-0">추천 구독</h6>
                             <h4 class="mb-0">{{ $stats['featured'] }}</h4>
                         </div>
                     </div>
@@ -96,7 +96,7 @@
     <!-- 필터 -->
     <div class="card mb-4">
         <div class="card-body">
-            <form method="GET" action="{{ route('admin.site.services.index') }}">
+            <form method="GET" action="{{ route('admin.site.subscribes.index') }}">
                 <div class="row">
                     <div class="col-md-4">
                         <div class="form-group">
@@ -105,7 +105,7 @@
                                    id="search"
                                    name="search"
                                    class="form-control"
-                                   placeholder="서비스명, 설명으로 검색..."
+                                   placeholder="구독명, 설명으로 검색..."
                                    value="{{ request('search') }}">
                         </div>
                     </div>
@@ -125,10 +125,10 @@
                     </div>
                     <div class="col-md-2">
                         <div class="form-group">
-                            <label for="enable">서비스상태</label>
+                            <label for="enable">구독상태</label>
                             <select id="enable" name="enable" class="form-control">
                                 <option value="">전체</option>
-                                <option value="1" {{ request('enable') === '1' ? 'selected' : '' }}>서비스중</option>
+                                <option value="1" {{ request('enable') === '1' ? 'selected' : '' }}>구독중</option>
                                 <option value="0" {{ request('enable') === '0' ? 'selected' : '' }}>준비중</option>
                             </select>
                         </div>
@@ -147,7 +147,7 @@
                         <button type="submit" class="btn btn-outline-primary me-2">
                             <i class="fe fe-search me-1"></i>검색
                         </button>
-                        <a href="{{ route('admin.site.services.index') }}" class="btn btn-outline-secondary">
+                        <a href="{{ route('admin.site.subscribes.index') }}" class="btn btn-outline-secondary">
                             <i class="fe fe-refresh-cw me-1"></i>초기화
                         </a>
                     </div>
@@ -156,19 +156,19 @@
         </div>
     </div>
 
-    <!-- 서비스 목록 -->
+    <!-- 구독 목록 -->
     <div class="card">
         <div class="card-header">
-            <h5 class="mb-0">서비스 목록</h5>
+            <h5 class="mb-0">구독 목록</h5>
         </div>
         <div class="card-body p-0">
-            @if($services->count() > 0)
+            @if($subscribes->count() > 0)
                 <div class="table-responsive">
                     <table class="table table-hover mb-0">
                         <thead class="table-light">
                             <tr>
                                 <th width="50">ID</th>
-                                <th>서비스정보</th>
+                                <th>구독정보</th>
                                 <th>카테고리</th>
                                 <th width="120">가격/기간</th>
                                 <th width="100">상태</th>
@@ -177,14 +177,14 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach($services as $service)
+                            @foreach($subscribes as $subscribe)
                             <tr>
-                                <td>{{ $service->id }}</td>
+                                <td>{{ $subscribe->id }}</td>
                                 <td>
                                     <div class="d-flex align-items-center">
-                                        @if($service->image)
-                                            <img src="{{ $service->image }}"
-                                                 alt="{{ $service->title }}"
+                                        @if($subscribe->image)
+                                            <img src="{{ $subscribe->image }}"
+                                                 alt="{{ $subscribe->title }}"
                                                  class="me-3 rounded"
                                                  style="width: 50px; height: 50px; object-fit: cover;">
                                         @else
@@ -194,59 +194,59 @@
                                             </div>
                                         @endif
                                         <div>
-                                            <a href="{{ route('admin.site.services.show', $service->id) }}"
+                                            <a href="{{ route('admin.site.subscribes.show', $subscribe->id) }}"
                                                class="text-decoration-none">
-                                                <strong>{{ $service->title }}</strong>
+                                                <strong>{{ $subscribe->title }}</strong>
                                             </a>
-                                            @if($service->featured)
+                                            @if($subscribe->featured)
                                                 <span class="badge bg-warning text-dark ms-1">추천</span>
                                             @endif
-                                            @if($service->description)
-                                                <br><small class="text-muted">{{ Str::limit(strip_tags($service->description), 60) }}</small>
+                                            @if($subscribe->description)
+                                                <br><small class="text-muted">{{ Str::limit(strip_tags($subscribe->description), 60) }}</small>
                                             @endif
                                         </div>
                                     </div>
                                 </td>
                                 <td>
-                                    @if($service->category_name)
-                                        <span class="badge bg-light text-dark">{{ $service->category_name }}</span>
+                                    @if($subscribe->category_name)
+                                        <span class="badge bg-light text-dark">{{ $subscribe->category_name }}</span>
                                     @else
                                         <span class="text-muted">-</span>
                                     @endif
                                 </td>
                                 <td>
-                                    @if($service->price)
+                                    @if($subscribe->price)
                                         <div class="small">
-                                            <strong>₩{{ number_format($service->price) }}</strong>
+                                            <strong>₩{{ number_format($subscribe->price) }}</strong>
                                         </div>
                                     @endif
-                                    @if($service->duration)
-                                        <div class="small text-muted">{{ $service->duration }}</div>
+                                    @if($subscribe->duration)
+                                        <div class="small text-muted">{{ $subscribe->duration }}</div>
                                     @endif
-                                    @if(!$service->price && !$service->duration)
+                                    @if(!$subscribe->price && !$subscribe->duration)
                                         <span class="text-muted">-</span>
                                     @endif
                                 </td>
                                 <td>
-                                    @if($service->enable)
-                                        <span class="badge bg-success">서비스중</span>
+                                    @if($subscribe->enable)
+                                        <span class="badge bg-success">구독중</span>
                                     @else
                                         <span class="badge bg-secondary">준비중</span>
                                     @endif
                                 </td>
                                 <td>
                                     <small class="text-muted">
-                                        {{ \Carbon\Carbon::parse($service->created_at)->format('Y-m-d H:i') }}
+                                        {{ \Carbon\Carbon::parse($subscribe->created_at)->format('Y-m-d H:i') }}
                                     </small>
                                 </td>
                                 <td>
                                     <div class="btn-group btn-group-sm">
-                                        <a href="{{ route('admin.site.services.show', $service->id) }}"
+                                        <a href="{{ route('admin.site.subscribes.show', $subscribe->id) }}"
                                            class="btn btn-outline-info"
                                            title="보기">
                                             <i class="fe fe-eye"></i>
                                         </a>
-                                        <a href="{{ route('admin.site.services.edit', $service->id) }}"
+                                        <a href="{{ route('admin.site.subscribes.edit', $subscribe->id) }}"
                                            class="btn btn-outline-primary"
                                            title="수정">
                                             <i class="fe fe-edit"></i>
@@ -254,7 +254,7 @@
                                         <button type="button"
                                                 class="btn btn-outline-danger"
                                                 title="삭제"
-                                                onclick="deleteService({{ $service->id }})">
+                                                onclick="deletesubscribe({{ $subscribe->id }})">
                                             <i class="fe fe-trash-2"></i>
                                         </button>
                                     </div>
@@ -269,21 +269,21 @@
                 <div class="card-footer">
                     <div class="d-flex justify-content-between align-items-center">
                         <div class="text-muted">
-                            전체 {{ $services->total() }}개 중
-                            {{ $services->firstItem() }}~{{ $services->lastItem() }}개 표시
+                            전체 {{ $subscribes->total() }}개 중
+                            {{ $subscribes->firstItem() }}~{{ $subscribes->lastItem() }}개 표시
                         </div>
                         <div>
-                            {{ $services->appends(request()->query())->links('pagination::bootstrap-4') }}
+                            {{ $subscribes->appends(request()->query())->links('pagination::bootstrap-4') }}
                         </div>
                     </div>
                 </div>
             @else
                 <div class="text-center py-5">
                     <i class="fe fe-briefcase fe-3x text-muted mb-3"></i>
-                    <h5 class="text-muted">등록된 서비스가 없습니다</h5>
-                    <p class="text-muted">새 서비스를 등록해보세요.</p>
-                    <a href="{{ route('admin.site.services.create') }}" class="btn btn-primary">
-                        <i class="fe fe-plus me-2"></i>새 서비스 등록
+                    <h5 class="text-muted">등록된 구독가 없습니다</h5>
+                    <p class="text-muted">새 구독를 등록해보세요.</p>
+                    <a href="{{ route('admin.site.subscribes.create') }}" class="btn btn-primary">
+                        <i class="fe fe-plus me-2"></i>새 구독 등록
                     </a>
                 </div>
             @endif
@@ -296,11 +296,11 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">서비스 삭제</h5>
+                <h5 class="modal-title">구독 삭제</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <p>이 서비스를 삭제하시겠습니까?</p>
+                <p>이 구독를 삭제하시겠습니까?</p>
                 <p class="text-danger small">
                     <i class="fe fe-alert-triangle me-1"></i>
                     삭제된 데이터는 복구할 수 있습니다.
@@ -342,10 +342,10 @@
 @push('scripts')
 <script>
 // 삭제 확인
-function deleteService(id) {
+function deletesubscribe(id) {
     const modal = new bootstrap.Modal(document.getElementById('deleteModal'));
     const form = document.getElementById('deleteForm');
-    form.action = `/admin/site/services/${id}`;
+    form.action = `/admin/site/subscribes/${id}`;
     modal.show();
 }
 </script>

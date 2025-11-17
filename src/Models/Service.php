@@ -1,11 +1,11 @@
 <?php
 
-namespace Jiny\Service\Models;
+namespace Jiny\Subscribe\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Database\Factories\ServiceFactory;
+use Database\Factories\subscribeFactory;
 
 class Service extends Model
 {
@@ -16,7 +16,7 @@ class Service extends Model
      */
     protected static function newFactory()
     {
-        return ServiceFactory::new();
+        return subscribeFactory::new();
     }
 
     protected $fillable = [
@@ -59,12 +59,12 @@ class Service extends Model
 
     public function category()
     {
-        return $this->belongsTo(ServiceCategory::class, 'category_id');
+        return $this->belongsTo(subscribeCategory::class, 'category_id');
     }
 
     public function plans()
     {
-        return $this->hasMany(ServicePlan::class);
+        return $this->hasMany(subscribePlan::class);
     }
 
     public function appointments()

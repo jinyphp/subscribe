@@ -1,26 +1,26 @@
 <?php
 
-namespace Jiny\Service\Http\Controllers\Admin\Users;
+namespace Jiny\Subscribe\Http\Controllers\Admin\Users;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Jiny\Service\Models\ServiceUser;
-use Jiny\Service\Models\ServicePlan;
+use Jiny\Subscribe\Models\subscribeUser;
+use Jiny\Subscribe\Models\subscribePlan;
 use Carbon\Carbon;
 
 class UpdateController extends Controller
 {
     public function __invoke(Request $request, $id)
     {
-        $serviceUser = ServiceUser::findOrFail($id);
+        $subscribeUser = subscribeUser::findOrFail($id);
 
         $request->validate([
-            'user_uuid' => 'required|string|max:255|unique:site_service_users,user_uuid,' . $serviceUser->id,
+            'user_uuid' => 'required|string|max:255|unique:site_subscribe_users,user_uuid,' . $subscribeUser->id,
             'user_email' => 'required|email|max:255',
             'user_name' => 'required|string|max:255',
             'user_shard' => 'nullable|string|max:255',
             'user_id' => 'nullable|integer',
-            'service_id' => 'required|exists:site_services,id',
+            'subscribe_id' => 'required|exists:site_subscribes,id',
             'plan_name' => 'required|string',
             'billing_cycle' => 'required|in:monthly,quarterly,yearly,lifetime',
             'status' => 'required|in:active,pending,expired,cancelled,suspended',
@@ -39,26 +39,26 @@ class UpdateController extends Controller
         ]);
 
         // 변경사항 추적을 위한 원본 데이터 백업
-        $originalData = $serviceUser->toArray();
+        $originalData = $subscribeUser->toArray();
 
         // 플랜 정보 확인
-        $plan = ServicePlan::where('plan_name', $request->plan_name)
-                          ->where('service_id', $request->service_id)
+        $plan = subscribePlan::where('plan_name', $request->plan_name)
+                          ->where('subscribe_id', $request->subscribe_id)
                           ->first();
 
         if (!$plan) {
-            return back()->withErrors(['plan_name' => '선택한 서비스에서 해당 플랜을 찾을 수 없습니다.']);
+            return back()->withErrors(['plan_name' => '선택한 구독에서 해당 플랜을 찾을 수 없습니다.']);
         }
 
         $data = $request->only([
             'user_uuid', 'user_email', 'user_name', 'user_shard', 'user_id',
-            'service_id', 'plan_name', 'billing_cycle', 'status',
+            'subscribe_id', 'plan_name', 'billing_cycle', 'status',
             'payment_method', 'payment_status', 'admin_notes',
             'plan_price', 'monthly_price', 'total_paid', 'refund_amount'
         ]);
 
-        // 서비스 정보 자동 입력
-        $data['service_title'] = $plan->service->name;
+        // 구독 정보 자동 입력
+        $data['subscribe_title'] = $plan->subscribe->name;
 
         // 플랜 피처 업데이트
         $data['plan_features'] = $plan->features;
@@ -94,7 +94,7 @@ class UpdateController extends Controller
             $data['refunded_at'] = now();
         }
 
-        $serviceUser->update($data);
+        $subscribeUser->update($data);
 
         // 변경사항 로그 기록
         $changes = [];
@@ -108,9 +108,9 @@ class UpdateController extends Controller
         }
 
         if (!empty($changes)) {
-            $serviceUser->subscriptionLogs()->create([
+            $subscribeUser->subscriptionLogs()->create([
                 'user_uuid' => $data['user_uuid'],
-                'service_id' => $data['service_id'],
+                'subscribe_id' => $data['subscribe_id'],
                 'action' => 'admin_update',
                 'action_title' => '관리자 정보 수정',
                 'action_description' => '관리자가 구독 정보를 수정했습니다.',
@@ -131,7 +131,7 @@ class UpdateController extends Controller
         }
 
         return redirect()
-            ->route('admin.service.users.edit', $serviceUser->id)
-            ->with('success', '서비스 구독 사용자 정보가 성공적으로 수정되었습니다.');
+            ->route('admin.subscribe.users.edit', $subscribeUser->id)
+            ->with('success', '구독 구독 사용자 정보가 성공적으로 수정되었습니다.');
     }
 }

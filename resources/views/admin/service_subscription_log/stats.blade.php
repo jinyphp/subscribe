@@ -1,4 +1,4 @@
-@extends('jiny-service::layouts.admin.sidebar')
+@extends('jiny-subscribe::layouts.admin.sidebar')
 
 @section('title', '구독 로그 통계')
 
@@ -19,10 +19,10 @@
                     </p>
                 </div>
                 <div class="d-flex gap-2">
-                    <a href="{{ route('admin.service.subscription-logs.index') }}" class="btn btn-secondary">
+                    <a href="{{ route('admin.subscribe.subscription-logs.index') }}" class="btn btn-secondary">
                         <i class="fe fe-arrow-left me-2"></i>로그 목록
                     </a>
-                    <a href="{{ route('admin.service.subscription-logs.export', ['period' => $period, 'format' => 'csv']) }}" class="btn btn-success">
+                    <a href="{{ route('admin.subscribe.subscription-logs.export', ['period' => $period, 'format' => 'csv']) }}" class="btn btn-success">
                         <i class="fe fe-download me-2"></i>CSV 내보내기
                     </a>
                 </div>
@@ -191,19 +191,19 @@
     </div>
     @endif
 
-    <!-- 서비스별 통계 -->
-    @if($serviceStats->count() > 0)
+    <!-- 구독별 통계 -->
+    @if($subscribeStats->count() > 0)
     <div class="row mb-4">
         <div class="col-12">
             <div class="card border-0 shadow-sm">
                 <div class="card-header bg-white">
                     <h6 class="card-title mb-0">
-                        <i class="fe fe-layers me-2"></i>서비스별 통계 (상위 10개)
+                        <i class="fe fe-layers me-2"></i>구독별 통계 (상위 10개)
                     </h6>
                 </div>
                 <div class="card-body">
                     <div class="row">
-                        @foreach($serviceStats as $stat)
+                        @foreach($subscribeStats as $stat)
                             <div class="col-md-6 col-lg-4 mb-3">
                                 <div class="d-flex justify-content-between align-items-center p-3 bg-light rounded">
                                     <div>

@@ -1,10 +1,10 @@
 <?php
 
-namespace Jiny\Service\Http\Controllers\Admin;
+namespace Jiny\Subscribe\Http\Controllers\Admin;
 
-use Jiny\Service\Models\ServiceProgress;
-use Jiny\Service\Models\Appointment;
-use Jiny\Service\Models\ServiceChecklist;
+use Jiny\Subscribe\Models\ServiceProgress;
+use Jiny\Subscribe\Models\Appointment;
+use Jiny\Subscribe\Models\ServiceChecklist;
 use Illuminate\Http\Request;
 
 class ServiceProgressController extends BaseAdminController
@@ -13,7 +13,7 @@ class ServiceProgressController extends BaseAdminController
     {
         parent::__construct();
         $this->model = ServiceProgress::class;
-        $this->viewPath = 'jiny-service::admin.service-progress';
+        $this->viewPath = 'jiny-subscribe::admin.service-progress';
         $this->routePrefix = 'service-progress';
         $this->title = '서비스 진행상황';
     }
@@ -41,7 +41,7 @@ class ServiceProgressController extends BaseAdminController
 
     public function index(Request $request)
     {
-        $query = $this->model::with(['appointment.customer', 'appointment.service', 'checklist']);
+        $query = $this->model::with(['appointment.customer', 'appointment.subscribe', 'checklist']);
 
         // 검색 기능
         if ($request->has('search') && $request->search) {
@@ -80,8 +80,8 @@ class ServiceProgressController extends BaseAdminController
         }
 
         $items = $query->orderBy('id', 'desc')->paginate(20);
-        $appointments = Appointment::with('customer', 'service')->orderBy('scheduled_date', 'desc')->limit(50)->get();
-        $checklists = ServiceChecklist::where('is_active', true)->orderBy('name')->get();
+        $appointments = Appointment::with('customer', 'subscribe')->orderBy('scheduled_date', 'desc')->limit(50)->get();
+        $checklists = subscribeChecklist::where('is_active', true)->orderBy('name')->get();
 
         return view("{$this->viewPath}.index", [
             'items' => $items,
@@ -99,8 +99,8 @@ class ServiceProgressController extends BaseAdminController
 
     public function create()
     {
-        $appointments = Appointment::with('customer', 'service')->where('status', '!=', 'cancelled')->orderBy('scheduled_date', 'desc')->get();
-        $checklists = ServiceChecklist::where('is_active', true)->orderBy('name')->get();
+        $appointments = Appointment::with('customer', 'subscribe')->where('status', '!=', 'cancelled')->orderBy('scheduled_date', 'desc')->get();
+        $checklists = subscribeChecklist::where('is_active', true)->orderBy('name')->get();
 
         return view("{$this->viewPath}.create", [
             'appointments' => $appointments,
@@ -112,9 +112,9 @@ class ServiceProgressController extends BaseAdminController
 
     public function edit($id)
     {
-        $item = $this->model::with(['appointment.customer', 'appointment.service', 'checklist'])->findOrFail($id);
-        $appointments = Appointment::with('customer', 'service')->where('status', '!=', 'cancelled')->orderBy('scheduled_date', 'desc')->get();
-        $checklists = ServiceChecklist::where('is_active', true)->orderBy('name')->get();
+        $item = $this->model::with(['appointment.customer', 'appointment.subscribe', 'checklist'])->findOrFail($id);
+        $appointments = Appointment::with('customer', 'subscribe')->where('status', '!=', 'cancelled')->orderBy('scheduled_date', 'desc')->get();
+        $checklists = subscribeChecklist::where('is_active', true)->orderBy('name')->get();
 
         return view("{$this->viewPath}.edit", [
             'item' => $item,
@@ -161,7 +161,7 @@ class ServiceProgressController extends BaseAdminController
      */
     public function appointmentProgress($appointmentId)
     {
-        $appointment = Appointment::with(['customer', 'service'])->findOrFail($appointmentId);
+        $appointment = Appointment::with(['customer', 'subscribe'])->findOrFail($appointmentId);
 
         $progress = $this->model::where('appointment_id', $appointmentId)
             ->with('checklist')
@@ -196,7 +196,7 @@ class ServiceProgressController extends BaseAdminController
     public function getChecklistItems(Request $request)
     {
         $checklistId = $request->get('checklist_id');
-        $checklist = ServiceChecklist::find($checklistId);
+        $checklist = subscribeChecklist::find($checklistId);
 
         if (!$checklist) {
             return response()->json(['error' => '체크리스트를 찾을 수 없습니다.'], 404);
@@ -216,7 +216,7 @@ class ServiceProgressController extends BaseAdminController
         $request->validate([
             'appointment_id' => 'required|exists:appointments,id',
             'updates' => 'required|array',
-            'updates.*.id' => 'required|exists:service_progress,id',
+            'updates.*.id' => 'required|exists:subscribe_progress,id',
             'updates.*.status' => 'required|in:pending,in_progress,completed,skipped,failed'
         ]);
 

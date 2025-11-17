@@ -1,16 +1,16 @@
 <?php
 
-namespace Jiny\Service\Http\Controllers\Admin\Services;
+namespace Jiny\Subscribe\Http\Controllers\Admin\subscribes;
 
 use Illuminate\Routing\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 /**
- * Services 목록 컨트롤러
+ * subscribes 목록 컨트롤러
  *
  * 진입 경로:
- * Route::get('/admin/site/services/') → IndexController::__invoke()
+ * Route::get('/admin/site/subscribes/') → IndexController::__invoke()
  */
 class IndexController extends Controller
 {
@@ -24,10 +24,10 @@ class IndexController extends Controller
     protected function loadConfig()
     {
         $this->config = [
-            'table' => 'services',
-            'view' => 'jiny-service::admin.services.index',
-            'title' => 'Services 관리',
-            'subtitle' => '서비스 정보를 관리합니다.',
+            'table' => 'subscribes',
+            'view' => 'jiny-subscribe::admin.services.index',
+            'title' => 'subscribes 관리',
+            'subtitle' => '구독 정보를 관리합니다.',
             'per_page' => 15,
         ];
     }
@@ -37,7 +37,7 @@ class IndexController extends Controller
         $query = $this->buildQuery();
         $query = $this->applyFilters($query, $request);
 
-        $services = $query->orderBy('services.created_at', 'desc')
+        $subscribes = $query->orderBy('subscribes.created_at', 'desc')
             ->paginate($this->config['per_page'])
             ->withQueryString();
 
@@ -45,7 +45,7 @@ class IndexController extends Controller
         $categories = $this->getCategories();
 
         return view($this->config['view'], [
-            'services' => $services,
+            'subscribes' => $subscribes,
             'stats' => $stats,
             'categories' => $categories,
             'config' => $this->config,
@@ -55,12 +55,12 @@ class IndexController extends Controller
     protected function buildQuery()
     {
         return DB::table($this->config['table'])
-            ->leftJoin('service_categories', 'services.category_id', '=', 'service_categories.id')
+            ->leftJoin('subscribe_categories', 'subscribes.category_id', '=', 'subscribe_categories.id')
             ->select(
-                'services.*',
-                'service_categories.title as category_name'
+                'subscribes.*',
+                'subscribe_categories.title as category_name'
             )
-            ->whereNull('services.deleted_at');
+            ->whereNull('subscribes.deleted_at');
     }
 
     protected function applyFilters($query, Request $request)
@@ -68,22 +68,22 @@ class IndexController extends Controller
         if ($request->filled('search')) {
             $search = $request->get('search');
             $query->where(function ($q) use ($search) {
-                $q->where('services.title', 'like', "%{$search}%")
-                  ->orWhere('services.description', 'like', "%{$search}%")
-                  ->orWhere('service_categories.title', 'like', "%{$search}%");
+                $q->where('subscribes.title', 'like', "%{$search}%")
+                  ->orWhere('subscribes.description', 'like', "%{$search}%")
+                  ->orWhere('subscribe_categories.title', 'like', "%{$search}%");
             });
         }
 
         if ($request->filled('category') && $request->get('category') !== 'all') {
-            $query->where('services.category_id', $request->get('category'));
+            $query->where('subscribes.category_id', $request->get('category'));
         }
 
         if ($request->filled('enable') && $request->get('enable') !== 'all') {
-            $query->where('services.enable', $request->get('enable') === '1');
+            $query->where('subscribes.enable', $request->get('enable') === '1');
         }
 
         if ($request->filled('featured') && $request->get('featured') !== 'all') {
-            $query->where('services.featured', $request->get('featured') === '1');
+            $query->where('subscribes.featured', $request->get('featured') === '1');
         }
 
         return $query;
@@ -103,7 +103,7 @@ class IndexController extends Controller
 
     protected function getCategories()
     {
-        return DB::table('service_categories')
+        return DB::table('subscribe_categories')
             ->whereNull('deleted_at')
             ->where('enable', true)
             ->orderBy('pos')

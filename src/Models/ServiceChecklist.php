@@ -1,6 +1,6 @@
 <?php
 
-namespace Jiny\Service\Models;
+namespace Jiny\Subscribe\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -10,7 +10,7 @@ class ServiceChecklist extends Model
     use HasFactory;
 
     protected $fillable = [
-        'service_id',
+        'subscribe_id',
         'name',
         'version',
         'checklist_data',
@@ -26,14 +26,14 @@ class ServiceChecklist extends Model
         'is_active' => 'boolean'
     ];
 
-    public function service()
+    public function subscribe()
     {
-        return $this->belongsTo(Service::class);
+        return $this->belongsTo(subscribe::class);
     }
 
-    public function serviceProgress()
+    public function subscribeProgress()
     {
-        return $this->hasMany(ServiceProgress::class, 'checklist_id');
+        return $this->hasMany(subscribeProgress::class, 'checklist_id');
     }
 
     // Scopes
@@ -42,9 +42,9 @@ class ServiceChecklist extends Model
         return $query->where('is_active', true);
     }
 
-    public function scopeForService($query, $serviceId)
+    public function scopeForsubscribe($query, $subscribeId)
     {
-        return $query->where('service_id', $serviceId);
+        return $query->where('subscribe_id', $subscribeId);
     }
 
     // Accessors

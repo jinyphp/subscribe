@@ -1,6 +1,6 @@
 <?php
 
-namespace Jiny\Service\Models;
+namespace Jiny\Subscribe\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -47,7 +47,7 @@ class ServiceInspection extends Model
 
     public function provider()
     {
-        return $this->belongsTo(ServiceProvider::class, 'provider_id');
+        return $this->belongsTo(subscribeProvider::class, 'provider_id');
     }
 
     // Scopes

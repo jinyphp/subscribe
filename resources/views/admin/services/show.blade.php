@@ -1,4 +1,4 @@
-@extends('jiny-service::layouts.admin.sidebar')
+@extends('jiny-subscribe::layouts.admin.sidebar')
 
 @section('content')
 <div class="container-fluid">
@@ -7,14 +7,14 @@
         <div class="col-12">
             <div class="d-flex justify-content-between align-items-center">
                 <div>
-                    <h2 class="mb-1">{{ $service->title }}</h2>
-                    <p class="text-muted mb-0">서비스 상세 정보와 통계를 확인합니다.</p>
+                    <h2 class="mb-1">{{ $subscribe->title }}</h2>
+                    <p class="text-muted mb-0">구독 상세 정보와 통계를 확인합니다.</p>
                 </div>
                 <div>
-                    <a href="{{ route('admin.site.services.index') }}" class="btn btn-outline-secondary me-2">
+                    <a href="{{ route('admin.site.subscribes.index') }}" class="btn btn-outline-secondary me-2">
                         <i class="fe fe-arrow-left me-2"></i>목록으로
                     </a>
-                    <a href="{{ route('admin.site.services.edit', $service->id) }}" class="btn btn-primary">
+                    <a href="{{ route('admin.site.subscribes.edit', $subscribe->id) }}" class="btn btn-primary">
                         <i class="fe fe-edit me-2"></i>수정하기
                     </a>
                 </div>
@@ -35,7 +35,7 @@
                         </div>
                         <div class="flex-grow-1 ms-3">
                             <h6 class="mb-0">조회수</h6>
-                            <h4 class="mb-0">{{ number_format($service->view_count ?? 0) }}</h4>
+                            <h4 class="mb-0">{{ number_format($subscribe->view_count ?? 0) }}</h4>
                         </div>
                     </div>
                 </div>
@@ -53,10 +53,10 @@
                         <div class="flex-grow-1 ms-3">
                             <h6 class="mb-0">현재 가격</h6>
                             <h4 class="mb-0">
-                                @if($service->sale_price && $service->sale_price < $service->price)
-                                    ₩{{ number_format($service->sale_price) }}
-                                @elseif($service->price)
-                                    ₩{{ number_format($service->price) }}
+                                @if($subscribe->sale_price && $subscribe->sale_price < $subscribe->price)
+                                    ₩{{ number_format($subscribe->sale_price) }}
+                                @elseif($subscribe->price)
+                                    ₩{{ number_format($subscribe->price) }}
                                 @else
                                     문의
                                 @endif
@@ -77,7 +77,7 @@
                         </div>
                         <div class="flex-grow-1 ms-3">
                             <h6 class="mb-0">소요 기간</h6>
-                            <h4 class="mb-0">{{ $service->duration ?? '-' }}</h4>
+                            <h4 class="mb-0">{{ $subscribe->duration ?? '-' }}</h4>
                         </div>
                     </div>
                 </div>
@@ -93,8 +93,8 @@
                             </div>
                         </div>
                         <div class="flex-grow-1 ms-3">
-                            <h6 class="mb-0">추천 서비스</h6>
-                            <h4 class="mb-0">{{ $service->featured ? '예' : '아니오' }}</h4>
+                            <h6 class="mb-0">추천 구독</h6>
+                            <h4 class="mb-0">{{ $subscribe->featured ? '예' : '아니오' }}</h4>
                         </div>
                     </div>
                 </div>
@@ -113,88 +113,88 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label class="font-weight-bold">서비스명</label>
-                                <p class="text-gray-800">{{ $service->title }}</p>
+                                <label class="font-weight-bold">구독명</label>
+                                <p class="text-gray-800">{{ $subscribe->title }}</p>
                             </div>
                             <div class="form-group">
                                 <label class="font-weight-bold">슬러그</label>
-                                <p class="text-gray-800">{{ $service->slug }}</p>
+                                <p class="text-gray-800">{{ $subscribe->slug }}</p>
                             </div>
                             <div class="form-group">
                                 <label class="font-weight-bold">카테고리</label>
-                                <p class="text-gray-800">{{ $service->category ?? '-' }}</p>
+                                <p class="text-gray-800">{{ $subscribe->category ?? '-' }}</p>
                             </div>
                             <div class="form-group">
                                 <label class="font-weight-bold">담당자</label>
-                                <p class="text-gray-800">{{ $service->manager ?? '-' }}</p>
+                                <p class="text-gray-800">{{ $subscribe->manager ?? '-' }}</p>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label class="font-weight-bold">상태</label>
                                 <p>
-                                    @if($service->enable)
+                                    @if($subscribe->enable)
                                         <span class="badge bg-success">활성</span>
                                     @else
                                         <span class="badge bg-secondary">비활성</span>
                                     @endif
-                                    @if($service->featured)
+                                    @if($subscribe->featured)
                                         <span class="badge bg-warning text-dark ms-1">추천</span>
                                     @endif
                                 </p>
                             </div>
                             <div class="form-group">
                                 <label class="font-weight-bold">조회수</label>
-                                <p class="text-gray-800">{{ number_format($service->view_count ?? 0) }}회</p>
+                                <p class="text-gray-800">{{ number_format($subscribe->view_count ?? 0) }}회</p>
                             </div>
                             <div class="form-group">
                                 <label class="font-weight-bold">등록일</label>
-                                <p class="text-gray-800">{{ date('Y-m-d H:i', strtotime($service->created_at)) }}</p>
+                                <p class="text-gray-800">{{ date('Y-m-d H:i', strtotime($subscribe->created_at)) }}</p>
                             </div>
                             <div class="form-group">
                                 <label class="font-weight-bold">수정일</label>
-                                <p class="text-gray-800">{{ date('Y-m-d H:i', strtotime($service->updated_at)) }}</p>
+                                <p class="text-gray-800">{{ date('Y-m-d H:i', strtotime($subscribe->updated_at)) }}</p>
                             </div>
                         </div>
                     </div>
 
-                    @if($service->description)
+                    @if($subscribe->description)
                     <div class="form-group">
                         <label class="font-weight-bold">설명</label>
-                        <div class="text-gray-800">{{ $service->description }}</div>
+                        <div class="text-gray-800">{{ $subscribe->description }}</div>
                     </div>
                     @endif
 
-                    @if($service->tags)
+                    @if($subscribe->tags)
                     <div class="form-group">
                         <label class="font-weight-bold">태그</label>
                         <div>
-                            @foreach(explode(',', $service->tags) as $tag)
+                            @foreach(explode(',', $subscribe->tags) as $tag)
                                 <span class="badge bg-secondary me-1">{{ trim($tag) }}</span>
                             @endforeach
                         </div>
                     </div>
                     @endif
 
-                    @if($service->duration)
+                    @if($subscribe->duration)
                     <div class="form-group">
                         <label class="font-weight-bold">소요 기간</label>
-                        <p class="text-gray-800">{{ $service->duration }}</p>
+                        <p class="text-gray-800">{{ $subscribe->duration }}</p>
                     </div>
                     @endif
                 </div>
             </div>
 
 
-            <!-- 서비스 특징 -->
-            @if($service->features)
+            <!-- 구독 특징 -->
+            @if($subscribe->features)
             @php
-                $features = json_decode($service->features, true);
+                $features = json_decode($subscribe->features, true);
             @endphp
             @if($features && count($features) > 0)
             <div class="card mb-4">
                 <div class="card-header">
-                    <h5 class="mb-0">서비스 특징</h5>
+                    <h5 class="mb-0">구독 특징</h5>
                 </div>
                 <div class="card-body">
                     <div class="row">
@@ -209,15 +209,15 @@
             @endif
             @endif
 
-            <!-- 서비스 프로세스 -->
-            @if($service->process)
+            <!-- 구독 프로세스 -->
+            @if($subscribe->process)
             @php
-                $process = json_decode($service->process, true);
+                $process = json_decode($subscribe->process, true);
             @endphp
             @if($process && count($process) > 0)
             <div class="card mb-4">
                 <div class="card-header">
-                    <h5 class="mb-0">서비스 프로세스</h5>
+                    <h5 class="mb-0">구독 프로세스</h5>
                 </div>
                 <div class="card-body">
                     <div class="row">
@@ -244,9 +244,9 @@
             <!-- 요구사항 및 결과물 -->
             <div class="row">
                 <!-- 요구사항 -->
-                @if($service->requirements)
+                @if($subscribe->requirements)
                 @php
-                    $requirements = json_decode($service->requirements, true);
+                    $requirements = json_decode($subscribe->requirements, true);
                 @endphp
                 @if($requirements && count($requirements) > 0)
                 <div class="col-md-6">
@@ -267,9 +267,9 @@
                 @endif
 
                 <!-- 결과물 -->
-                @if($service->deliverables)
+                @if($subscribe->deliverables)
                 @php
-                    $deliverables = json_decode($service->deliverables, true);
+                    $deliverables = json_decode($subscribe->deliverables, true);
                 @endphp
                 @if($deliverables && count($deliverables) > 0)
                 <div class="col-md-6">
@@ -291,41 +291,41 @@
             </div>
 
             <!-- 상세 내용 -->
-            @if($service->content)
+            @if($subscribe->content)
             <div class="card mb-4">
                 <div class="card-header">
                     <h5 class="mb-0">상세 내용</h5>
                 </div>
                 <div class="card-body">
                     <div class="content-html">
-                        {!! $service->content !!}
+                        {!! $subscribe->content !!}
                     </div>
                 </div>
             </div>
             @endif
 
-            <!-- 서비스 가격 -->
+            <!-- 구독 가격 -->
             <div class="card mb-4">
                 <div class="card-header d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0">서비스 가격</h5>
+                    <h5 class="mb-0">구독 가격</h5>
                     <div>
-                        <a href="{{ route('admin.site.services.price.create', $service->id) }}" class="btn btn-primary btn-sm me-2">
+                        <a href="{{ route('admin.site.subscribes.price.create', $subscribe->id) }}" class="btn btn-primary btn-sm me-2">
                             <i class="fe fe-plus me-1"></i>가격 추가
                         </a>
-                        <a href="{{ route('admin.site.services.price.index', $service->id) }}" class="btn btn-outline-primary btn-sm">
+                        <a href="{{ route('admin.site.subscribes.price.index', $subscribe->id) }}" class="btn btn-outline-primary btn-sm">
                             <i class="fe fe-dollar-sign me-1"></i>가격 관리
                         </a>
                     </div>
                 </div>
                 <div class="card-body">
                     @php
-                        $servicePrices = \Jiny\Service\Models\ServicePrice::where('service_id', $service->id)
+                        $subscribePrices = \Jiny\Subscribe\Models\subscribePrice::where('subscribe_id', $subscribe->id)
                             ->where('enable', true)
                             ->orderBy('pos')
                             ->get();
                     @endphp
 
-                    @if($servicePrices->count() > 0)
+                    @if($subscribePrices->count() > 0)
                         <div class="table-responsive">
                             <table class="table table-sm">
                                 <thead>
@@ -338,7 +338,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach($servicePrices as $price)
+                                    @foreach($subscribePrices as $price)
                                     <tr>
                                         <td>
                                             <strong>{{ $price->name }}</strong>
@@ -372,7 +372,7 @@
                                         </td>
                                         <td>
                                             <div class="btn-group btn-group-sm">
-                                                <a href="{{ route('admin.site.services.price.edit', [$service->id, $price->id]) }}"
+                                                <a href="{{ route('admin.site.subscribes.price.edit', [$subscribe->id, $price->id]) }}"
                                                    class="btn btn-outline-primary btn-sm"
                                                    title="수정">
                                                     <i class="fe fe-edit"></i>
@@ -388,7 +388,7 @@
                         <div class="text-center py-4">
                             <i class="fe fe-dollar-sign fe-2x text-muted mb-2"></i>
                             <p class="text-muted mb-3">등록된 가격 옵션이 없습니다</p>
-                            <a href="{{ route('admin.site.services.price.create', $service->id) }}" class="btn btn-primary btn-sm">
+                            <a href="{{ route('admin.site.subscribes.price.create', $subscribe->id) }}" class="btn btn-primary btn-sm">
                                 <i class="fe fe-plus me-1"></i>첫 번째 가격 옵션 추가
                             </a>
                         </div>
@@ -396,22 +396,22 @@
                 </div>
             </div>
 
-            <!-- 서비스 상세 정보 -->
+            <!-- 구독 상세 정보 -->
             <div class="card mb-4">
                 <div class="card-header d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0">서비스 상세 정보</h5>
+                    <h5 class="mb-0">구독 상세 정보</h5>
                     <div>
-                        <a href="{{ route('admin.site.services.detail.create', $service->id) }}" class="btn btn-primary btn-sm me-2">
+                        <a href="{{ route('admin.site.subscribes.detail.create', $subscribe->id) }}" class="btn btn-primary btn-sm me-2">
                             <i class="fe fe-plus me-1"></i>상세 정보 추가
                         </a>
-                        <a href="{{ route('admin.site.services.detail.index', $service->id) }}" class="btn btn-outline-primary btn-sm">
+                        <a href="{{ route('admin.site.subscribes.detail.index', $subscribe->id) }}" class="btn btn-outline-primary btn-sm">
                             <i class="fe fe-list me-1"></i>상세 정보 관리
                         </a>
                     </div>
                 </div>
                 <div class="card-body">
                     @php
-                        $serviceDetails = \Jiny\Service\Models\ServicePlanDetail::where('service_id', $service->id)
+                        $subscribeDetails = \Jiny\Subscribe\Models\subscribePlanDetail::where('subscribe_id', $subscribe->id)
                             ->where('enable', true)
                             ->orderBy('category')
                             ->orderBy('group_name')
@@ -420,9 +420,9 @@
                             ->get();
                     @endphp
 
-                    @if($serviceDetails->count() > 0)
+                    @if($subscribeDetails->count() > 0)
                         @php
-                            $groupedDetails = $serviceDetails->groupBy(function($detail) {
+                            $groupedDetails = $subscribeDetails->groupBy(function($detail) {
                                 return $detail->category . '|' . ($detail->group_name ?: '기타');
                             });
                         @endphp
@@ -459,7 +459,7 @@
                                                 </div>
                                             </div>
                                             <div class="flex-shrink-0">
-                                                <a href="{{ route('admin.site.services.detail.edit', [$service->id, $detail->id]) }}"
+                                                <a href="{{ route('admin.site.subscribes.detail.edit', [$subscribe->id, $detail->id]) }}"
                                                    class="btn btn-outline-secondary btn-sm"
                                                    title="수정">
                                                     <i class="fe fe-edit"></i>
@@ -475,7 +475,7 @@
                         <div class="text-center py-4">
                             <i class="fe fe-info fe-2x text-muted mb-2"></i>
                             <p class="text-muted mb-3">등록된 상세 정보가 없습니다</p>
-                            <a href="{{ route('admin.site.services.detail.create', $service->id) }}" class="btn btn-primary btn-sm">
+                            <a href="{{ route('admin.site.subscribes.detail.create', $subscribe->id) }}" class="btn btn-primary btn-sm">
                                 <i class="fe fe-plus me-1"></i>첫 번째 상세 정보 추가
                             </a>
                         </div>
@@ -486,22 +486,22 @@
 
         <!-- 사이드바 -->
         <div class="col-lg-4">
-            <!-- 서비스 이미지 -->
-            @if($service->image)
+            <!-- 구독 이미지 -->
+            @if($subscribe->image)
             <div class="card mb-4">
                 <div class="card-header">
                     <h5 class="mb-0">대표 이미지</h5>
                 </div>
                 <div class="card-body text-center">
-                    <img src="{{ $service->image }}" alt="{{ $service->title }}" class="img-fluid rounded">
+                    <img src="{{ $subscribe->image }}" alt="{{ $subscribe->title }}" class="img-fluid rounded">
                 </div>
             </div>
             @endif
 
             <!-- 추가 이미지들 -->
-            @if($service->images)
+            @if($subscribe->images)
             @php
-                $images = json_decode($service->images, true);
+                $images = json_decode($subscribe->images, true);
             @endphp
             @if($images && count($images) > 0)
             <div class="card mb-4">
@@ -512,7 +512,7 @@
                     <div class="row">
                         @foreach($images as $image)
                         <div class="col-6 mb-2">
-                            <img src="{{ $image }}" alt="{{ $service->title }}" class="img-fluid rounded">
+                            <img src="{{ $image }}" alt="{{ $subscribe->title }}" class="img-fluid rounded">
                         </div>
                         @endforeach
                     </div>
@@ -522,22 +522,22 @@
             @endif
 
             <!-- SEO 정보 -->
-            @if($service->meta_title || $service->meta_description)
+            @if($subscribe->meta_title || $subscribe->meta_description)
             <div class="card mb-4">
                 <div class="card-header">
                     <h5 class="mb-0">SEO 정보</h5>
                 </div>
                 <div class="card-body">
-                    @if($service->meta_title)
+                    @if($subscribe->meta_title)
                     <div class="mb-3">
                         <label class="font-weight-bold small">META 제목</label>
-                        <p class="text-muted small mb-0">{{ $service->meta_title }}</p>
+                        <p class="text-muted small mb-0">{{ $subscribe->meta_title }}</p>
                     </div>
                     @endif
-                    @if($service->meta_description)
+                    @if($subscribe->meta_description)
                     <div>
                         <label class="font-weight-bold small">META 설명</label>
-                        <p class="text-muted small mb-0">{{ $service->meta_description }}</p>
+                        <p class="text-muted small mb-0">{{ $subscribe->meta_description }}</p>
                     </div>
                     @endif
                 </div>
@@ -552,23 +552,23 @@
                 <div class="card-body">
                     <div class="small">
                         <div class="mb-2">
-                            <strong>ID:</strong> {{ $service->id }}
+                            <strong>ID:</strong> {{ $subscribe->id }}
                         </div>
                         <div class="mb-2">
-                            <strong>카테고리 ID:</strong> {{ $service->category_id ?? '-' }}
+                            <strong>카테고리 ID:</strong> {{ $subscribe->category_id ?? '-' }}
                         </div>
                         <div class="mb-2">
                             <strong>등록일:</strong><br>
-                            {{ date('Y-m-d H:i:s', strtotime($service->created_at)) }}
+                            {{ date('Y-m-d H:i:s', strtotime($subscribe->created_at)) }}
                         </div>
                         <div class="mb-2">
                             <strong>수정일:</strong><br>
-                            {{ date('Y-m-d H:i:s', strtotime($service->updated_at)) }}
+                            {{ date('Y-m-d H:i:s', strtotime($subscribe->updated_at)) }}
                         </div>
-                        @if($service->deleted_at)
+                        @if($subscribe->deleted_at)
                         <div class="mb-2">
                             <strong class="text-danger">삭제일:</strong><br>
-                            <span class="text-danger">{{ date('Y-m-d H:i:s', strtotime($service->deleted_at)) }}</span>
+                            <span class="text-danger">{{ date('Y-m-d H:i:s', strtotime($subscribe->deleted_at)) }}</span>
                         </div>
                         @endif
                     </div>

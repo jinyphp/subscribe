@@ -1,35 +1,35 @@
 <?php
 
-namespace Jiny\Service\Http\Controllers\Admin\Plan;
+namespace Jiny\Subscribe\Http\Controllers\Admin\Plan;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Jiny\Service\Models\ServicePlan;
-use Jiny\Service\Models\ServicePlanDetail;
-use Jiny\Service\Models\ServicePrice;
+use Jiny\Subscribe\Models\subscribePlan;
+use Jiny\Subscribe\Models\subscribePlanDetail;
+use Jiny\Subscribe\Models\subscribePrice;
 
 class ShowController extends Controller
 {
     public function __invoke(Request $request, $id)
     {
-        $plan = ServicePlan::with('service')->findOrFail($id);
+        $plan = subscribePlan::with('subscribe')->findOrFail($id);
 
         // 현재 플랜의 구독자 수
-        $subscribersCount = $plan->serviceUsers()->count();
+        $subscribersCount = $plan->subscribeUsers()->count();
 
         // 활성 구독자 수
-        $activeSubscribers = $plan->serviceUsers()
+        $activeSubscribers = $plan->subscribeUsers()
                                  ->where('status', 'active')
                                  ->count();
 
         // 이번 달 신규 구독자 수
-        $newSubscribersThisMonth = $plan->serviceUsers()
+        $newSubscribersThisMonth = $plan->subscribeUsers()
                                        ->whereMonth('created_at', now()->month)
                                        ->whereYear('created_at', now()->year)
                                        ->count();
 
         // 최근 구독자 목록 (최근 5명)
-        $recentSubscribers = $plan->serviceUsers()
+        $recentSubscribers = $plan->subscribeUsers()
                                  ->with('user')
                                  ->orderBy('created_at', 'desc')
                                  ->limit(5)
@@ -39,7 +39,7 @@ class ShowController extends Controller
         $monthlyStats = [];
         for ($i = 5; $i >= 0; $i--) {
             $date = now()->subMonths($i);
-            $count = $plan->serviceUsers()
+            $count = $plan->subscribeUsers()
                          ->whereMonth('created_at', $date->month)
                          ->whereYear('created_at', $date->year)
                          ->count();
@@ -56,7 +56,7 @@ class ShowController extends Controller
         $downgradePlans = collect();
 
         if ($plan->upgrade_paths) {
-            $upgradePlans = ServicePlan::whereIn('plan_code', $plan->upgrade_paths)
+            $upgradePlans = subscribePlan::whereIn('plan_code', $plan->upgrade_paths)
                                      ->where('is_active', true)
                                      ->select('id', 'plan_name', 'plan_code', 'monthly_price')
                                      ->orderBy('monthly_price')
@@ -64,7 +64,7 @@ class ShowController extends Controller
         }
 
         if ($plan->downgrade_paths) {
-            $downgradePlans = ServicePlan::whereIn('plan_code', $plan->downgrade_paths)
+            $downgradePlans = subscribePlan::whereIn('plan_code', $plan->downgrade_paths)
                                         ->where('is_active', true)
                                         ->select('id', 'plan_name', 'plan_code', 'monthly_price')
                                         ->orderBy('monthly_price')
@@ -72,26 +72,26 @@ class ShowController extends Controller
         }
 
         // 이번 달 수익 (결제 테이블이 없으므로 예상 수익으로 계산)
-        $thisMonthRevenue = $plan->serviceUsers()
+        $thisMonthRevenue = $plan->subscribeUsers()
                                 ->where('status', 'active')
                                 ->whereMonth('created_at', now()->month)
                                 ->whereYear('created_at', now()->year)
                                 ->count() * ($plan->monthly_price ?? 0);
 
-        // 플랜 상세 정보 (service_plan_detail)
-        $planDetails = ServicePlanDetail::where('service_plan_id', $plan->id)
+        // 플랜 상세 정보 (subscribe_plan_detail)
+        $planDetails = subscribePlanDetail::where('subscribe_plan_id', $plan->id)
                                       ->where('enable', true)
                                       ->orderBy('group_order')
                                       ->orderBy('pos')
                                       ->get();
 
-        // 플랜 가격 옵션 (service_plan_price)
-        $planPrices = ServicePrice::where('service_plan_id', $plan->id)
+        // 플랜 가격 옵션 (subscribe_plan_price)
+        $planPrices = subscribePrice::where('subscribe_plan_id', $plan->id)
                                  ->where('enable', true)
                                  ->orderBy('pos')
                                  ->get();
 
-        return view('jiny-service::admin.plan.show', compact(
+        return view('jiny-subscribe::admin.plan.show', compact(
             'plan',
             'subscribersCount',
             'activeSubscribers',

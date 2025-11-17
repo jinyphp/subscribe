@@ -30,7 +30,7 @@
     <!-- Wrapper -->
     <main id="db-wrapper">
         <!-- Sidebar -->
-        @include($layoutSidebar ?? 'jiny-service::partials.admin.sidebar')
+        @include($layoutSidebar ?? 'jiny-subscribe::partials.admin.sidebar')
 
         <!-- Page Content -->
         <section id="page-content">
@@ -38,7 +38,7 @@
             @hasSection('header')
                 @yield('header')
             @else
-                @include($layoutHeader ?? 'jiny-service::partials.admin.header')
+                @include($layoutHeader ?? 'jiny-subscribe::partials.admin.header')
             @endif
 
             <!-- Content -->

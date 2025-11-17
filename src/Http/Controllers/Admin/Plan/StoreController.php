@@ -1,10 +1,10 @@
 <?php
 
-namespace Jiny\Service\Http\Controllers\Admin\Plan;
+namespace Jiny\Subscribe\Http\Controllers\Admin\Plan;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Jiny\Service\Models\ServicePlan;
+use Jiny\Subscribe\Models\subscribePlan;
 use Illuminate\Support\Str;
 
 class StoreController extends Controller
@@ -12,9 +12,9 @@ class StoreController extends Controller
     public function __invoke(Request $request)
     {
         $request->validate([
-            'service_id' => 'required|exists:services,id',
+            'subscribe_id' => 'required|exists:subscribes,id',
             'plan_name' => 'required|string|max:255',
-            'plan_code' => 'required|string|max:255|unique:service_plans,plan_code',
+            'plan_code' => 'required|string|max:255|unique:subscribe_plans,plan_code',
             'description' => 'nullable|string',
             'plan_type' => 'required|in:basic,standard,premium,enterprise,custom',
             'billing_type' => 'required|in:subscription,one_time,usage_based,hybrid',
@@ -40,7 +40,7 @@ class StoreController extends Controller
         ]);
 
         $data = $request->only([
-            'service_id', 'plan_name', 'plan_code', 'description',
+            'subscribe_id', 'plan_name', 'plan_code', 'description',
             'plan_type', 'billing_type', 'setup_fee', 'trial_period_days',
             'max_users', 'max_projects', 'storage_limit_gb', 'api_calls_per_month',
             'sort_order', 'color_code', 'icon'
@@ -120,10 +120,10 @@ class StoreController extends Controller
             $data['plan_code'] = Str::slug($data['plan_name']) . '-' . time();
         }
 
-        $plan = ServicePlan::create($data);
+        $plan = subscribePlan::create($data);
 
         return redirect()
-            ->route('admin.service.plan.index')
-            ->with('success', '서비스 플랜이 성공적으로 생성되었습니다.');
+            ->route('admin.subscribe.plan.index')
+            ->with('success', '구독 플랜이 성공적으로 생성되었습니다.');
     }
 }

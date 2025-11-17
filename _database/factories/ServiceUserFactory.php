@@ -3,12 +3,12 @@
 namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Jiny\Service\Models\ServiceUser;
-use Jiny\Service\Models\Service;
+use Jiny\Subscribe\Models\subscribeUser;
+use Jiny\Subscribe\Models\subscribe;
 
-class ServiceUserFactory extends Factory
+class subscribeUserFactory extends Factory
 {
-    protected $model = ServiceUser::class;
+    protected $model = subscribeUser::class;
 
     public function definition(): array
     {
@@ -38,8 +38,8 @@ class ServiceUserFactory extends Factory
             'user_id' => $this->faker->numberBetween(1, 100000),
             'user_email' => $this->faker->unique()->safeEmail,
             'user_name' => $this->faker->name,
-            'service_id' => Service::factory(),
-            'service_title' => $this->faker->words(2, true) . ' Service',
+            'subscribe_id' => subscribe::factory(),
+            'subscribe_title' => $this->faker->words(2, true) . ' subscribe',
             'status' => $this->faker->randomElement(['pending', 'active', 'suspended', 'cancelled', 'expired']),
             'billing_cycle' => $billingCycle,
             'started_at' => $startedAt,
@@ -67,7 +67,7 @@ class ServiceUserFactory extends Factory
     }
 
     /**
-     * 활성 상태의 서비스 사용자 생성
+     * 활성 상태의 구독 사용자 생성
      */
     public function active(): self
     {
@@ -82,7 +82,7 @@ class ServiceUserFactory extends Factory
     }
 
     /**
-     * 대기 상태의 서비스 사용자 생성
+     * 대기 상태의 구독 사용자 생성
      */
     public function pending(): self
     {
@@ -97,7 +97,7 @@ class ServiceUserFactory extends Factory
     }
 
     /**
-     * 일시정지 상태의 서비스 사용자 생성
+     * 일시정지 상태의 구독 사용자 생성
      */
     public function suspended(): self
     {
@@ -111,7 +111,7 @@ class ServiceUserFactory extends Factory
     }
 
     /**
-     * 취소된 서비스 사용자 생성
+     * 취소된 구독 사용자 생성
      */
     public function cancelled(): self
     {
@@ -123,7 +123,7 @@ class ServiceUserFactory extends Factory
                 'cancel_reason' => $this->faker->randomElement([
                     '사용자 요청',
                     '결제 실패',
-                    '서비스 불만족',
+                    '구독 불만족',
                     '비용 부담'
                 ]),
             ];
@@ -131,7 +131,7 @@ class ServiceUserFactory extends Factory
     }
 
     /**
-     * 만료된 서비스 사용자 생성
+     * 만료된 구독 사용자 생성
      */
     public function expired(): self
     {
@@ -193,7 +193,7 @@ class ServiceUserFactory extends Factory
     }
 
     /**
-     * 환불된 서비스 사용자 생성
+     * 환불된 구독 사용자 생성
      */
     public function refunded(): self
     {
@@ -225,13 +225,13 @@ class ServiceUserFactory extends Factory
     }
 
     /**
-     * 특정 서비스에 속한 사용자 생성
+     * 특정 구독에 속한 사용자 생성
      */
-    public function forService($serviceId): self
+    public function forsubscribe($subscribeId): self
     {
-        return $this->state(function (array $attributes) use ($serviceId) {
+        return $this->state(function (array $attributes) use ($subscribeId) {
             return [
-                'service_id' => $serviceId,
+                'subscribe_id' => $subscribeId,
             ];
         });
     }

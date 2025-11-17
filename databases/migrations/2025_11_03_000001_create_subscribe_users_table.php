@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('service_users', function (Blueprint $table) {
+        Schema::create('subscribe_users', function (Blueprint $table) {
             $table->id();
 
             // 사용자 정보 (샤딩 고려)
@@ -21,9 +21,9 @@ return new class extends Migration
             $table->string('user_email')->nullable(); // 캐시된 이메일
             $table->string('user_name')->nullable(); // 캐시된 사용자명
 
-            // 서비스 정보
-            $table->unsignedBigInteger('service_id')->index();
-            $table->string('service_title')->nullable(); // 캐시된 서비스명
+            // 구독 정보
+            $table->unsignedBigInteger('subscribe_id')->index();
+            $table->string('subscribe_title')->nullable(); // 캐시된 구독명
 
             // 구독 상태
             $table->enum('status', ['active', 'suspended', 'cancelled', 'expired', 'pending'])->default('pending');
@@ -62,13 +62,13 @@ return new class extends Migration
             $table->softDeletes();
 
             // 인덱스
-            $table->index(['user_uuid', 'service_id']);
+            $table->index(['user_uuid', 'subscribe_id']);
             $table->index(['status', 'expires_at']);
             $table->index(['billing_cycle', 'next_billing_at']);
             $table->index(['payment_status', 'next_billing_at']);
 
             // 외래키
-            $table->foreign('service_id')->references('id')->on('services')->onDelete('cascade');
+            $table->foreign('subscribe_id')->references('id')->on('subscribes')->onDelete('cascade');
         });
     }
 
@@ -77,6 +77,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('service_users');
+        Schema::dropIfExists('subscribe_users');
     }
 };

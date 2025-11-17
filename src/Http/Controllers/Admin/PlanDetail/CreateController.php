@@ -1,29 +1,29 @@
 <?php
 
-namespace Jiny\Service\Http\Controllers\Admin\PlanDetail;
+namespace Jiny\Subscribe\Http\Controllers\Admin\PlanDetail;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Jiny\Service\Models\ServicePlan;
-use Jiny\Service\Models\ServicePlanDetail;
+use Jiny\Subscribe\Models\subscribePlan;
+use Jiny\Subscribe\Models\subscribePlanDetail;
 
 class CreateController extends Controller
 {
     public function __invoke(Request $request, $planId)
     {
-        $plan = ServicePlan::with('service')->findOrFail($planId);
+        $plan = subscribePlan::with('subscribe')->findOrFail($planId);
 
         // 상세 타입 옵션
-        $detailTypes = ServicePlanDetail::getDetailTypes();
+        $detailTypes = subscribePlanDetail::getDetailTypes();
 
         // 값 타입 옵션
-        $valueTypes = ServicePlanDetail::getValueTypes();
+        $valueTypes = subscribePlanDetail::getValueTypes();
 
         // 카테고리 옵션
-        $categories = ServicePlanDetail::getCategories();
+        $categories = subscribePlanDetail::getCategories();
 
         // 기존 그룹명들 (현재 플랜의)
-        $existingGroups = ServicePlanDetail::where('service_plan_id', $planId)
+        $existingGroups = subscribePlanDetail::where('subscribe_plan_id', $planId)
                             ->whereNotNull('group_name')
                             ->distinct()
                             ->pluck('group_name')
@@ -32,7 +32,7 @@ class CreateController extends Controller
                             ->values();
 
         // 다음 정렬순서 제안
-        $nextPos = ServicePlanDetail::where('service_plan_id', $planId)->max('pos') + 1;
+        $nextPos = subscribePlanDetail::where('subscribe_plan_id', $planId)->max('pos') + 1;
 
         // 기본 아이콘 템플릿
         $defaultIcons = [
@@ -60,7 +60,7 @@ class CreateController extends Controller
             ],
         ];
 
-        return view('jiny-service::admin.plan_detail.create', compact(
+        return view('jiny-subscribe::admin.plan_detail.create', compact(
             'plan',
             'detailTypes',
             'valueTypes',

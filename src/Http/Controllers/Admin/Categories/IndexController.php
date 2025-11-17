@@ -1,16 +1,16 @@
 <?php
 
-namespace Jiny\Service\Http\Controllers\Admin\Categories;
+namespace Jiny\Subscribe\Http\Controllers\Admin\Categories;
 
 use Illuminate\Routing\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 /**
- * Service Categories 목록 컨트롤러
+ * subscribe Categories 목록 컨트롤러
  *
  * 진입 경로:
- * Route::get('/admin/service/categories/') → IndexController::__invoke()
+ * Route::get('/admin/subscribe/categories/') → IndexController::__invoke()
  */
 class IndexController extends Controller
 {
@@ -24,10 +24,10 @@ class IndexController extends Controller
     protected function loadConfig()
     {
         $this->config = [
-            'table' => 'service_categories',
-            'view' => 'jiny-service::admin.categories.index',
-            'title' => 'Service Categories 관리',
-            'subtitle' => '서비스 카테고리를 관리합니다.',
+            'table' => 'subscribe_categories',
+            'view' => 'jiny-subscribe::admin.categories.index',
+            'title' => 'subscribe Categories 관리',
+            'subtitle' => '구독 카테고리를 관리합니다.',
             'per_page' => 15,
         ];
     }
@@ -54,17 +54,17 @@ class IndexController extends Controller
     protected function buildQuery()
     {
         return DB::table($this->config['table'])
-            ->leftJoin('service_categories as parent', 'service_categories.parent_id', '=', 'parent.id')
+            ->leftJoin('subscribe_categories as parent', 'subscribe_categories.parent_id', '=', 'parent.id')
             ->leftJoin(
-                DB::raw('(SELECT category_id, COUNT(*) as service_count FROM services WHERE deleted_at IS NULL GROUP BY category_id) as service_counts'),
-                'service_categories.id',
+                DB::raw('(SELECT category_id, COUNT(*) as subscribe_count FROM subscribes WHERE deleted_at IS NULL GROUP BY category_id) as subscribe_counts'),
+                'subscribe_categories.id',
                 '=',
-                'service_counts.category_id'
+                'subscribe_counts.category_id'
             )
             ->select(
-                'service_categories.*',
+                'subscribe_categories.*',
                 'parent.title as parent_name',
-                DB::raw('COALESCE(service_counts.service_count, 0) as service_count')
+                DB::raw('COALESCE(subscribe_counts.subscribe_count, 0) as subscribe_count')
             );
     }
 
@@ -73,20 +73,20 @@ class IndexController extends Controller
         if ($request->filled('search')) {
             $search = $request->get('search');
             $query->where(function ($q) use ($search) {
-                $q->where('service_categories.title', 'like', "%{$search}%")
-                  ->orWhere('service_categories.description', 'like', "%{$search}%");
+                $q->where('subscribe_categories.title', 'like', "%{$search}%")
+                  ->orWhere('subscribe_categories.description', 'like', "%{$search}%");
             });
         }
 
         if ($request->filled('enable') && $request->get('enable') !== 'all') {
-            $query->where('service_categories.enable', $request->get('enable') === '1');
+            $query->where('subscribe_categories.enable', $request->get('enable') === '1');
         }
 
         if ($request->filled('parent') && $request->get('parent') !== 'all') {
             if ($request->get('parent') === '0') {
-                $query->whereNull('service_categories.parent_id');
+                $query->whereNull('subscribe_categories.parent_id');
             } else {
-                $query->where('service_categories.parent_id', $request->get('parent'));
+                $query->where('subscribe_categories.parent_id', $request->get('parent'));
             }
         }
 
@@ -108,7 +108,7 @@ class IndexController extends Controller
 
     public function getParentCategories()
     {
-        return DB::table('service_categories')
+        return DB::table('subscribe_categories')
             ->whereNull('parent_id')
             ->where('enable', true)
             ->orderBy('pos')

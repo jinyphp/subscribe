@@ -1,4 +1,4 @@
-@extends('jiny-service::layouts.admin.sidebar')
+@extends('jiny-subscribe::layouts.admin.sidebar')
 
 @section('title', '결제 내역 관리')
 
@@ -19,10 +19,10 @@
                     </p>
                 </div>
                 <div class="d-flex gap-2">
-                    <a href="{{ route('admin.service.payments.stats') }}" class="btn btn-info">
+                    <a href="{{ route('admin.subscribe.payments.stats') }}" class="btn btn-info">
                         <i class="fe fe-bar-chart-2 me-2"></i>통계 보기
                     </a>
-                    <a href="{{ route('admin.service.payments.export', array_filter(request()->all())) }}" class="btn btn-success">
+                    <a href="{{ route('admin.subscribe.payments.export', array_filter(request()->all())) }}" class="btn btn-success">
                         <i class="fe fe-download me-2"></i>CSV 내보내기
                     </a>
                 </div>
@@ -124,12 +124,12 @@
                             </select>
                         </div>
                         <div class="col-md-2">
-                            <label for="service_id" class="form-label">서비스</label>
-                            <select id="service_id" name="service_id" class="form-select">
+                            <label for="subscribe_id" class="form-label">구독</label>
+                            <select id="subscribe_id" name="subscribe_id" class="form-select">
                                 <option value="">전체</option>
-                                @foreach($services as $service)
-                                    <option value="{{ $service->id }}" {{ request('service_id') == $service->id ? 'selected' : '' }}>
-                                        {{ $service->title }}
+                                @foreach($subscribes as $subscribe)
+                                    <option value="{{ $subscribe->id }}" {{ request('subscribe_id') == $subscribe->id ? 'selected' : '' }}>
+                                        {{ $subscribe->title }}
                                     </option>
                                 @endforeach
                             </select>
@@ -162,7 +162,7 @@
                                     <tr>
                                         <th>결제 정보</th>
                                         <th>사용자</th>
-                                        <th>서비스</th>
+                                        <th>구독</th>
                                         <th>금액</th>
                                         <th>결제 방법</th>
                                         <th>상태</th>
@@ -175,7 +175,7 @@
                                         <tr>
                                             <td>
                                                 <div class="fw-medium">
-                                                    <a href="{{ route('admin.service.payments.show', $payment) }}" class="text-decoration-none">
+                                                    <a href="{{ route('admin.subscribe.payments.show', $payment) }}" class="text-decoration-none">
                                                         #{{ $payment->id }}
                                                     </a>
                                                 </div>
@@ -185,16 +185,16 @@
                                                 @endif
                                             </td>
                                             <td>
-                                                @if($payment->serviceUser)
-                                                    <div class="fw-medium">{{ $payment->serviceUser->user_name }}</div>
-                                                    <small class="text-muted">{{ $payment->serviceUser->user_email }}</small>
+                                                @if($payment->subscribeUser)
+                                                    <div class="fw-medium">{{ $payment->subscribeUser->user_name }}</div>
+                                                    <small class="text-muted">{{ $payment->subscribeUser->user_email }}</small>
                                                 @else
                                                     <span class="text-muted">N/A</span>
                                                 @endif
                                             </td>
                                             <td>
-                                                @if($payment->service)
-                                                    <span class="badge bg-light text-dark">{{ $payment->service->title }}</span>
+                                                @if($payment->subscribe)
+                                                    <span class="badge bg-light text-dark">{{ $payment->subscribe->title }}</span>
                                                 @else
                                                     <span class="text-muted">N/A</span>
                                                 @endif
@@ -243,12 +243,12 @@
                                             </td>
                                             <td>
                                                 <div class="btn-group btn-group-sm">
-                                                    <a href="{{ route('admin.service.payments.show', $payment) }}"
+                                                    <a href="{{ route('admin.subscribe.payments.show', $payment) }}"
                                                        class="btn btn-outline-primary" title="상세 보기">
                                                         <i class="fe fe-eye"></i>
                                                     </a>
-                                                    @if($payment->serviceUser)
-                                                        <a href="{{ route('admin.service.users.show', $payment->serviceUser) }}"
+                                                    @if($payment->subscribeUser)
+                                                        <a href="{{ route('admin.subscribe.users.show', $payment->subscribeUser) }}"
                                                            class="btn btn-outline-info" title="사용자 보기">
                                                             <i class="fe fe-user"></i>
                                                         </a>
@@ -287,9 +287,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const statusSelect = document.getElementById('status');
     const methodSelect = document.getElementById('payment_method');
     const typeSelect = document.getElementById('payment_type');
-    const serviceSelect = document.getElementById('service_id');
+    const subscribeSelect = document.getElementById('subscribe_id');
 
-    [statusSelect, methodSelect, typeSelect, serviceSelect].forEach(element => {
+    [statusSelect, methodSelect, typeSelect, subscribeSelect].forEach(element => {
         if (element) {
             element.addEventListener('change', function() {
                 this.form.submit();

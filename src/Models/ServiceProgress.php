@@ -1,6 +1,6 @@
 <?php
 
-namespace Jiny\Service\Models;
+namespace Jiny\Subscribe\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -36,7 +36,7 @@ class ServiceProgress extends Model
 
     public function checklist()
     {
-        return $this->belongsTo(ServiceChecklist::class, 'checklist_id');
+        return $this->belongsTo(subscribeChecklist::class, 'checklist_id');
     }
 
     // Scopes

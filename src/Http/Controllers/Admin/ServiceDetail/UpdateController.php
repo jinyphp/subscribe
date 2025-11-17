@@ -1,19 +1,19 @@
 <?php
 
-namespace Jiny\Service\Http\Controllers\Admin\ServiceDetail;
+namespace Jiny\Subscribe\Http\Controllers\Admin\subscribeDetail;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Jiny\Service\Models\SiteService;
-use Jiny\Service\Models\ServicePlanDetail;
+use Jiny\Subscribe\Models\Sitesubscribe;
+use Jiny\Subscribe\Models\subscribePlanDetail;
 
 class UpdateController extends Controller
 {
-    public function __invoke(Request $request, $serviceId, $detailId)
+    public function __invoke(Request $request, $subscribeId, $detailId)
     {
-        $service = SiteService::findOrFail($serviceId);
+        $subscribe = Sitesubscribe::findOrFail($subscribeId);
 
-        $detail = ServicePlanDetail::where('service_id', $serviceId)
+        $detail = subscribePlanDetail::where('subscribe_id', $subscribeId)
                      ->findOrFail($detailId);
 
         $validated = $request->validate([
@@ -65,7 +65,7 @@ class UpdateController extends Controller
         $detail->update($validated);
 
         return redirect()
-            ->route('admin.site.services.detail.index', $serviceId)
-            ->with('success', '서비스 상세 정보가 성공적으로 수정되었습니다.');
+            ->route('admin.site.subscribes.detail.index', $subscribeId)
+            ->with('success', '구독 상세 정보가 성공적으로 수정되었습니다.');
     }
 }

@@ -1,7 +1,7 @@
-# 004. Service Catalog Management - TDD Implementation
+# 004. subscribe Catalog Management - TDD Implementation
 
 ## 개요
-서비스 카탈로그 CRUD 관리 시스템 구현: 서비스 생성, 수정, 삭제, 조회 및 공개 카탈로그
+구독 카탈로그 CRUD 관리 시스템 구현: 구독 생성, 수정, 삭제, 조회 및 공개 카탈로그
 
 ## 의존관계
 - **선행 태스크**: [003. 인증 시스템](003_authentication_system.md)
@@ -9,27 +9,27 @@
 
 ## TDD 테스트 시나리오 (모두 HTTP 200 반환)
 
-### Admin 서비스 관리 테스트
+### Admin 구독 관리 테스트
 
-#### 1. 서비스 카탈로그 목록 조회
-**테스트**: `AdminServiceCatalogListTest`
+#### 1. 구독 카탈로그 목록 조회
+**테스트**: `AdminsubscribeCatalogListTest`
 
 ```php
-public function test_admin_service_catalog_list_returns_200()
+public function test_admin_subscribe_catalog_list_returns_200()
 {
-    // Given: 관리자와 서비스 데이터
+    // Given: 관리자와 구독 데이터
     $admin = User::factory()->admin()->create();
-    Service::factory()->count(5)->create();
+    subscribe::factory()->count(5)->create();
 
-    // When: 서비스 목록 조회
-    $response = $this->actingAs($admin)->get('/admin/service/catalog');
+    // When: 구독 목록 조회
+    $response = $this->actingAs($admin)->get('/admin/subscribe/catalog');
 
-    // Then: HTTP 200과 서비스 목록
+    // Then: HTTP 200과 구독 목록
     $response->assertStatus(200);
     $response->assertJsonStructure([
         'status',
         'data' => [
-            'services' => [
+            'subscribes' => [
                 '*' => ['id', 'name', 'category', 'status', 'base_price', 'created_at']
             ],
             'pagination' => ['current_page', 'total_pages', 'total_count']
@@ -37,36 +37,36 @@ public function test_admin_service_catalog_list_returns_200()
     ]);
 }
 
-public function test_admin_service_search_returns_200()
+public function test_admin_subscribe_search_returns_200()
 {
-    // Given: 관리자와 검색 가능한 서비스
+    // Given: 관리자와 검색 가능한 구독
     $admin = User::factory()->admin()->create();
-    Service::factory()->create(['name' => 'Premium Air Conditioning Service']);
-    Service::factory()->create(['name' => 'Basic Cleaning Service']);
+    subscribe::factory()->create(['name' => 'Premium Air Conditioning subscribe']);
+    subscribe::factory()->create(['name' => 'Basic Cleaning subscribe']);
 
-    // When: 서비스 검색
-    $response = $this->actingAs($admin)->get('/admin/service/catalog?search=Air');
+    // When: 구독 검색
+    $response = $this->actingAs($admin)->get('/admin/subscribe/catalog?search=Air');
 
     // Then: HTTP 200과 검색 결과
     $response->assertStatus(200);
-    $response->assertJsonCount(1, 'data.services');
-    $response->assertJsonPath('data.services.0.name', 'Premium Air Conditioning Service');
+    $response->assertJsonCount(1, 'data.subscribes');
+    $response->assertJsonPath('data.subscribes.0.name', 'Premium Air Conditioning subscribe');
 }
 ```
 
-#### 2. 서비스 생성
-**테스트**: `AdminServiceCreateTest`
+#### 2. 구독 생성
+**테스트**: `AdminsubscribeCreateTest`
 
 ```php
-public function test_admin_can_create_service_returns_200()
+public function test_admin_can_create_subscribe_returns_200()
 {
     // Given: 관리자
     $admin = User::factory()->admin()->create();
 
-    // When: 새 서비스 생성
-    $serviceData = [
-        'name' => 'Premium Air Conditioning Service',
-        'description' => 'Complete AC maintenance and cleaning service',
+    // When: 새 구독 생성
+    $subscribeData = [
+        'name' => 'Premium Air Conditioning subscribe',
+        'description' => 'Complete AC maintenance and cleaning subscribe',
         'category' => 'maintenance',
         'pricing_model' => 'fixed',
         'base_price' => 150000,
@@ -80,24 +80,24 @@ public function test_admin_can_create_service_returns_200()
         'status' => 'active'
     ];
 
-    $response = $this->actingAs($admin)->post('/admin/service/catalog', $serviceData);
+    $response = $this->actingAs($admin)->post('/admin/subscribe/catalog', $subscribeData);
 
-    // Then: HTTP 200과 생성된 서비스
+    // Then: HTTP 200과 생성된 구독
     $response->assertStatus(200);
     $response->assertJson(['status' => 'success']);
-    $this->assertDatabaseHas('services', [
-        'name' => 'Premium Air Conditioning Service',
+    $this->assertDatabaseHas('subscribes', [
+        'name' => 'Premium Air Conditioning subscribe',
         'category' => 'maintenance'
     ]);
 }
 
-public function test_service_creation_validation_returns_422()
+public function test_subscribe_creation_validation_returns_422()
 {
     // Given: 관리자
     $admin = User::factory()->admin()->create();
 
-    // When: 잘못된 데이터로 서비스 생성
-    $response = $this->actingAs($admin)->post('/admin/service/catalog', [
+    // When: 잘못된 데이터로 구독 생성
+    $response = $this->actingAs($admin)->post('/admin/subscribe/catalog', [
         'name' => '', // 필수 필드 누락
         'category' => 'invalid_category'
     ]);
@@ -108,26 +108,26 @@ public function test_service_creation_validation_returns_422()
 }
 ```
 
-#### 3. 서비스 상세 조회
-**테스트**: `AdminServiceDetailTest`
+#### 3. 구독 상세 조회
+**테스트**: `AdminsubscribeDetailTest`
 
 ```php
-public function test_admin_service_detail_returns_200()
+public function test_admin_subscribe_detail_returns_200()
 {
-    // Given: 관리자와 서비스
+    // Given: 관리자와 구독
     $admin = User::factory()->admin()->create();
-    $service = Service::factory()->create();
-    Subscription::factory()->count(3)->create(['service_id' => $service->id]);
+    $subscribe = subscribe::factory()->create();
+    Subscription::factory()->count(3)->create(['subscribe_id' => $subscribe->id]);
 
-    // When: 서비스 상세 조회
-    $response = $this->actingAs($admin)->get("/admin/service/catalog/{$service->id}");
+    // When: 구독 상세 조회
+    $response = $this->actingAs($admin)->get("/admin/subscribe/catalog/{$subscribe->id}");
 
     // Then: HTTP 200과 상세 정보
     $response->assertStatus(200);
     $response->assertJsonStructure([
         'status',
         'data' => [
-            'service' => [
+            'subscribe' => [
                 'id', 'name', 'description', 'category', 'pricing_model',
                 'base_price', 'features', 'trial_config', 'status'
             ],
@@ -138,13 +138,13 @@ public function test_admin_service_detail_returns_200()
     ]);
 }
 
-public function test_nonexistent_service_returns_404()
+public function test_nonexistent_subscribe_returns_404()
 {
     // Given: 관리자
     $admin = User::factory()->admin()->create();
 
-    // When: 존재하지 않는 서비스 조회
-    $response = $this->actingAs($admin)->get('/admin/service/catalog/999');
+    // When: 존재하지 않는 구독 조회
+    $response = $this->actingAs($admin)->get('/admin/subscribe/catalog/999');
 
     // Then: 404 Not Found
     $response->assertStatus(404);
@@ -153,25 +153,25 @@ public function test_nonexistent_service_returns_404()
 
 ### Customer 공개 카탈로그 테스트
 
-#### 4. 공개 서비스 카탈로그
-**테스트**: `CustomerServiceCatalogTest`
+#### 4. 공개 구독 카탈로그
+**테스트**: `CustomersubscribeCatalogTest`
 
 ```php
-public function test_public_service_catalog_returns_200()
+public function test_public_subscribe_catalog_returns_200()
 {
-    // Given: 공개된 서비스들
-    Service::factory()->count(3)->create(['status' => 'active']);
-    Service::factory()->create(['status' => 'draft']); // 비공개
+    // Given: 공개된 구독들
+    subscribe::factory()->count(3)->create(['status' => 'active']);
+    subscribe::factory()->create(['status' => 'draft']); // 비공개
 
     // When: 공개 카탈로그 조회 (인증 불필요)
-    $response = $this->get('/home/service/catalog');
+    $response = $this->get('/home/subscribe/catalog');
 
-    // Then: HTTP 200과 활성 서비스만 반환
+    // Then: HTTP 200과 활성 구독만 반환
     $response->assertStatus(200);
-    $response->assertJsonCount(3, 'data.services');
+    $response->assertJsonCount(3, 'data.subscribes');
     $response->assertJsonStructure([
         'data' => [
-            'services' => [
+            'subscribes' => [
                 '*' => ['id', 'name', 'category', 'base_price', 'features', 'trial_available']
             ],
             'filters' => ['categories', 'price_range']
@@ -179,41 +179,41 @@ public function test_public_service_catalog_returns_200()
     ]);
 }
 
-public function test_customer_service_filtering_returns_200()
+public function test_customer_subscribe_filtering_returns_200()
 {
-    // Given: 다양한 카테고리의 서비스
-    Service::factory()->create(['category' => 'maintenance', 'base_price' => 100000, 'status' => 'active']);
-    Service::factory()->create(['category' => 'cleaning', 'base_price' => 200000, 'status' => 'active']);
+    // Given: 다양한 카테고리의 구독
+    subscribe::factory()->create(['category' => 'maintenance', 'base_price' => 100000, 'status' => 'active']);
+    subscribe::factory()->create(['category' => 'cleaning', 'base_price' => 200000, 'status' => 'active']);
 
     // When: 카테고리 필터 적용
-    $response = $this->get('/home/service/catalog?category=maintenance&price_max=150000');
+    $response = $this->get('/home/subscribe/catalog?category=maintenance&price_max=150000');
 
     // Then: HTTP 200과 필터된 결과
     $response->assertStatus(200);
-    $response->assertJsonCount(1, 'data.services');
+    $response->assertJsonCount(1, 'data.subscribes');
 }
 ```
 
-#### 5. 고객용 서비스 상세
-**테스트**: `CustomerServiceDetailTest`
+#### 5. 고객용 구독 상세
+**테스트**: `CustomersubscribeDetailTest`
 
 ```php
-public function test_customer_service_detail_returns_200()
+public function test_customer_subscribe_detail_returns_200()
 {
-    // Given: 활성 서비스
-    $service = Service::factory()->create([
+    // Given: 활성 구독
+    $subscribe = subscribe::factory()->create([
         'status' => 'active',
         'trial_config' => json_encode(['type' => 'time_based', 'duration' => 7])
     ]);
 
-    // When: 서비스 상세 조회
-    $response = $this->get("/home/service/catalog/{$service->id}");
+    // When: 구독 상세 조회
+    $response = $this->get("/home/subscribe/catalog/{$subscribe->id}");
 
     // Then: HTTP 200과 고객용 정보
     $response->assertStatus(200);
     $response->assertJsonStructure([
         'data' => [
-            'service' => [
+            'subscribe' => [
                 'id', 'name', 'description', 'category', 'base_price',
                 'features', 'trial_available', 'trial_config'
             ],
@@ -223,13 +223,13 @@ public function test_customer_service_detail_returns_200()
     ]);
 }
 
-public function test_draft_service_not_accessible_to_customers()
+public function test_draft_subscribe_not_accessible_to_customers()
 {
-    // Given: 비공개 서비스
-    $service = Service::factory()->create(['status' => 'draft']);
+    // Given: 비공개 구독
+    $subscribe = subscribe::factory()->create(['status' => 'draft']);
 
-    // When: 고객이 비공개 서비스 접근
-    $response = $this->get("/home/service/catalog/{$service->id}");
+    // When: 고객이 비공개 구독 접근
+    $response = $this->get("/home/subscribe/catalog/{$subscribe->id}");
 
     // Then: 404 Not Found
     $response->assertStatus(404);
@@ -238,23 +238,23 @@ public function test_draft_service_not_accessible_to_customers()
 
 ## 컨트롤러 구현
 
-### 1. Admin Service Catalog Controller
+### 1. Admin subscribe Catalog Controller
 
 ```php
 <?php
 
-namespace Jiny\Service\Http\Controllers\Admin;
+namespace Jiny\Subscribe\Http\Controllers\Admin;
 
 use Illuminate\Http\Request;
-use Jiny\Service\Models\Service;
-use Jiny\Service\Models\ServiceCategory;
+use Jiny\Subscribe\Models\subscribe;
+use Jiny\Subscribe\Models\subscribeCategory;
 use Illuminate\Support\Str;
 
-class ServiceCatalogController extends Controller
+class subscribeCatalogController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Service::with(['category']);
+        $query = subscribe::with(['category']);
 
         // 검색 필터
         if ($search = $request->get('search')) {
@@ -279,7 +279,7 @@ class ServiceCatalogController extends Controller
                        $request->get('direction', 'desc'));
 
         // 페이지네이션
-        $services = $query->paginate($request->get('per_page', 20));
+        $subscribes = $query->paginate($request->get('per_page', 20));
 
         // 통계 계산
         $statistics = $this->calculateStatistics();
@@ -287,12 +287,12 @@ class ServiceCatalogController extends Controller
         return response()->json([
             'status' => 'success',
             'data' => [
-                'services' => $services->items(),
+                'subscribes' => $subscribes->items(),
                 'pagination' => [
-                    'current_page' => $services->currentPage(),
-                    'total_pages' => $services->lastPage(),
-                    'total_count' => $services->total(),
-                    'per_page' => $services->perPage()
+                    'current_page' => $subscribes->currentPage(),
+                    'total_pages' => $subscribes->lastPage(),
+                    'total_count' => $subscribes->total(),
+                    'per_page' => $subscribes->perPage()
                 ],
                 'statistics' => $statistics
             ]
@@ -301,7 +301,7 @@ class ServiceCatalogController extends Controller
 
     public function create()
     {
-        $categories = ServiceCategory::where('is_active', true)
+        $categories = subscribeCategory::where('is_active', true)
                                    ->orderBy('sort_order')
                                    ->get();
 
@@ -321,9 +321,9 @@ class ServiceCatalogController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255|unique:services,name',
+            'name' => 'required|string|max:255|unique:subscribes,name',
             'description' => 'required|string',
-            'category' => 'required|string|exists:service_categories,name',
+            'category' => 'required|string|exists:subscribe_categories,name',
             'pricing_model' => 'required|in:fixed,hourly,subscription',
             'base_price' => 'required|numeric|min:0',
             'features' => 'array',
@@ -341,7 +341,7 @@ class ServiceCatalogController extends Controller
         // 중복 슬러그 처리
         $originalSlug = $validated['slug'];
         $counter = 1;
-        while (Service::where('slug', $validated['slug'])->exists()) {
+        while (subscribe::where('slug', $validated['slug'])->exists()) {
             $validated['slug'] = $originalSlug . '-' . $counter++;
         }
 
@@ -351,45 +351,45 @@ class ServiceCatalogController extends Controller
             ? json_encode($validated['trial_config'])
             : null;
 
-        $service = Service::create($validated);
+        $subscribe = subscribe::create($validated);
 
         // 활동 로그
-        $this->logAdminActivity('service_created', [
-            'service_id' => $service->id,
-            'service_name' => $service->name
+        $this->logAdminActivity('subscribe_created', [
+            'subscribe_id' => $subscribe->id,
+            'subscribe_name' => $subscribe->name
         ]);
 
         return response()->json([
             'status' => 'success',
-            'message' => 'Service created successfully',
+            'message' => 'subscribe created successfully',
             'data' => [
-                'service' => [
-                    'id' => $service->id,
-                    'name' => $service->name,
-                    'slug' => $service->slug,
-                    'status' => $service->status,
-                    'created_at' => $service->created_at
+                'subscribe' => [
+                    'id' => $subscribe->id,
+                    'name' => $subscribe->name,
+                    'slug' => $subscribe->slug,
+                    'status' => $subscribe->status,
+                    'created_at' => $subscribe->created_at
                 ]
             ]
         ], 200);
     }
 
-    public function show(Service $service)
+    public function show(subscribe $subscribe)
     {
         // 구독 통계
         $subscriptionStats = [
-            'total_subscriptions' => $service->subscriptions()->count(),
-            'active_subscriptions' => $service->subscriptions()->where('status', 'active')->count(),
-            'trial_subscriptions' => $service->subscriptions()->where('status', 'trial')->count(),
+            'total_subscriptions' => $subscribe->subscriptions()->count(),
+            'active_subscriptions' => $subscribe->subscriptions()->where('status', 'active')->count(),
+            'trial_subscriptions' => $subscribe->subscriptions()->where('status', 'trial')->count(),
         ];
 
         // 수익 통계
         $revenueStats = [
-            'total_revenue' => $service->subscriptions()
+            'total_revenue' => $subscribe->subscriptions()
                 ->join('subscription_billings', 'subscriptions.id', '=', 'subscription_billings.subscription_id')
                 ->where('subscription_billings.status', 'paid')
                 ->sum('subscription_billings.total_amount'),
-            'monthly_recurring_revenue' => $service->subscriptions()
+            'monthly_recurring_revenue' => $subscribe->subscriptions()
                 ->where('status', 'active')
                 ->where('billing_cycle', 'monthly')
                 ->sum('amount')
@@ -397,10 +397,10 @@ class ServiceCatalogController extends Controller
 
         // 평점 통계
         $ratingStats = [
-            'average_rating' => $service->serviceExecutions()
+            'average_rating' => $subscribe->subscribeExecutions()
                 ->whereNotNull('customer_rating')
                 ->avg('customer_rating'),
-            'total_reviews' => $service->serviceExecutions()
+            'total_reviews' => $subscribe->subscribeExecutions()
                 ->whereNotNull('customer_feedback')
                 ->count()
         ];
@@ -408,7 +408,7 @@ class ServiceCatalogController extends Controller
         return response()->json([
             'status' => 'success',
             'data' => [
-                'service' => $service->load('category'),
+                'subscribe' => $subscribe->load('category'),
                 'statistics' => [
                     'subscriptions' => $subscriptionStats,
                     'revenue' => $revenueStats,
@@ -418,16 +418,16 @@ class ServiceCatalogController extends Controller
         ], 200);
     }
 
-    public function edit(Service $service)
+    public function edit(subscribe $subscribe)
     {
-        $categories = ServiceCategory::where('is_active', true)
+        $categories = subscribeCategory::where('is_active', true)
                                    ->orderBy('sort_order')
                                    ->get();
 
         return response()->json([
             'status' => 'success',
             'data' => [
-                'service' => $service,
+                'subscribe' => $subscribe,
                 'categories' => $categories,
                 'pricing_models' => ['fixed', 'hourly', 'subscription'],
                 'trial_types' => ['time_based', 'usage_based', 'feature_based', 'hybrid']
@@ -435,12 +435,12 @@ class ServiceCatalogController extends Controller
         ], 200);
     }
 
-    public function update(Request $request, Service $service)
+    public function update(Request $request, subscribe $subscribe)
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255|unique:services,name,' . $service->id,
+            'name' => 'required|string|max:255|unique:subscribes,name,' . $subscribe->id,
             'description' => 'required|string',
-            'category' => 'required|string|exists:service_categories,name',
+            'category' => 'required|string|exists:subscribe_categories,name',
             'pricing_model' => 'required|in:fixed,hourly,subscription',
             'base_price' => 'required|numeric|min:0',
             'features' => 'array',
@@ -453,12 +453,12 @@ class ServiceCatalogController extends Controller
         ]);
 
         // 이름이 변경되면 슬러그 재생성
-        if ($service->name !== $validated['name']) {
+        if ($subscribe->name !== $validated['name']) {
             $validated['slug'] = Str::slug($validated['name']);
 
             $originalSlug = $validated['slug'];
             $counter = 1;
-            while (Service::where('slug', $validated['slug'])->where('id', '!=', $service->id)->exists()) {
+            while (subscribe::where('slug', $validated['slug'])->where('id', '!=', $subscribe->id)->exists()) {
                 $validated['slug'] = $originalSlug . '-' . $counter++;
             }
         }
@@ -469,52 +469,52 @@ class ServiceCatalogController extends Controller
             ? json_encode($validated['trial_config'])
             : null;
 
-        $service->update($validated);
+        $subscribe->update($validated);
 
         // 활동 로그
-        $this->logAdminActivity('service_updated', [
-            'service_id' => $service->id,
-            'service_name' => $service->name
+        $this->logAdminActivity('subscribe_updated', [
+            'subscribe_id' => $subscribe->id,
+            'subscribe_name' => $subscribe->name
         ]);
 
         return response()->json([
             'status' => 'success',
-            'message' => 'Service updated successfully',
-            'data' => ['service' => $service->fresh()]
+            'message' => 'subscribe updated successfully',
+            'data' => ['subscribe' => $subscribe->fresh()]
         ], 200);
     }
 
-    public function destroy(Service $service)
+    public function destroy(subscribe $subscribe)
     {
         // 활성 구독 확인
-        $activeSubscriptions = $service->subscriptions()
+        $activeSubscriptions = $subscribe->subscriptions()
             ->whereIn('status', ['active', 'trial'])
             ->count();
 
         if ($activeSubscriptions > 0) {
             return response()->json([
-                'error' => 'Cannot delete service with active subscriptions',
+                'error' => 'Cannot delete subscribe with active subscriptions',
                 'active_subscriptions' => $activeSubscriptions
             ], 422);
         }
 
         // 소프트 삭제 또는 하드 삭제
-        $hasHistoricalData = $service->subscriptions()->count() > 0;
+        $hasHistoricalData = $subscribe->subscriptions()->count() > 0;
 
         if ($hasHistoricalData) {
             // 소프트 삭제 (상태를 inactive로 변경)
-            $service->update(['status' => 'inactive']);
-            $message = 'Service deactivated due to historical data';
+            $subscribe->update(['status' => 'inactive']);
+            $message = 'subscribe deactivated due to historical data';
         } else {
             // 하드 삭제
-            $service->delete();
-            $message = 'Service deleted successfully';
+            $subscribe->delete();
+            $message = 'subscribe deleted successfully';
         }
 
         // 활동 로그
-        $this->logAdminActivity('service_deleted', [
-            'service_id' => $service->id,
-            'service_name' => $service->name,
+        $this->logAdminActivity('subscribe_deleted', [
+            'subscribe_id' => $subscribe->id,
+            'subscribe_name' => $subscribe->name,
             'deletion_type' => $hasHistoricalData ? 'soft' : 'hard'
         ]);
 
@@ -524,19 +524,19 @@ class ServiceCatalogController extends Controller
         ], 200);
     }
 
-    public function updateStatus(Request $request, Service $service)
+    public function updateStatus(Request $request, subscribe $subscribe)
     {
         $validated = $request->validate([
             'status' => 'required|in:active,inactive,draft',
             'reason' => 'nullable|string|max:500'
         ]);
 
-        $oldStatus = $service->status;
-        $service->update(['status' => $validated['status']]);
+        $oldStatus = $subscribe->status;
+        $subscribe->update(['status' => $validated['status']]);
 
         // 활동 로그
-        $this->logAdminActivity('service_status_changed', [
-            'service_id' => $service->id,
+        $this->logAdminActivity('subscribe_status_changed', [
+            'subscribe_id' => $subscribe->id,
             'old_status' => $oldStatus,
             'new_status' => $validated['status'],
             'reason' => $validated['reason'] ?? null
@@ -544,43 +544,43 @@ class ServiceCatalogController extends Controller
 
         return response()->json([
             'status' => 'success',
-            'message' => 'Service status updated successfully',
+            'message' => 'subscribe status updated successfully',
             'data' => [
-                'service' => $service->fresh()
+                'subscribe' => $subscribe->fresh()
             ]
         ], 200);
     }
 
-    public function duplicate(Service $service)
+    public function duplicate(subscribe $subscribe)
     {
-        $newService = $service->replicate();
-        $newService->name = $service->name . ' (Copy)';
-        $newService->slug = Str::slug($newService->name);
-        $newService->status = 'draft';
+        $newsubscribe = $subscribe->replicate();
+        $newsubscribe->name = $subscribe->name . ' (Copy)';
+        $newsubscribe->slug = Str::slug($newsubscribe->name);
+        $newsubscribe->status = 'draft';
 
         // 슬러그 중복 처리
-        $originalSlug = $newService->slug;
+        $originalSlug = $newsubscribe->slug;
         $counter = 1;
-        while (Service::where('slug', $newService->slug)->exists()) {
-            $newService->slug = $originalSlug . '-' . $counter++;
+        while (subscribe::where('slug', $newsubscribe->slug)->exists()) {
+            $newsubscribe->slug = $originalSlug . '-' . $counter++;
         }
 
-        $newService->save();
+        $newsubscribe->save();
 
         return response()->json([
             'status' => 'success',
-            'message' => 'Service duplicated successfully',
-            'data' => ['service' => $newService]
+            'message' => 'subscribe duplicated successfully',
+            'data' => ['subscribe' => $newsubscribe]
         ], 200);
     }
 
     private function calculateStatistics(): array
     {
         return [
-            'total_services' => Service::count(),
-            'active_services' => Service::where('status', 'active')->count(),
-            'draft_services' => Service::where('status', 'draft')->count(),
-            'services_with_trials' => Service::whereNotNull('trial_config')->count(),
+            'total_subscribes' => subscribe::count(),
+            'active_subscribes' => subscribe::where('status', 'active')->count(),
+            'draft_subscribes' => subscribe::where('status', 'draft')->count(),
+            'subscribes_with_trials' => subscribe::whereNotNull('trial_config')->count(),
         ];
     }
 
@@ -597,22 +597,22 @@ class ServiceCatalogController extends Controller
 }
 ```
 
-### 2. Customer Service Catalog Controller
+### 2. Customer subscribe Catalog Controller
 
 ```php
 <?php
 
-namespace Jiny\Service\Http\Controllers\Customer;
+namespace Jiny\Subscribe\Http\Controllers\Customer;
 
 use Illuminate\Http\Request;
-use Jiny\Service\Models\Service;
-use Jiny\Service\Models\ServiceCategory;
+use Jiny\Subscribe\Models\subscribe;
+use Jiny\Subscribe\Models\subscribeCategory;
 
-class ServiceCatalogController extends Controller
+class subscribeCatalogController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Service::where('status', 'active')
+        $query = subscribe::where('status', 'active')
                        ->with(['category']);
 
         // 카테고리 필터
@@ -627,7 +627,7 @@ class ServiceCatalogController extends Controller
         if ($priceMax = $request->get('price_max')) {
         }
 
-        // 무료 체험 가능 서비스
+        // 무료 체험 가능 구독
         if ($request->boolean('trial_available')) {
             $query->whereNotNull('trial_config');
         }
@@ -647,120 +647,120 @@ class ServiceCatalogController extends Controller
                   ->orderBy('subscriptions_count', 'desc');
         } elseif ($sortBy === 'rating') {
             // 평점 기준 정렬
-            $query->leftJoin('service_executions', 'services.id', '=', 'service_executions.subscription_id')
-                  ->select('services.*')
-                  ->selectRaw('AVG(service_executions.customer_rating) as avg_rating')
-                  ->groupBy('services.id')
+            $query->leftJoin('subscribe_executions', 'subscribes.id', '=', 'subscribe_executions.subscription_id')
+                  ->select('subscribes.*')
+                  ->selectRaw('AVG(subscribe_executions.customer_rating) as avg_rating')
+                  ->groupBy('subscribes.id')
                   ->orderBy('avg_rating', 'desc');
         } else {
             $query->orderBy($sortBy, $direction);
         }
 
-        $services = $query->paginate($request->get('per_page', 12));
+        $subscribes = $query->paginate($request->get('per_page', 12));
 
-        // 서비스 데이터 변환 (고객용)
-        $transformedServices = $services->getCollection()->map(function ($service) {
+        // 구독 데이터 변환 (고객용)
+        $transformedsubscribes = $subscribes->getCollection()->map(function ($subscribe) {
             return [
-                'id' => $service->id,
-                'name' => $service->name,
-                'description' => $service->description,
-                'category' => $service->category,
-                'base_price' => $service->base_price,
-                'features' => json_decode($service->features, true),
-                'trial_available' => !is_null($service->trial_config),
-                'trial_config' => $service->trial_config ? json_decode($service->trial_config, true) : null,
-                'image_url' => $service->image_url,
-                'pricing_options' => $this->generatePricingOptions($service),
-                'rating' => $this->getServiceRating($service->id),
-                'reviews_count' => $this->getReviewsCount($service->id)
+                'id' => $subscribe->id,
+                'name' => $subscribe->name,
+                'description' => $subscribe->description,
+                'category' => $subscribe->category,
+                'base_price' => $subscribe->base_price,
+                'features' => json_decode($subscribe->features, true),
+                'trial_available' => !is_null($subscribe->trial_config),
+                'trial_config' => $subscribe->trial_config ? json_decode($subscribe->trial_config, true) : null,
+                'image_url' => $subscribe->image_url,
+                'pricing_options' => $this->generatePricingOptions($subscribe),
+                'rating' => $this->getsubscribeRating($subscribe->id),
+                'reviews_count' => $this->getReviewsCount($subscribe->id)
             ];
         });
 
         // 필터 옵션
         $filters = [
-            'categories' => ServiceCategory::where('is_active', true)
+            'categories' => subscribeCategory::where('is_active', true)
                                           ->orderBy('sort_order')
                                           ->pluck('name'),
             'price_range' => [
-                'min' => Service::where('status', 'active')->min('base_price'),
-                'max' => Service::where('status', 'active')->max('base_price')
+                'min' => subscribe::where('status', 'active')->min('base_price'),
+                'max' => subscribe::where('status', 'active')->max('base_price')
             ]
         ];
 
         return response()->json([
             'status' => 'success',
             'data' => [
-                'services' => $transformedServices,
+                'subscribes' => $transformedsubscribes,
                 'pagination' => [
-                    'current_page' => $services->currentPage(),
-                    'total_pages' => $services->lastPage(),
-                    'total_count' => $services->total()
+                    'current_page' => $subscribes->currentPage(),
+                    'total_pages' => $subscribes->lastPage(),
+                    'total_count' => $subscribes->total()
                 ],
                 'filters' => $filters
             ]
         ], 200);
     }
 
-    public function show(Service $service)
+    public function show(subscribe $subscribe)
     {
-        // 활성 서비스만 조회 가능
-        if ($service->status !== 'active') {
-            return response()->json(['error' => 'Service not found'], 404);
+        // 활성 구독만 조회 가능
+        if ($subscribe->status !== 'active') {
+            return response()->json(['error' => 'subscribe not found'], 404);
         }
 
-        // 서비스 상세 정보
-        $serviceData = [
-            'id' => $service->id,
-            'name' => $service->name,
-            'description' => $service->description,
-            'category' => $service->category,
-            'pricing_model' => $service->pricing_model,
-            'base_price' => $service->base_price,
-            'features' => json_decode($service->features, true),
-            'trial_available' => !is_null($service->trial_config),
-            'trial_config' => $service->trial_config ? json_decode($service->trial_config, true) : null,
-            'image_url' => $service->image_url
+        // 구독 상세 정보
+        $subscribeData = [
+            'id' => $subscribe->id,
+            'name' => $subscribe->name,
+            'description' => $subscribe->description,
+            'category' => $subscribe->category,
+            'pricing_model' => $subscribe->pricing_model,
+            'base_price' => $subscribe->base_price,
+            'features' => json_decode($subscribe->features, true),
+            'trial_available' => !is_null($subscribe->trial_config),
+            'trial_config' => $subscribe->trial_config ? json_decode($subscribe->trial_config, true) : null,
+            'image_url' => $subscribe->image_url
         ];
 
         // 리뷰 및 평점
         $reviews = [
-            'average_rating' => $this->getServiceRating($service->id),
-            'total_reviews' => $this->getReviewsCount($service->id),
-            'rating_distribution' => $this->getRatingDistribution($service->id),
-            'recent_reviews' => $this->getRecentReviews($service->id, 5)
+            'average_rating' => $this->getsubscribeRating($subscribe->id),
+            'total_reviews' => $this->getReviewsCount($subscribe->id),
+            'rating_distribution' => $this->getRatingDistribution($subscribe->id),
+            'recent_reviews' => $this->getRecentReviews($subscribe->id, 5)
         ];
 
         // 가격 옵션
-        $pricingOptions = $this->generatePricingOptions($service);
+        $pricingOptions = $this->generatePricingOptions($subscribe);
 
-        // 비슷한 서비스
-        $similarServices = Service::where('category', $service->category)
-                                 ->where('id', '!=', $service->id)
+        // 비슷한 구독
+        $similarsubscribes = subscribe::where('category', $subscribe->category)
+                                 ->where('id', '!=', $subscribe->id)
                                  ->where('status', 'active')
                                  ->limit(4)
                                  ->get(['id', 'name', 'base_price', 'image_url']);
 
         // 조회수 증가 (비동기로 처리)
-        $this->incrementViewCount($service->id);
+        $this->incrementViewCount($subscribe->id);
 
         return response()->json([
             'status' => 'success',
             'data' => [
-                'service' => $serviceData,
+                'subscribe' => $subscribeData,
                 'reviews' => $reviews,
                 'pricing_options' => $pricingOptions,
-                'similar_services' => $similarServices
+                'similar_subscribes' => $similarsubscribes
             ]
         ], 200);
     }
 
-    public function trialInfo(Service $service)
+    public function trialInfo(subscribe $subscribe)
     {
-        if (!$service->trial_config) {
-            return response()->json(['error' => 'Trial not available for this service'], 404);
+        if (!$subscribe->trial_config) {
+            return response()->json(['error' => 'Trial not available for this subscribe'], 404);
         }
 
-        $trialConfig = json_decode($service->trial_config, true);
+        $trialConfig = json_decode($subscribe->trial_config, true);
 
         // 고객별 개인화 체험 설정 (JWT 토큰에서 고객 정보 추출)
         $customer = $request->input('authenticated_customer');
@@ -773,14 +773,14 @@ class ServiceCatalogController extends Controller
             'data' => [
                 'trial_config' => $trialConfig,
                 'terms_and_conditions' => $this->getTrialTerms(),
-                'estimated_value' => $this->calculateTrialValue($service, $trialConfig)
+                'estimated_value' => $this->calculateTrialValue($subscribe, $trialConfig)
             ]
         ], 200);
     }
 
-    private function generatePricingOptions(Service $service): array
+    private function generatePricingOptions(subscribe $subscribe): array
     {
-        $basePrice = $service->base_price;
+        $basePrice = $subscribe->base_price;
 
         return [
             'monthly' => [
@@ -801,30 +801,30 @@ class ServiceCatalogController extends Controller
         ];
     }
 
-    private function getServiceRating(int $serviceId): float
+    private function getsubscribeRating(int $subscribeId): float
     {
-        return \DB::table('service_executions')
-                  ->join('subscriptions', 'service_executions.subscription_id', '=', 'subscriptions.id')
-                  ->where('subscriptions.service_id', $serviceId)
-                  ->whereNotNull('service_executions.customer_rating')
-                  ->avg('service_executions.customer_rating') ?? 0;
+        return \DB::table('subscribe_executions')
+                  ->join('subscriptions', 'subscribe_executions.subscription_id', '=', 'subscriptions.id')
+                  ->where('subscriptions.subscribe_id', $subscribeId)
+                  ->whereNotNull('subscribe_executions.customer_rating')
+                  ->avg('subscribe_executions.customer_rating') ?? 0;
     }
 
-    private function getReviewsCount(int $serviceId): int
+    private function getReviewsCount(int $subscribeId): int
     {
-        return \DB::table('service_executions')
-                  ->join('subscriptions', 'service_executions.subscription_id', '=', 'subscriptions.id')
-                  ->where('subscriptions.service_id', $serviceId)
-                  ->whereNotNull('service_executions.customer_feedback')
+        return \DB::table('subscribe_executions')
+                  ->join('subscriptions', 'subscribe_executions.subscription_id', '=', 'subscriptions.id')
+                  ->where('subscriptions.subscribe_id', $subscribeId)
+                  ->whereNotNull('subscribe_executions.customer_feedback')
                   ->count();
     }
 
-    private function getRatingDistribution(int $serviceId): array
+    private function getRatingDistribution(int $subscribeId): array
     {
-        $ratings = \DB::table('service_executions')
-                     ->join('subscriptions', 'service_executions.subscription_id', '=', 'subscriptions.id')
-                     ->where('subscriptions.service_id', $serviceId)
-                     ->whereNotNull('service_executions.customer_rating')
+        $ratings = \DB::table('subscribe_executions')
+                     ->join('subscriptions', 'subscribe_executions.subscription_id', '=', 'subscriptions.id')
+                     ->where('subscriptions.subscribe_id', $subscribeId)
+                     ->whereNotNull('subscribe_executions.customer_rating')
                      ->select('customer_rating', \DB::raw('count(*) as count'))
                      ->groupBy('customer_rating')
                      ->pluck('count', 'customer_rating')
@@ -838,29 +838,29 @@ class ServiceCatalogController extends Controller
         return $distribution;
     }
 
-    private function getRecentReviews(int $serviceId, int $limit = 5): array
+    private function getRecentReviews(int $subscribeId, int $limit = 5): array
     {
-        return \DB::table('service_executions')
-                  ->join('subscriptions', 'service_executions.subscription_id', '=', 'subscriptions.id')
-                  ->where('subscriptions.service_id', $serviceId)
-                  ->whereNotNull('service_executions.customer_feedback')
-                  ->whereNotNull('service_executions.customer_rating')
+        return \DB::table('subscribe_executions')
+                  ->join('subscriptions', 'subscribe_executions.subscription_id', '=', 'subscriptions.id')
+                  ->where('subscriptions.subscribe_id', $subscribeId)
+                  ->whereNotNull('subscribe_executions.customer_feedback')
+                  ->whereNotNull('subscribe_executions.customer_rating')
                   ->select([
-                      'service_executions.customer_rating',
-                      'service_executions.customer_feedback',
-                      'service_executions.completed_at'
+                      'subscribe_executions.customer_rating',
+                      'subscribe_executions.customer_feedback',
+                      'subscribe_executions.completed_at'
                   ])
-                  ->orderBy('service_executions.completed_at', 'desc')
+                  ->orderBy('subscribe_executions.completed_at', 'desc')
                   ->limit($limit)
                   ->get()
                   ->toArray();
     }
 
-    private function incrementViewCount(int $serviceId): void
+    private function incrementViewCount(int $subscribeId): void
     {
         // 비동기 작업으로 조회수 증가
-        \DB::table('service_view_logs')->insert([
-            'service_id' => $serviceId,
+        \DB::table('subscribe_view_logs')->insert([
+            'subscribe_id' => $subscribeId,
             'ip_address' => request()->ip(),
             'user_agent' => request()->userAgent(),
             'viewed_at' => now()
@@ -869,7 +869,7 @@ class ServiceCatalogController extends Controller
 
     private function personalizeTrialConfig(array $config, object $customer): array
     {
-        // 고객의 이전 서비스 이용 이력에 따른 개인화
+        // 고객의 이전 구독 이용 이력에 따른 개인화
         // 이는 향후 AI/ML 기반 개인화로 확장 가능
         return $config;
     }
@@ -884,14 +884,14 @@ class ServiceCatalogController extends Controller
         ];
     }
 
-    private function calculateTrialValue(Service $service, array $trialConfig): array
+    private function calculateTrialValue(subscribe $subscribe, array $trialConfig): array
     {
-        $basePrice = $service->base_price;
+        $basePrice = $subscribe->base_price;
         $trialDuration = $trialConfig['duration'] ?? 7;
 
         return [
             'trial_value' => $basePrice * ($trialDuration / 30), // 일할 계산
-            'full_service_value' => $basePrice,
+            'full_subscribe_value' => $basePrice,
             'savings' => $basePrice * ($trialDuration / 30)
         ];
     }
@@ -900,17 +900,17 @@ class ServiceCatalogController extends Controller
 
 ## 모델 구현
 
-### Service Model
+### subscribe Model
 ```php
 <?php
 
-namespace Jiny\Service\Models;
+namespace Jiny\Subscribe\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Service extends Model
+class subscribe extends Model
 {
     use HasFactory, SoftDeletes;
 
@@ -937,15 +937,15 @@ class Service extends Model
 
     public function category()
     {
-        return $this->belongsTo(ServiceCategory::class, 'category', 'name');
+        return $this->belongsTo(subscribeCategory::class, 'category', 'name');
     }
 
-    public function serviceExecutions()
+    public function subscribeExecutions()
     {
         return $this->hasManyThrough(
-            ServiceExecution::class,
+            subscribeExecution::class,
             Subscription::class,
-            'service_id',
+            'subscribe_id',
             'subscription_id'
         );
     }
@@ -998,7 +998,7 @@ class Service extends Model
 
     public function getAverageRating(): float
     {
-        return $this->serviceExecutions()
+        return $this->subscribeExecutions()
                    ->whereNotNull('customer_rating')
                    ->avg('customer_rating') ?? 0;
     }
@@ -1007,69 +1007,69 @@ class Service extends Model
 
 ## 구현 체크리스트
 
-### Admin 서비스 관리
-- [ ] **서비스 목록 조회** (`GET /admin/service/catalog`)
+### Admin 구독 관리
+- [ ] **구독 목록 조회** (`GET /admin/subscribe/catalog`)
   - [ ] HTTP 200 응답 검증
   - [ ] 검색/필터 기능
   - [ ] 페이지네이션
   - [ ] 정렬 기능
   - [ ] 통계 데이터 포함
 
-- [ ] **서비스 생성** (`POST /admin/service/catalog`)
+- [ ] **구독 생성** (`POST /admin/subscribe/catalog`)
   - [ ] HTTP 200 응답 검증
   - [ ] 입력 검증 (422 오류)
   - [ ] 슬러그 자동 생성
   - [ ] 중복 이름 방지
   - [ ] JSON 필드 처리
 
-- [ ] **서비스 상세 조회** (`GET /admin/service/catalog/{id}`)
+- [ ] **구독 상세 조회** (`GET /admin/subscribe/catalog/{id}`)
   - [ ] HTTP 200 응답 검증
   - [ ] 404 오류 처리
   - [ ] 구독 통계 계산
   - [ ] 수익 통계 계산
   - [ ] 평점 통계 계산
 
-- [ ] **서비스 수정** (`PUT /admin/service/catalog/{id}`)
+- [ ] **구독 수정** (`PUT /admin/subscribe/catalog/{id}`)
   - [ ] HTTP 200 응답 검증
   - [ ] 검증 로직
   - [ ] 슬러그 업데이트
   - [ ] 변경 이력 로그
 
-- [ ] **서비스 삭제** (`DELETE /admin/service/catalog/{id}`)
+- [ ] **구독 삭제** (`DELETE /admin/subscribe/catalog/{id}`)
   - [ ] HTTP 200 응답 검증
   - [ ] 활성 구독 확인
   - [ ] 소프트/하드 삭제 로직
   - [ ] 삭제 이력 로그
 
 ### Customer 공개 카탈로그
-- [ ] **공개 카탈로그 조회** (`GET /home/service/catalog`)
+- [ ] **공개 카탈로그 조회** (`GET /home/subscribe/catalog`)
   - [ ] HTTP 200 응답 검증
-  - [ ] 활성 서비스만 표시
+  - [ ] 활성 구독만 표시
   - [ ] 카테고리/가격 필터
   - [ ] 정렬 옵션
   - [ ] 필터 메타데이터
 
-- [ ] **서비스 상세 조회** (`GET /home/service/catalog/{id}`)
+- [ ] **구독 상세 조회** (`GET /home/subscribe/catalog/{id}`)
   - [ ] HTTP 200 응답 검증
-  - [ ] 비활성 서비스 404 처리
+  - [ ] 비활성 구독 404 처리
   - [ ] 리뷰/평점 표시
   - [ ] 가격 옵션 계산
-  - [ ] 비슷한 서비스 추천
+  - [ ] 비슷한 구독 추천
 
-- [ ] **체험 정보 조회** (`GET /home/service/catalog/{id}/trial-info`)
+- [ ] **체험 정보 조회** (`GET /home/subscribe/catalog/{id}/trial-info`)
   - [ ] HTTP 200 응답 검증
-  - [ ] 체험 불가능한 서비스 404 처리
+  - [ ] 체험 불가능한 구독 404 처리
   - [ ] 개인화된 체험 설정
   - [ ] 체험 가치 계산
 
 ### 데이터 모델
-- [ ] **Service 모델**
-  - [ ] 관계 설정 (Subscription, ServiceCategory)
+- [ ] **subscribe 모델**
+  - [ ] 관계 설정 (Subscription, subscribeCategory)
   - [ ] 스코프 메서드
   - [ ] 접근자 메서드
   - [ ] 헬퍼 메서드
 
-- [ ] **ServiceCategory 모델**
+- [ ] **subscribeCategory 모델**
   - [ ] 기본 카테고리 시딩
   - [ ] 정렬 순서 관리
 

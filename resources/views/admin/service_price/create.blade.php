@@ -1,4 +1,4 @@
-@extends('jiny-service::layouts.admin.sidebar')
+@extends('jiny-subscribe::layouts.admin.sidebar')
 
 @section('content')
 <div class="container-fluid">
@@ -8,10 +8,10 @@
             <div class="d-flex justify-content-between align-items-center">
                 <div>
                     <h2 class="mb-1">새 가격 옵션 추가</h2>
-                    <p class="text-muted mb-0">{{ $service->title }}에 새로운 가격 옵션을 추가합니다.</p>
+                    <p class="text-muted mb-0">{{ $subscribe->title }}에 새로운 가격 옵션을 추가합니다.</p>
                 </div>
                 <div>
-                    <a href="{{ route('admin.site.services.price.index', $service->id) }}" class="btn btn-outline-secondary">
+                    <a href="{{ route('admin.site.subscribes.price.index', $subscribe->id) }}" class="btn btn-outline-secondary">
                         <i class="fe fe-arrow-left me-2"></i>목록으로
                     </a>
                 </div>
@@ -20,7 +20,7 @@
     </div>
 
     <!-- 폼 -->
-    <form method="POST" action="{{ route('admin.site.services.price.store', $service->id) }}">
+    <form method="POST" action="{{ route('admin.site.subscribes.price.store', $subscribe->id) }}">
         @csrf
         <div class="row">
             <div class="col-lg-8">

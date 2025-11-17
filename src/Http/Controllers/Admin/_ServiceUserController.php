@@ -1,10 +1,10 @@
 <?php
 
-namespace Jiny\Service\Http\Controllers\Admin;
+namespace Jiny\Subscribe\Http\Controllers\Admin;
 
-use Jiny\Service\Models\ServiceUser;
-use Jiny\Service\Models\SiteService;
-use Jiny\Service\Models\ServicePlan;
+use Jiny\Subscribe\Models\ServiceUser;
+use Jiny\Subscribe\Models\SiteService;
+use Jiny\Subscribe\Models\ServicePlan;
 use Illuminate\Http\Request;
 
 class ServiceUserController extends BaseAdminController
@@ -13,7 +13,7 @@ class ServiceUserController extends BaseAdminController
     {
         parent::__construct();
         $this->model = ServiceUser::class;
-        $this->viewPath = 'jiny-service::admin.service-users';
+        $this->viewPath = 'jiny-subscribe::admin.service-users';
         $this->routePrefix = 'service-users';
         $this->title = '서비스 사용자';
     }
@@ -52,12 +52,12 @@ class ServiceUserController extends BaseAdminController
 
     protected function getSearchFields(): array
     {
-        return ['user_email', 'user_name', 'service_title', 'plan_name'];
+        return ['user_email', 'user_name', 'subscribe_title', 'plan_name'];
     }
 
     public function index(Request $request)
     {
-        $query = $this->model::with('service');
+        $query = $this->model::with('subscribe');
 
         // 검색 기능
         if ($request->has('search') && $request->search) {
@@ -74,31 +74,31 @@ class ServiceUserController extends BaseAdminController
             $query->where('status', $request->status);
         }
 
-        // 서비스 필터
-        if ($request->has('service_id') && $request->service_id) {
-            $query->where('service_id', $request->service_id);
+        // 구독 필터
+        if ($request->has('subscribe_id') && $request->subscribe_id) {
+            $query->where('subscribe_id', $request->subscribe_id);
         }
 
         $items = $query->orderBy('id', 'desc')->paginate(20);
-        $services = SiteService::where('is_active', true)->orderBy('title')->get();
+        $subscribes = Sitesubscribe::where('is_active', true)->orderBy('title')->get();
 
         return view("{$this->viewPath}.index", [
             'items' => $items,
-            'services' => $services,
+            'subscribes' => $subscribes,
             'title' => $this->title,
             'routePrefix' => $this->routePrefix,
             'searchValue' => $request->search,
             'selectedStatus' => $request->status,
-            'selectedService' => $request->service_id
+            'selectedsubscribe' => $request->subscribe_id
         ]);
     }
 
     public function create()
     {
-        $services = SiteService::where('is_active', true)->orderBy('title')->get();
+        $subscribes = Sitesubscribe::where('is_active', true)->orderBy('title')->get();
 
         return view("{$this->viewPath}.create", [
-            'services' => $services,
+            'subscribes' => $subscribes,
             'title' => $this->title,
             'routePrefix' => $this->routePrefix
         ]);
@@ -106,12 +106,12 @@ class ServiceUserController extends BaseAdminController
 
     public function edit($id)
     {
-        $item = $this->model::with('service')->findOrFail($id);
-        $services = SiteService::where('is_active', true)->orderBy('title')->get();
+        $item = $this->model::with('subscribe')->findOrFail($id);
+        $subscribes = Sitesubscribe::where('is_active', true)->orderBy('title')->get();
 
         return view("{$this->viewPath}.edit", [
             'item' => $item,
-            'services' => $services,
+            'subscribes' => $subscribes,
             'title' => $this->title,
             'routePrefix' => $this->routePrefix
         ]);

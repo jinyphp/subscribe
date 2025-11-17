@@ -1,4 +1,4 @@
-@extends('jiny-service::layouts.admin.sidebar')
+@extends('jiny-subscribe::layouts.admin.sidebar')
 
 @section('title', '결제 상세 정보')
 
@@ -17,11 +17,11 @@
                     <p class="text-muted mb-0">결제 ID: {{ $payment->id }} - {{ $payment->created_at->format('Y년 m월 d일 H:i:s') }}</p>
                 </div>
                 <div class="d-flex gap-2">
-                    <a href="{{ route('admin.service.payments.index') }}" class="btn btn-secondary">
+                    <a href="{{ route('admin.subscribe.payments.index') }}" class="btn btn-secondary">
                         <i class="fe fe-arrow-left me-2"></i>목록으로
                     </a>
-                    @if($payment->serviceUser)
-                        <a href="{{ route('admin.service.users.show', $payment->serviceUser->id) }}" class="btn btn-info">
+                    @if($payment->subscribeUser)
+                        <a href="{{ route('admin.subscribe.users.show', $payment->subscribeUser->id) }}" class="btn btn-info">
                             <i class="fe fe-user me-2"></i>사용자 보기
                         </a>
                     @endif
@@ -118,21 +118,21 @@
                                     <td width="120" class="text-muted">사용자 UUID</td>
                                     <td><code>{{ $payment->user_uuid }}</code></td>
                                 </tr>
-                                @if($payment->serviceUser)
+                                @if($payment->subscribeUser)
                                     <tr>
                                         <td class="text-muted">사용자명</td>
-                                        <td><strong>{{ $payment->serviceUser->user_name }}</strong></td>
+                                        <td><strong>{{ $payment->subscribeUser->user_name }}</strong></td>
                                     </tr>
                                     <tr>
                                         <td class="text-muted">이메일</td>
-                                        <td>{{ $payment->serviceUser->user_email }}</td>
+                                        <td>{{ $payment->subscribeUser->user_email }}</td>
                                     </tr>
                                 @endif
                                 <tr>
-                                    <td class="text-muted">서비스</td>
+                                    <td class="text-muted">구독</td>
                                     <td>
-                                        @if($payment->service)
-                                            <span class="badge bg-light text-dark">{{ $payment->service->title }}</span>
+                                        @if($payment->subscribe)
+                                            <span class="badge bg-light text-dark">{{ $payment->subscribe->title }}</span>
                                         @else
                                             <span class="text-muted">N/A</span>
                                         @endif
@@ -363,7 +363,7 @@
                         <div class="d-flex justify-content-between align-items-start mb-3">
                             <div class="flex-grow-1">
                                 <div class="fw-medium">{{ number_format($relatedPayment->final_amount) }} {{ $relatedPayment->currency }}</div>
-                                <small class="text-muted">{{ $relatedPayment->service->title ?? 'N/A' }}</small>
+                                <small class="text-muted">{{ $relatedPayment->subscribe->title ?? 'N/A' }}</small>
                                 <br><small class="text-muted">{{ $relatedPayment->created_at->format('m/d H:i') }}</small>
                             </div>
                             <div class="ms-2">
@@ -382,7 +382,7 @@
                         </div>
                     @endforeach
                     <div class="text-center">
-                        <a href="{{ route('admin.service.payments.index', ['search' => $payment->user_uuid]) }}" class="btn btn-sm btn-outline-primary">
+                        <a href="{{ route('admin.subscribe.payments.index', ['search' => $payment->user_uuid]) }}" class="btn btn-sm btn-outline-primary">
                             전체 보기
                         </a>
                     </div>
@@ -390,25 +390,25 @@
             </div>
             @endif
 
-            <!-- 동일 서비스 결제 내역 -->
-            @if($servicePayments->count() > 0)
+            <!-- 동일 구독 결제 내역 -->
+            @if($subscribePayments->count() > 0)
             <div class="card border-0 shadow-sm">
                 <div class="card-header bg-light">
                     <h6 class="card-title mb-0">
-                        <i class="fe fe-layers me-2"></i>동일 서비스 최근 결제
+                        <i class="fe fe-layers me-2"></i>동일 구독 최근 결제
                     </h6>
                 </div>
                 <div class="card-body">
-                    @foreach($servicePayments as $servicePayment)
+                    @foreach($subscribePayments as $subscribePayment)
                         <div class="d-flex justify-content-between align-items-start mb-3">
                             <div class="flex-grow-1">
-                                <div class="fw-medium">{{ $servicePayment->serviceUser->user_name ?? 'N/A' }}</div>
-                                <small class="text-muted">{{ number_format($servicePayment->final_amount) }} {{ $servicePayment->currency }}</small>
-                                <br><small class="text-muted">{{ $servicePayment->created_at->format('m/d H:i') }}</small>
+                                <div class="fw-medium">{{ $subscribePayment->subscribeUser->user_name ?? 'N/A' }}</div>
+                                <small class="text-muted">{{ number_format($subscribePayment->final_amount) }} {{ $subscribePayment->currency }}</small>
+                                <br><small class="text-muted">{{ $subscribePayment->created_at->format('m/d H:i') }}</small>
                             </div>
                             <div class="ms-2">
                                 @php
-                                    $statusClass = match($servicePayment->status) {
+                                    $statusClass = match($subscribePayment->status) {
                                         'completed' => 'success',
                                         'pending' => 'warning',
                                         'failed' => 'danger',
@@ -416,13 +416,13 @@
                                     };
                                 @endphp
                                 <span class="badge bg-{{ $statusClass }}">
-                                    {{ $servicePayment->status }}
+                                    {{ $subscribePayment->status }}
                                 </span>
                             </div>
                         </div>
                     @endforeach
                     <div class="text-center">
-                        <a href="{{ route('admin.service.payments.index', ['service_id' => $payment->service_id]) }}" class="btn btn-sm btn-outline-primary">
+                        <a href="{{ route('admin.subscribe.payments.index', ['subscribe_id' => $payment->subscribe_id]) }}" class="btn btn-sm btn-outline-primary">
                             전체 보기
                         </a>
                     </div>

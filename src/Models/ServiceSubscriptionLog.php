@@ -1,18 +1,18 @@
 <?php
 
-namespace Jiny\Service\Models;
+namespace Jiny\Subscribe\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class ServiceSubscriptionLog extends Model
 {
-    protected $table = 'service_subscription_logs';
+    protected $table = 'subscribe_subscription_logs';
 
     protected $fillable = [
-        'service_user_id',
+        'subscribe_user_id',
         'user_uuid',
-        'service_id',
+        'subscribe_id',
         'action',
         'action_title',
         'action_description',
@@ -42,14 +42,14 @@ class ServiceSubscriptionLog extends Model
     ];
 
     // Relationships
-    public function serviceUser(): BelongsTo
+    public function subscribeUser(): BelongsTo
     {
-        return $this->belongsTo(ServiceUser::class, 'service_user_id');
+        return $this->belongsTo(subscribeUser::class, 'subscribe_user_id');
     }
 
-    public function service(): BelongsTo
+    public function subscribe(): BelongsTo
     {
-        return $this->belongsTo(Service::class, 'service_id');
+        return $this->belongsTo(subscribe::class, 'subscribe_id');
     }
 
     // Scopes
@@ -58,9 +58,9 @@ class ServiceSubscriptionLog extends Model
         return $query->where('user_uuid', $userUuid);
     }
 
-    public function scopeByService($query, $serviceId)
+    public function scopeBysubscribe($query, $subscribeId)
     {
-        return $query->where('service_id', $serviceId);
+        return $query->where('subscribe_id', $subscribeId);
     }
 
     public function scopeByAction($query, $action)
@@ -89,17 +89,17 @@ class ServiceSubscriptionLog extends Model
     }
 
     // Helper Methods
-    public static function logAction($serviceUserId, $action, $data = [])
+    public static function logAction($subscribeUserId, $action, $data = [])
     {
-        $serviceUser = ServiceUser::find($serviceUserId);
-        if (!$serviceUser) {
+        $subscribeUser = subscribeUser::find($subscribeUserId);
+        if (!$subscribeUser) {
             return null;
         }
 
         $logData = array_merge([
-            'service_user_id' => $serviceUserId,
-            'user_uuid' => $serviceUser->user_uuid,
-            'service_id' => $serviceUser->service_id,
+            'subscribe_user_id' => $subscribeUserId,
+            'user_uuid' => $subscribeUser->user_uuid,
+            'subscribe_id' => $subscribeUser->subscribe_id,
             'action' => $action,
             'processed_by' => 'system',
             'result' => 'success',
@@ -110,9 +110,9 @@ class ServiceSubscriptionLog extends Model
         return static::create($logData);
     }
 
-    public static function logPaymentSuccess($serviceUserId, $amount, $paymentMethod)
+    public static function logPaymentSuccess($subscribeUserId, $amount, $paymentMethod)
     {
-        return static::logAction($serviceUserId, 'payment_success', [
+        return static::logAction($subscribeUserId, 'payment_success', [
             'action_title' => '결제 성공',
             'action_description' => "결제가 성공적으로 완료되었습니다. ({$paymentMethod})",
             'amount' => $amount,
@@ -123,9 +123,9 @@ class ServiceSubscriptionLog extends Model
         ]);
     }
 
-    public static function logPaymentFailed($serviceUserId, $amount, $failureReason)
+    public static function logPaymentFailed($subscribeUserId, $amount, $failureReason)
     {
-        return static::logAction($serviceUserId, 'payment_failed', [
+        return static::logAction($subscribeUserId, 'payment_failed', [
             'action_title' => '결제 실패',
             'action_description' => "결제가 실패했습니다: {$failureReason}",
             'amount' => $amount,
@@ -138,9 +138,9 @@ class ServiceSubscriptionLog extends Model
         ]);
     }
 
-    public static function logSubscribe($serviceUserId, $planName, $expiresAt)
+    public static function logSubscribe($subscribeUserId, $planName, $expiresAt)
     {
-        return static::logAction($serviceUserId, 'subscribe', [
+        return static::logAction($subscribeUserId, 'subscribe', [
             'action_title' => '구독 신청',
             'action_description' => "'{$planName}' 플랜에 구독하였습니다.",
             'status_after' => 'active',
@@ -153,14 +153,14 @@ class ServiceSubscriptionLog extends Model
         ]);
     }
 
-    public static function logCancel($serviceUserId, $reason = null)
+    public static function logCancel($subscribeUserId, $reason = null)
     {
-        $serviceUser = ServiceUser::find($serviceUserId);
+        $subscribeUser = subscribeUser::find($subscribeUserId);
 
-        return static::logAction($serviceUserId, 'cancel', [
+        return static::logAction($subscribeUserId, 'cancel', [
             'action_title' => '구독 취소',
             'action_description' => $reason ?: '구독이 취소되었습니다.',
-            'status_before' => $serviceUser->status ?? 'unknown',
+            'status_before' => $subscribeUser->status ?? 'unknown',
             'status_after' => 'cancelled',
             'action_data' => [
                 'cancel_reason' => $reason,
@@ -169,9 +169,9 @@ class ServiceSubscriptionLog extends Model
         ]);
     }
 
-    public static function logUpgrade($serviceUserId, $fromPlan, $toPlan, $amount = null)
+    public static function logUpgrade($subscribeUserId, $fromPlan, $toPlan, $amount = null)
     {
-        return static::logAction($serviceUserId, 'upgrade', [
+        return static::logAction($subscribeUserId, 'upgrade', [
             'action_title' => '플랜 업그레이드',
             'action_description' => "'{$fromPlan}'에서 '{$toPlan}'으로 업그레이드하였습니다.",
             'plan_before' => $fromPlan,
@@ -185,9 +185,9 @@ class ServiceSubscriptionLog extends Model
         ]);
     }
 
-    public static function logDowngrade($serviceUserId, $fromPlan, $toPlan, $refundAmount = null)
+    public static function logDowngrade($subscribeUserId, $fromPlan, $toPlan, $refundAmount = null)
     {
-        return static::logAction($serviceUserId, 'downgrade', [
+        return static::logAction($subscribeUserId, 'downgrade', [
             'action_title' => '플랜 다운그레이드',
             'action_description' => "'{$fromPlan}'에서 '{$toPlan}'으로 다운그레이드하였습니다.",
             'plan_before' => $fromPlan,
@@ -201,15 +201,15 @@ class ServiceSubscriptionLog extends Model
         ]);
     }
 
-    public static function logRenew($serviceUserId, $amount, $newExpiresAt)
+    public static function logRenew($subscribeUserId, $amount, $newExpiresAt)
     {
-        $serviceUser = ServiceUser::find($serviceUserId);
+        $subscribeUser = subscribeUser::find($subscribeUserId);
 
-        return static::logAction($serviceUserId, 'renew', [
+        return static::logAction($subscribeUserId, 'renew', [
             'action_title' => '구독 갱신',
             'action_description' => '구독이 자동으로 갱신되었습니다.',
             'amount' => $amount,
-            'expires_before' => $serviceUser->expires_at,
+            'expires_before' => $subscribeUser->expires_at,
             'expires_after' => $newExpiresAt,
             'action_data' => [
                 'renewal_amount' => $amount,
@@ -218,9 +218,9 @@ class ServiceSubscriptionLog extends Model
         ]);
     }
 
-    public static function logRefund($serviceUserId, $refundAmount, $reason = null)
+    public static function logRefund($subscribeUserId, $refundAmount, $reason = null)
     {
-        return static::logAction($serviceUserId, 'refund', [
+        return static::logAction($subscribeUserId, 'refund', [
             'action_title' => '환불 처리',
             'action_description' => $reason ?: '환불이 처리되었습니다.',
             'amount' => -$refundAmount,
@@ -232,9 +232,9 @@ class ServiceSubscriptionLog extends Model
         ]);
     }
 
-    public static function logAdminAction($serviceUserId, $actionTitle, $description, $adminId = null, $adminName = null)
+    public static function logAdminAction($subscribeUserId, $actionTitle, $description, $adminId = null, $adminName = null)
     {
-        return static::logAction($serviceUserId, 'admin_action', [
+        return static::logAction($subscribeUserId, 'admin_action', [
             'action_title' => $actionTitle,
             'action_description' => $description,
             'processed_by' => 'admin',

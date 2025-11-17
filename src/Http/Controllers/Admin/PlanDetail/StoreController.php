@@ -1,17 +1,17 @@
 <?php
 
-namespace Jiny\Service\Http\Controllers\Admin\PlanDetail;
+namespace Jiny\Subscribe\Http\Controllers\Admin\PlanDetail;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Jiny\Service\Models\ServicePlan;
-use Jiny\Service\Models\ServicePlanDetail;
+use Jiny\Subscribe\Models\subscribePlan;
+use Jiny\Subscribe\Models\subscribePlanDetail;
 
 class StoreController extends Controller
 {
     public function __invoke(Request $request, $planId)
     {
-        $plan = ServicePlan::findOrFail($planId);
+        $plan = subscribePlan::findOrFail($planId);
 
         $validated = $request->validate([
             'detail_type' => 'required|string|in:feature,limitation,requirement,benefit,support,addon',
@@ -35,8 +35,8 @@ class StoreController extends Controller
             'enable' => 'boolean',
         ]);
 
-        // 서비스 플랜 ID 추가
-        $validated['service_plan_id'] = $planId;
+        // 구독 플랜 ID 추가
+        $validated['subscribe_plan_id'] = $planId;
 
         // 기본값 설정
         $validated['is_highlighted'] = $request->boolean('is_highlighted');
@@ -63,10 +63,10 @@ class StoreController extends Controller
             $validated['conditions'] = $request->input('conditions');
         }
 
-        $detail = ServicePlanDetail::create($validated);
+        $detail = subscribePlanDetail::create($validated);
 
         return redirect()
-            ->route('admin.service.plan.detail.index', $planId)
+            ->route('admin.subscribe.plan.detail.index', $planId)
             ->with('success', '플랜 상세 정보가 성공적으로 추가되었습니다.');
     }
 }

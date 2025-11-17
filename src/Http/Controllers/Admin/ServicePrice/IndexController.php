@@ -1,19 +1,19 @@
 <?php
 
-namespace Jiny\Service\Http\Controllers\Admin\ServicePrice;
+namespace Jiny\Subscribe\Http\Controllers\Admin\subscribePrice;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Jiny\Service\Models\SiteService;
-use Jiny\Service\Models\ServicePrice;
+use Jiny\Subscribe\Models\Sitesubscribe;
+use Jiny\Subscribe\Models\subscribePrice;
 
 class IndexController extends Controller
 {
-    public function __invoke(Request $request, $serviceId)
+    public function __invoke(Request $request, $subscribeId)
     {
-        $service = SiteService::findOrFail($serviceId);
+        $subscribe = Sitesubscribe::findOrFail($subscribeId);
 
-        $prices = ServicePrice::where('service_id', $serviceId)
+        $prices = subscribePrice::where('subscribe_id', $subscribeId)
                     ->when($request->search, function ($query, $search) {
                         $query->where(function ($q) use ($search) {
                             $q->where('name', 'like', '%' . $search . '%')
@@ -40,15 +40,15 @@ class IndexController extends Controller
 
         // 통계 계산
         $stats = [
-            'total' => ServicePrice::where('service_id', $serviceId)->count(),
-            'active' => ServicePrice::where('service_id', $serviceId)->where('enable', true)->count(),
-            'popular' => ServicePrice::where('service_id', $serviceId)->where('is_popular', true)->count(),
-            'with_trial' => ServicePrice::where('service_id', $serviceId)->where('has_trial', true)->count(),
-            'with_discount' => ServicePrice::where('service_id', $serviceId)->whereNotNull('sale_price')->count(),
+            'total' => subscribePrice::where('subscribe_id', $subscribeId)->count(),
+            'active' => subscribePrice::where('subscribe_id', $subscribeId)->where('enable', true)->count(),
+            'popular' => subscribePrice::where('subscribe_id', $subscribeId)->where('is_popular', true)->count(),
+            'with_trial' => subscribePrice::where('subscribe_id', $subscribeId)->where('has_trial', true)->count(),
+            'with_discount' => subscribePrice::where('subscribe_id', $subscribeId)->whereNotNull('sale_price')->count(),
         ];
 
-        return view('jiny-service::admin.service_price.index', compact(
-            'service',
+        return view('jiny-subscribe::admin.service_price.index', compact(
+            'subscribe',
             'prices',
             'stats'
         ));

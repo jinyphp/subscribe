@@ -1,6 +1,6 @@
 <?php
 
-namespace Jiny\Service\Http\Controllers\Admin\ServiceUsers;
+namespace Jiny\Subscribe\Http\Controllers\Admin\subscribeUsers;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -9,15 +9,15 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Jiny\Auth\Models\ShardedUser;
-use Jiny\Auth\Services\ShardingService;
+use Jiny\Auth\subscribes\Shardingsubscribe;
 
 class SearchController extends Controller
 {
-    protected $shardingService;
+    protected $shardingsubscribe;
 
-    public function __construct(ShardingService $shardingService)
+    public function __construct(Shardingsubscribe $shardingsubscribe)
     {
-        $this->shardingService = $shardingService;
+        $this->shardingsubscribe = $shardingsubscribe;
     }
 
     /**
@@ -179,7 +179,7 @@ class SearchController extends Controller
         $users = collect();
 
         try {
-            if (!$this->shardingService->isEnabled()) {
+            if (!$this->shardingsubscribe->isEnabled()) {
                 // 샤딩이 비활성화된 경우 기본 users 테이블에서 검색
                 $userData = DB::table('users')
                     ->where(function($q) use ($query) {
@@ -197,7 +197,7 @@ class SearchController extends Controller
             }
 
             // 모든 샤드 테이블에서 검색
-            $shardTables = $this->shardingService->getAllShardTables();
+            $shardTables = $this->shardingsubscribe->getAllShardTables();
 
             foreach ($shardTables as $tableName) {
                 if (Schema::hasTable($tableName)) {

@@ -1,17 +1,17 @@
 <?php
 
-namespace Jiny\Service\Http\Controllers\Admin\ServiceDetail;
+namespace Jiny\Subscribe\Http\Controllers\Admin\subscribeDetail;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Jiny\Service\Models\SiteService;
-use Jiny\Service\Models\ServicePlanDetail;
+use Jiny\Subscribe\Models\Sitesubscribe;
+use Jiny\Subscribe\Models\subscribePlanDetail;
 
 class StoreController extends Controller
 {
-    public function __invoke(Request $request, $serviceId)
+    public function __invoke(Request $request, $subscribeId)
     {
-        $service = SiteService::findOrFail($serviceId);
+        $subscribe = Sitesubscribe::findOrFail($subscribeId);
 
         $validated = $request->validate([
             'detail_type' => 'required|string|in:feature,limitation,requirement,benefit,support,addon,specification,policy',
@@ -37,7 +37,7 @@ class StoreController extends Controller
         ]);
 
         // 기본값 설정
-        $validated['service_id'] = $serviceId;
+        $validated['subscribe_id'] = $subscribeId;
         $validated['is_highlighted'] = $request->boolean('is_highlighted');
         $validated['show_in_comparison'] = $request->boolean('show_in_comparison', true);
         $validated['show_in_summary'] = $request->boolean('show_in_summary');
@@ -60,10 +60,10 @@ class StoreController extends Controller
             $validated['value'] = filter_var($validated['value'], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) ? 'true' : 'false';
         }
 
-        ServicePlanDetail::create($validated);
+        subscribePlanDetail::create($validated);
 
         return redirect()
-            ->route('admin.site.services.detail.index', $serviceId)
-            ->with('success', '서비스 상세 정보가 성공적으로 등록되었습니다.');
+            ->route('admin.site.subscribes.detail.index', $subscribeId)
+            ->with('success', '구독 상세 정보가 성공적으로 등록되었습니다.');
     }
 }

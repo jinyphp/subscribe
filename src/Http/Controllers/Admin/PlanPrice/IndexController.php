@@ -1,20 +1,20 @@
 <?php
 
-namespace Jiny\Service\Http\Controllers\Admin\PlanPrice;
+namespace Jiny\Subscribe\Http\Controllers\Admin\PlanPrice;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Jiny\Service\Models\ServicePlan;
-use Jiny\Service\Models\ServicePlanPrice;
+use Jiny\Subscribe\Models\subscribePlan;
+use Jiny\Subscribe\Models\subscribePlanPrice;
 
 class IndexController extends Controller
 {
     public function __invoke(Request $request, $planId)
     {
-        $plan = ServicePlan::with('service')->findOrFail($planId);
+        $plan = subscribePlan::with('subscribe')->findOrFail($planId);
 
         // 가격 옵션 목록 조회 with 필터링
-        $query = ServicePlanPrice::where('service_plan_id', $planId)
+        $query = subscribePlanPrice::where('subscribe_plan_id', $planId)
                     ->orderBy('pos')
                     ->orderBy('price');
 
@@ -72,10 +72,10 @@ class IndexController extends Controller
 
         // 통계 정보
         $stats = [
-            'total' => ServicePlanPrice::where('service_plan_id', $planId)->count(),
-            'active' => ServicePlanPrice::where('service_plan_id', $planId)->where('enable', true)->count(),
-            'popular' => ServicePlanPrice::where('service_plan_id', $planId)->where('is_popular', true)->count(),
-            'with_trial' => ServicePlanPrice::where('service_plan_id', $planId)->where('trial_days', '>', 0)->count(),
+            'total' => subscribePlanPrice::where('subscribe_plan_id', $planId)->count(),
+            'active' => subscribePlanPrice::where('subscribe_plan_id', $planId)->where('enable', true)->count(),
+            'popular' => subscribePlanPrice::where('subscribe_plan_id', $planId)->where('is_popular', true)->count(),
+            'with_trial' => subscribePlanPrice::where('subscribe_plan_id', $planId)->where('trial_days', '>', 0)->count(),
         ];
 
         // 필터 옵션들
@@ -86,14 +86,14 @@ class IndexController extends Controller
             'once' => '일회성',
         ];
 
-        $currencies = ServicePlanPrice::where('service_plan_id', $planId)
+        $currencies = subscribePlanPrice::where('subscribe_plan_id', $planId)
                         ->distinct()
                         ->pluck('currency')
                         ->filter()
                         ->sort()
                         ->values();
 
-        return view('jiny-service::admin.plan_price.index', compact(
+        return view('jiny-subscribe::admin.plan_price.index', compact(
             'plan',
             'prices',
             'stats',

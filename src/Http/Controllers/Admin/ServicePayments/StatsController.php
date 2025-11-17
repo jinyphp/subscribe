@@ -1,10 +1,10 @@
 <?php
 
-namespace Jiny\Service\Http\Controllers\Admin\ServicePayments;
+namespace Jiny\Subscribe\Http\Controllers\Admin\subscribePayments;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Jiny\Service\Models\ServicePayment;
+use Jiny\Subscribe\Models\subscribePayment;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 
@@ -20,7 +20,7 @@ class StatsController extends Controller
         $startDate = $this->getStartDate($period);
         $endDate = now();
 
-        $query = ServicePayment::whereBetween('service_payments.created_at', [$startDate, $endDate]);
+        $query = subscribePayment::whereBetween('subscribe_payments.created_at', [$startDate, $endDate]);
 
         if ($status) {
             $query->where('status', $status);
@@ -32,7 +32,7 @@ class StatsController extends Controller
 
         // 일별 결제 통계
         $dailyStats = $query->clone()
-                           ->selectRaw('strftime("%Y-%m-%d", service_payments.created_at) as date,
+                           ->selectRaw('strftime("%Y-%m-%d", subscribe_payments.created_at) as date,
                                        COUNT(*) as count,
                                        SUM(final_amount) as total_amount,
                                        AVG(final_amount) as avg_amount')
@@ -61,24 +61,24 @@ class StatsController extends Controller
                           ->orderBy('count', 'desc')
                           ->get();
 
-        // 서비스별 통계 (상위 10개)
-        $serviceStats = $query->clone()
-                             ->join('services', 'service_payments.service_id', '=', 'services.id')
-                             ->selectRaw('services.title, COUNT(*) as count, SUM(service_payments.final_amount) as total_amount')
-                             ->groupBy('services.id', 'services.title')
+        // 구독별 통계 (상위 10개)
+        $subscribeStats = $query->clone()
+                             ->join('subscribes', 'subscribe_payments.subscribe_id', '=', 'subscribes.id')
+                             ->selectRaw('subscribes.title, COUNT(*) as count, SUM(subscribe_payments.final_amount) as total_amount')
+                             ->groupBy('subscribes.id', 'subscribes.title')
                              ->orderBy('total_amount', 'desc')
                              ->limit(10)
                              ->get();
 
         // 시간대별 통계
         $hourlyStats = $query->clone()
-                            ->selectRaw('strftime("%H", service_payments.created_at) as hour, COUNT(*) as count')
+                            ->selectRaw('strftime("%H", subscribe_payments.created_at) as hour, COUNT(*) as count')
                             ->groupBy('hour')
                             ->orderBy('hour')
                             ->get();
 
         // 월별 수익 통계 (최근 12개월)
-        $monthlyRevenue = ServicePayment::where('status', 'completed')
+        $monthlyRevenue = subscribePayment::where('status', 'completed')
                                        ->where('created_at', '>=', now()->subMonths(12))
                                        ->selectRaw('strftime("%Y-%m", created_at) as month,
                                                    SUM(final_amount) as revenue,
@@ -88,7 +88,7 @@ class StatsController extends Controller
                                        ->get();
 
         // 환불 통계
-        $refundStats = ServicePayment::whereBetween('service_payments.created_at', [$startDate, $endDate])
+        $refundStats = subscribePayment::whereBetween('subscribe_payments.created_at', [$startDate, $endDate])
                                     ->whereIn('status', ['refunded', 'partially_refunded'])
                                     ->selectRaw('
                                         status,
@@ -100,7 +100,7 @@ class StatsController extends Controller
                                     ->get();
 
         // 실패 원인별 통계
-        $failureStats = ServicePayment::whereBetween('service_payments.created_at', [$startDate, $endDate])
+        $failureStats = subscribePayment::whereBetween('subscribe_payments.created_at', [$startDate, $endDate])
                                      ->where('status', 'failed')
                                      ->selectRaw('failure_code, COUNT(*) as count')
                                      ->whereNotNull('failure_code')
@@ -109,12 +109,12 @@ class StatsController extends Controller
                                      ->limit(10)
                                      ->get();
 
-        return view('jiny-service::admin.service_payments.stats', compact(
+        return view('jiny-subscribe::admin.service_payments.stats', compact(
             'dailyStats',
             'statusStats',
             'methodStats',
             'typeStats',
-            'serviceStats',
+            'subscribeStats',
             'hourlyStats',
             'monthlyRevenue',
             'refundStats',
@@ -148,8 +148,8 @@ class StatsController extends Controller
         $startDate = $this->getStartDate($period);
         $endDate = now();
 
-        $query = ServicePayment::with(['serviceUser', 'service'])
-                              ->whereBetween('service_payments.created_at', [$startDate, $endDate]);
+        $query = subscribePayment::with(['subscribeUser', 'subscribe'])
+                              ->whereBetween('subscribe_payments.created_at', [$startDate, $endDate]);
 
         if ($status) {
             $query->where('status', $status);
@@ -184,7 +184,7 @@ class StatsController extends Controller
                 '사용자UUID',
                 '사용자이름',
                 '사용자이메일',
-                '서비스',
+                '구독',
                 '결제금액',
                 '최종금액',
                 '통화',
@@ -204,9 +204,9 @@ class StatsController extends Controller
                     $payment->payment_uuid,
                     $payment->transaction_id,
                     $payment->user_uuid,
-                    $payment->serviceUser->user_name ?? '',
-                    $payment->serviceUser->user_email ?? '',
-                    $payment->service->title ?? '',
+                    $payment->subscribeUser->user_name ?? '',
+                    $payment->subscribeUser->user_email ?? '',
+                    $payment->subscribe->title ?? '',
                     $payment->amount,
                     $payment->final_amount,
                     $payment->currency,

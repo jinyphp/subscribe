@@ -12,11 +12,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('service_plans', function (Blueprint $table) {
+        Schema::create('subscribe_plans', function (Blueprint $table) {
             $table->id();
 
             // 기본 정보
-            $table->unsignedBigInteger('service_id')->index();
+            $table->unsignedBigInteger('subscribe_id')->index();
             $table->string('plan_name');
             $table->string('plan_code')->unique(); // 플랜 고유 코드
             $table->text('description')->nullable();
@@ -83,20 +83,20 @@ return new class extends Migration
             $table->softDeletes();
 
             // 인덱스
-            $table->index(['service_id', 'is_active']);
+            $table->index(['subscribe_id', 'is_active']);
             $table->index(['plan_type', 'is_active']);
             $table->index(['is_featured', 'sort_order']);
             $table->index(['monthly_price', 'is_active']);
 
             // 외래키
-            $table->foreign('service_id')->references('id')->on('services')->onDelete('cascade');
+            $table->foreign('subscribe_id')->references('id')->on('subscribes')->onDelete('cascade');
         });
 
-        // Insert default service plans
-        DB::table('service_plans')->insert([
+        // Insert default subscribe plans
+        DB::table('subscribe_plans')->insert([
             // 웹사이트 개발 플랜들
             [
-                'service_id' => 1,
+                'subscribe_id' => 1,
                 'plan_name' => '기본 웹사이트',
                 'plan_code' => 'web-basic',
                 'description' => '개인 또는 소규모 비즈니스를 위한 기본 웹사이트',
@@ -146,7 +146,7 @@ return new class extends Migration
                 'updated_at' => now(),
             ],
             [
-                'service_id' => 1,
+                'subscribe_id' => 1,
                 'plan_name' => '프로 웹사이트',
                 'plan_code' => 'web-pro',
                 'description' => '중소기업을 위한 전문 웹사이트 솔루션',
@@ -199,7 +199,7 @@ return new class extends Migration
             ],
             // 모바일 앱 개발 플랜들
             [
-                'service_id' => 2,
+                'subscribe_id' => 2,
                 'plan_name' => '기본 모바일 앱',
                 'plan_code' => 'mobile-basic',
                 'description' => '간단한 모바일 앱 개발',
@@ -249,10 +249,10 @@ return new class extends Migration
             ],
             // UI/UX 디자인 플랜들
             [
-                'service_id' => 3,
+                'subscribe_id' => 3,
                 'plan_name' => '기본 디자인 패키지',
                 'plan_code' => 'design-basic',
-                'description' => '기본 UI/UX 디자인 서비스',
+                'description' => '기본 UI/UX 디자인 구독',
                 'monthly_price' => 80000.00,
                 'quarterly_price' => 210000.00,
                 'yearly_price' => 800000.00,
@@ -306,6 +306,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('service_plans');
+        Schema::dropIfExists('subscribe_plans');
     }
 };

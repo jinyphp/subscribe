@@ -1,21 +1,21 @@
 <?php
 
-namespace Jiny\Service\Http\Controllers\Admin\ServicePrice;
+namespace Jiny\Subscribe\Http\Controllers\Admin\subscribePrice;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Jiny\Service\Models\SiteService;
-use Jiny\Service\Models\ServicePrice;
+use Jiny\Subscribe\Models\Sitesubscribe;
+use Jiny\Subscribe\Models\subscribePrice;
 
 class StoreController extends Controller
 {
-    public function __invoke(Request $request, $serviceId)
+    public function __invoke(Request $request, $subscribeId)
     {
-        $service = SiteService::findOrFail($serviceId);
+        $subscribe = Sitesubscribe::findOrFail($subscribeId);
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'code' => 'nullable|string|max:255|unique:service_plan_price,code',
+            'code' => 'nullable|string|max:255|unique:subscribe_plan_price,code',
             'description' => 'nullable|string',
             'price' => 'nullable|numeric|min:0',
             'sale_price' => 'nullable|numeric|min:0',
@@ -39,7 +39,7 @@ class StoreController extends Controller
         ]);
 
         // 기본값 설정
-        $validated['service_id'] = $serviceId;
+        $validated['subscribe_id'] = $subscribeId;
         $validated['auto_renewal'] = $request->boolean('auto_renewal', true);
         $validated['is_popular'] = $request->boolean('is_popular');
         $validated['is_recommended'] = $request->boolean('is_recommended');
@@ -61,21 +61,21 @@ class StoreController extends Controller
 
         // 중복 상태 해제
         if ($validated['is_popular']) {
-            ServicePrice::where('service_id', $serviceId)
+            subscribePrice::where('subscribe_id', $subscribeId)
                 ->where('is_popular', true)
                 ->update(['is_popular' => false]);
         }
 
         if ($validated['is_recommended']) {
-            ServicePrice::where('service_id', $serviceId)
+            subscribePrice::where('subscribe_id', $subscribeId)
                 ->where('is_recommended', true)
                 ->update(['is_recommended' => false]);
         }
 
-        ServicePrice::create($validated);
+        subscribePrice::create($validated);
 
         return redirect()
-            ->route('admin.site.services.price.index', $serviceId)
-            ->with('success', '서비스 가격이 성공적으로 등록되었습니다.');
+            ->route('admin.site.subscribes.price.index', $subscribeId)
+            ->with('success', '구독 가격이 성공적으로 등록되었습니다.');
     }
 }

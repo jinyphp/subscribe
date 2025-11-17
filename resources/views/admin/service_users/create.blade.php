@@ -1,6 +1,6 @@
-@extends('jiny-service::layouts.admin.sidebar')
+@extends('jiny-subscribe::layouts.admin.sidebar')
 
-@section('title', '새 서비스 구독자 추가')
+@section('title', '새 구독 구독자 추가')
 
 @push('meta')
 <meta name="csrf-token" content="{{ csrf_token() }}">
@@ -13,10 +13,10 @@
         <div class="col-12">
             <div class="d-flex justify-content-between align-items-center">
                 <div>
-                    <h1 class="h2 fw-bold text-dark">새 서비스 구독자 추가</h1>
-                    <p class="text-muted mb-0">새로운 서비스 구독자를 등록합니다.</p>
+                    <h1 class="h2 fw-bold text-dark">새 구독 구독자 추가</h1>
+                    <p class="text-muted mb-0">새로운 구독 구독자를 등록합니다.</p>
                 </div>
-                <a href="{{ route('admin.service.users.index') }}"
+                <a href="{{ route('admin.subscribe.users.index') }}"
                    class="btn btn-secondary">
                     <i class="fe fe-arrow-left me-2"></i>목록으로 돌아가기
                 </a>
@@ -52,7 +52,7 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-body">
-                    <form action="{{ route('admin.service.users.store') }}" method="POST">
+                    <form action="{{ route('admin.subscribe.users.store') }}" method="POST">
                         @csrf
 
                         <!-- 사용자 검색 섹션 -->
@@ -152,32 +152,32 @@
                             </div>
                         </div>
 
-                        <!-- 서비스 계층 선택 섹션 -->
-                        <div class="border-bottom pb-4 mb-4" data-section="service-info">
-                            <h5 class="card-title">서비스 선택</h5>
+                        <!-- 구독 계층 선택 섹션 -->
+                        <div class="border-bottom pb-4 mb-4" data-section="subscribe-info">
+                            <h5 class="card-title">구독 선택</h5>
                             <p class="text-muted mb-4">
-                                단계별로 서비스를 선택하면 자동으로 가격이 계산됩니다.
+                                단계별로 구독를 선택하면 자동으로 가격이 계산됩니다.
                             </p>
 
-                            <!-- 1단계: 서비스 카테고리 선택 -->
+                            <!-- 1단계: 구독 카테고리 선택 -->
                             <div class="mb-4">
-                                <label for="service_category" class="form-label">
-                                    <span class="badge bg-primary me-2">1</span>서비스 카테고리 선택 *
+                                <label for="subscribe_category" class="form-label">
+                                    <span class="badge bg-primary me-2">1</span>구독 카테고리 선택 *
                                 </label>
-                                <select id="service_category"
+                                <select id="subscribe_category"
                                         class="form-select"
                                         required>
                                     <option value="">카테고리를 선택하세요</option>
                                 </select>
                             </div>
 
-                            <!-- 2단계: 서비스 선택 -->
+                            <!-- 2단계: 구독 선택 -->
                             <div class="mb-4">
-                                <label for="service_id" class="form-label">
-                                    <span class="badge bg-primary me-2">2</span>서비스 선택 *
+                                <label for="subscribe_id" class="form-label">
+                                    <span class="badge bg-primary me-2">2</span>구독 선택 *
                                 </label>
-                                <select id="service_id"
-                                        name="service_id"
+                                <select id="subscribe_id"
+                                        name="subscribe_id"
                                         class="form-select"
                                         required
                                         disabled>
@@ -187,14 +187,14 @@
 
                             <!-- 3단계: 플랜 선택 -->
                             <div class="mb-4">
-                                <label for="service_plan" class="form-label">
+                                <label for="subscribe_plan" class="form-label">
                                     <span class="badge bg-primary me-2">3</span>플랜 선택 *
                                 </label>
-                                <select id="service_plan"
+                                <select id="subscribe_plan"
                                         class="form-select"
                                         required
                                         disabled>
-                                    <option value="">먼저 서비스를 선택하세요</option>
+                                    <option value="">먼저 구독를 선택하세요</option>
                                 </select>
                                 <!-- 플랜 설명 -->
                                 <div id="plan_description" class="d-none mt-2">
@@ -222,7 +222,7 @@
                                     <div class="row">
                                         <div class="col-md-6">
                                             <p class="mb-1"><strong>카테고리:</strong> <span id="selected_category_name">-</span></p>
-                                            <p class="mb-1"><strong>서비스:</strong> <span id="selected_service_name">-</span></p>
+                                            <p class="mb-1"><strong>구독:</strong> <span id="selected_subscribe_name">-</span></p>
                                             <p class="mb-1"><strong>플랜:</strong> <span id="selected_plan_name">-</span></p>
                                             <p class="mb-0"><strong>청구 주기:</strong> <span id="selected_cycle_name">-</span></p>
                                         </div>
@@ -240,7 +240,7 @@
                             <input type="hidden" id="plan_name" name="plan_name">
                             <input type="hidden" id="plan_price" name="plan_price">
                             <input type="hidden" id="monthly_price" name="monthly_price">
-                            <input type="hidden" id="service_title" name="service_title">
+                            <input type="hidden" id="subscribe_title" name="subscribe_title">
 
                             <!-- 기타 구독 정보 -->
                             <div class="row g-3 mt-3">
@@ -332,13 +332,13 @@
 
                         <!-- 버튼 -->
                         <div class="d-flex justify-content-end gap-2 pt-3">
-                            <a href="{{ route('admin.service.users.index') }}"
+                            <a href="{{ route('admin.subscribe.users.index') }}"
                                class="btn btn-secondary">
                                 <i class="fe fe-x me-2"></i>취소
                             </a>
                             <button type="submit"
                                     class="btn btn-primary">
-                                <i class="fe fe-plus me-2"></i>서비스 구독자 추가
+                                <i class="fe fe-plus me-2"></i>구독 구독자 추가
                             </button>
                         </div>
                     </form>
@@ -386,7 +386,7 @@ document.addEventListener('DOMContentLoaded', function() {
         setLoading(true);
         hideResult();
 
-        fetch('{{ route("admin.service.users.search.email") }}', {
+        fetch('{{ route("admin.subscribe.users.search.email") }}', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -498,9 +498,9 @@ document.addEventListener('DOMContentLoaded', function() {
         searchEmailInput.value = '';
 
         setTimeout(() => {
-            const serviceSection = document.querySelector('[data-section="service-info"]');
-            if (serviceSection) {
-                serviceSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            const subscribeSection = document.querySelector('[data-section="subscribe-info"]');
+            if (subscribeSection) {
+                subscribeSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
             }
         }, 1000);
     };
@@ -547,11 +547,11 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // ===========================================
-    // 서비스 계층구조 선택 기능
+    // 구독 계층구조 선택 기능
     // ===========================================
-    const categorySelect = document.getElementById('service_category');
-    const serviceSelect = document.getElementById('service_id');
-    const planSelect = document.getElementById('service_plan');
+    const categorySelect = document.getElementById('subscribe_category');
+    const subscribeSelect = document.getElementById('subscribe_id');
+    const planSelect = document.getElementById('subscribe_plan');
     const billingOptionsDiv = document.getElementById('billing_options');
     const planDescriptionDiv = document.getElementById('plan_description');
     const priceSummaryDiv = document.getElementById('price_summary');
@@ -559,7 +559,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // 현재 선택 상태
     let currentSelection = {
         category: null,
-        service: null,
+        subscribe: null,
         plan: null,
         billingCycle: null,
         priceData: null
@@ -569,7 +569,7 @@ document.addEventListener('DOMContentLoaded', function() {
     loadCategories();
 
     function loadCategories() {
-        fetch('{{ route("admin.service.users.hierarchy.categories") }}', {
+        fetch('{{ route("admin.subscribe.users.hierarchy.categories") }}', {
             method: 'GET',
             headers: {
                 'X-CSRF-TOKEN': token,
@@ -608,14 +608,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 id: categoryId,
                 name: this.options[this.selectedIndex].textContent
             };
-            loadServices(categoryId);
+            loadsubscribes(categoryId);
         } else {
             resetSelection('category');
         }
     });
 
-    function loadServices(categoryId) {
-        fetch(`{{ route("admin.service.users.hierarchy.services") }}?category_id=${categoryId}`, {
+    function loadsubscribes(categoryId) {
+        fetch(`{{ route("admin.subscribe.users.hierarchy.subscribes") }}?category_id=${categoryId}`, {
             method: 'GET',
             headers: {
                 'X-CSRF-TOKEN': token,
@@ -625,48 +625,48 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                populateServices(data.services);
+                populatesubscribes(data.subscribes);
             } else {
-                console.error('Failed to load services:', data.message);
+                console.error('Failed to load subscribes:', data.message);
             }
         })
         .catch(error => {
-            console.error('Error loading services:', error);
+            console.error('Error loading subscribes:', error);
         });
     }
 
-    function populateServices(services) {
-        serviceSelect.innerHTML = '<option value="">서비스를 선택하세요</option>';
-        serviceSelect.disabled = false;
+    function populatesubscribes(subscribes) {
+        subscribeSelect.innerHTML = '<option value="">구독를 선택하세요</option>';
+        subscribeSelect.disabled = false;
 
-        services.forEach(service => {
+        subscribes.forEach(subscribe => {
             const option = document.createElement('option');
-            option.value = service.id;
-            option.textContent = service.title;
-            option.dataset.description = service.description || '';
-            option.dataset.price = service.price || 0;
-            serviceSelect.appendChild(option);
+            option.value = subscribe.id;
+            option.textContent = subscribe.title;
+            option.dataset.description = subscribe.description || '';
+            option.dataset.price = subscribe.price || 0;
+            subscribeSelect.appendChild(option);
         });
 
-        resetSelection('service');
+        resetSelection('subscribe');
     }
 
-    // 서비스 선택 이벤트
-    serviceSelect.addEventListener('change', function() {
-        const serviceId = this.value;
-        if (serviceId) {
-            currentSelection.service = {
-                id: serviceId,
+    // 구독 선택 이벤트
+    subscribeSelect.addEventListener('change', function() {
+        const subscribeId = this.value;
+        if (subscribeId) {
+            currentSelection.subscribe = {
+                id: subscribeId,
                 title: this.options[this.selectedIndex].textContent
             };
-            loadPlans(serviceId);
+            loadPlans(subscribeId);
         } else {
-            resetSelection('service');
+            resetSelection('subscribe');
         }
     });
 
-    function loadPlans(serviceId) {
-        fetch(`{{ route("admin.service.users.hierarchy.plans") }}?service_id=${serviceId}`, {
+    function loadPlans(subscribeId) {
+        fetch(`{{ route("admin.subscribe.users.hierarchy.plans") }}?subscribe_id=${subscribeId}`, {
             method: 'GET',
             headers: {
                 'X-CSRF-TOKEN': token,
@@ -731,7 +731,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function loadPrices(planId) {
-        fetch(`{{ route("admin.service.users.hierarchy.prices") }}?plan_id=${planId}`, {
+        fetch(`{{ route("admin.subscribe.users.hierarchy.prices") }}?plan_id=${planId}`, {
             method: 'GET',
             headers: {
                 'X-CSRF-TOKEN': token,
@@ -820,7 +820,7 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('plan_name').value = planData.name;
         document.getElementById('plan_price').value = priceData.price;
         document.getElementById('monthly_price').value = priceData.monthly_cost;
-        document.getElementById('service_title').value = currentSelection.service.title;
+        document.getElementById('subscribe_title').value = currentSelection.subscribe.title;
 
         // 최종 가격 계산 및 표시
         calculateAndShowFinalPrice(planData, priceData);
@@ -835,7 +835,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // 결과 표시
         updatePriceSummary({
             category: currentSelection.category.name,
-            service: currentSelection.service.title,
+            subscribe: currentSelection.subscribe.title,
             plan: planData.name,
             cycle: priceData.cycle_display,
             price: price,
@@ -848,7 +848,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function updatePriceSummary(data) {
         document.getElementById('selected_category_name').textContent = data.category;
-        document.getElementById('selected_service_name').textContent = data.service;
+        document.getElementById('selected_subscribe_name').textContent = data.subscribe;
         document.getElementById('selected_plan_name').textContent = data.plan;
         document.getElementById('selected_cycle_name').textContent = data.cycle;
         document.getElementById('calculated_price').textContent = `₩${number_format(data.price)}`;
@@ -878,11 +878,11 @@ document.addEventListener('DOMContentLoaded', function() {
     function resetSelection(from) {
         switch(from) {
             case 'category':
-                serviceSelect.innerHTML = '<option value="">먼저 카테고리를 선택하세요</option>';
-                serviceSelect.disabled = true;
+                subscribeSelect.innerHTML = '<option value="">먼저 카테고리를 선택하세요</option>';
+                subscribeSelect.disabled = true;
                 // fall through
-            case 'service':
-                planSelect.innerHTML = '<option value="">먼저 서비스를 선택하세요</option>';
+            case 'subscribe':
+                planSelect.innerHTML = '<option value="">먼저 구독를 선택하세요</option>';
                 planSelect.disabled = true;
                 planDescriptionDiv.classList.add('d-none');
                 // fall through
@@ -896,7 +896,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 document.getElementById('plan_name').value = '';
                 document.getElementById('plan_price').value = '';
                 document.getElementById('monthly_price').value = '';
-                document.getElementById('service_title').value = '';
+                document.getElementById('subscribe_title').value = '';
                 break;
         }
     }

@@ -32,7 +32,7 @@
         {{-- blade에서 직접 header 섹션을 추가하는 경우 --}}
         @yield('header')
     @else
-        @includeIf($header ?? 'jiny-service::partials.headers.' . ($header ?? 'header-default'))
+        @includeIf($header ?? 'jiny-subscribe::partials.headers.' . ($header ?? 'header-default'))
     @endif
 
 
@@ -44,11 +44,11 @@
         {{-- blade에서 직접 footer 섹션을 추가하는 경우 --}}
         @yield('footer')
     @else
-        @includeIf($footer ?? 'jiny-service::partials.footers.footer')
+        @includeIf($footer ?? 'jiny-subscribe::partials.footers.footer')
     @endif
 
     <!-- Modal -->
-    @include('jiny-service::partials.modals')
+    @include('jiny-subscribe::partials.modals')
 
     <!-- Scripts -->
     <!-- Libs JS -->

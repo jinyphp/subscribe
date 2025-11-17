@@ -1,4 +1,4 @@
-# 응용예제1 : 에어콘 필터 청소 및 정기계약 서비스
+# 응용예제1 : 에어콘 필터 청소 및 정기계약 구독
 
 ## 패키지 의존성 구현 사례
 
@@ -9,19 +9,19 @@
 // 1. 관리자 (jiny/admin 패키지 활용)
 // - 테이블: users (중앙 관리)
 // - 인증: 세션 기반 admin 미들웨어
-Route::middleware(['admin'])->prefix('admin/service')->group(function () {
+Route::middleware(['admin'])->prefix('admin/subscribe')->group(function () {
     Route::get('ac-cleaning/dashboard', [AdminACCleaningController::class, 'dashboard']);
-    Route::resource('ac-cleaning/services', AdminACServiceController::class);
+    Route::resource('ac-cleaning/subscribes', AdminACsubscribeController::class);
     Route::get('ac-cleaning/partners', [AdminPartnerController::class, 'index']);
 });
 
 // 2. 고객 (jiny/auth 패키지 - JWT 인증)
 // - 테이블: users_001~099 (샤딩)
 // - 인증: JWT 토큰
-Route::middleware(['jwt.auth'])->prefix('home/service')->group(function () {
+Route::middleware(['jwt.auth'])->prefix('home/subscribe')->group(function () {
     Route::get('ac-cleaning/catalog', [CustomerACController::class, 'catalog']);
     Route::post('ac-cleaning/subscribe', [CustomerACController::class, 'subscribe']);
-    Route::get('my-ac-service', [CustomerACController::class, 'myServices']);
+    Route::get('my-ac-subscribe', [CustomerACController::class, 'mysubscribes']);
 });
 
 // 3. 파트너/엔지니어 (jiny/auth 패키지 + 파트너 검증)
@@ -29,31 +29,31 @@ Route::middleware(['jwt.auth'])->prefix('home/service')->group(function () {
 // - 인증: JWT + partner.verify 미들웨어
 Route::middleware(['jwt.auth', 'partner.verify'])->prefix('partner')->group(function () {
     Route::get('ac-assignments', [PartnerACController::class, 'assignments']);
-    Route::patch('ac-service/{id}/complete', [PartnerACController::class, 'completeService']);
+    Route::patch('ac-subscribe/{id}/complete', [PartnerACController::class, 'completesubscribe']);
     Route::get('my-network', [PartnerACController::class, 'myNetwork']);
 });
 ```
 
 ## 개요
 
-이 예제는 구독형 서비스 관리 시스템을 실제 물리적 서비스인 "에어콘 필터 청소 및 정기계약" 비즈니스에 적용하여 디지털 플랫폼의 효과성을 검증합니다. 전통적인 가정관리 서비스를 현대적인 구독 모델로 혁신하며, Jiny 생태계의 기존 패키지들과 완전히 통합된 사례입니다.
+이 예제는 구독형 구독 관리 시스템을 실제 물리적 구독인 "에어콘 필터 청소 및 정기계약" 비즈니스에 적용하여 디지털 플랫폼의 효과성을 검증합니다. 전통적인 가정관리 구독를 현대적인 구독 모델로 혁신하며, Jiny 생태계의 기존 패키지들과 완전히 통합된 사례입니다.
 
 ## 비즈니스 모델 분석
 
-### 기존 서비스의 문제점
-- **비정기적 서비스**: 고객이 기억해서 요청해야 하는 수동적 모델
+### 기존 구독의 문제점
+- **비정기적 구독**: 고객이 기억해서 요청해야 하는 수동적 모델
 - **가격 투명성 부족**: 방문 후 견적 제공으로 인한 불안감
-- **서비스 품질 일관성 부족**: 기사별 서비스 품질 편차
+- **구독 품질 일관성 부족**: 기사별 구독 품질 편차
 - **고객 관리 어려움**: 수기 스케줄링과 고객 정보 관리
 - **영업 비효율성**: 개별 영업 활동으로 인한 높은 고객 유치 비용
 
 ### 3-Tier 파트너 시스템의 장점
 - **예측 가능한 매출**: 정기 구독을 통한 안정적 수익
-- **고객 편의성**: 자동 스케줄링과 알림 서비스
-- **서비스 표준화**: 체크리스트 기반 일관된 서비스 품질
+- **고객 편의성**: 자동 스케줄링과 알림 구독
+- **구독 표준화**: 체크리스트 기반 일관된 구독 품질
 - **데이터 기반 운영**: 고객 패턴 분석을 통한 최적화
 - **분산 영업 시스템**: 다수의 영업 파트너를 통한 효율적 고객 유치
-- **전문화된 서비스 제공**: 숙련된 서비스 파트너(엔지니어)의 품질 보장
+- **전문화된 구독 제공**: 숙련된 구독 파트너(엔지니어)의 품질 보장
 
 ### 3-Tier 파트너 생태계 구조
 
@@ -64,23 +64,23 @@ Route::middleware(['jwt.auth', 'partner.verify'])->prefix('partner')->group(func
 │   ├── 총판/리셀러 (Distributors/Resellers)
 │   ├── 에이전트 (Local Agents)
 │   └── 개인 셀러 (Individual Sellers)
-└── 서비스 파트너 네트워크 (Service Partners)
-    ├── 플래티넘 엔지니어 (전담 서비스)
-    ├── 골드/실버 엔지니어 (일반 서비스)
-    └── 브론즈 엔지니어 (보조 서비스)
+└── 구독 파트너 네트워크 (subscribe Partners)
+    ├── 플래티넘 엔지니어 (전담 구독)
+    ├── 골드/실버 엔지니어 (일반 구독)
+    └── 브론즈 엔지니어 (보조 구독)
 ```
 
-## 서비스 설계 적용
+## 구독 설계 적용
 
-### 1. 서비스 카탈로그 설계
+### 1. 구독 카탈로그 설계
 
-#### 1.1 서비스 분류
+#### 1.1 구독 분류
 ```
-가정관리 서비스
+가정관리 구독
 ├── 에어콘 관리
-│   ├── 필터 청소 서비스
-│   ├── 종합 점검 서비스
-│   └── 응급 수리 서비스
+│   ├── 필터 청소 구독
+│   ├── 종합 점검 구독
+│   └── 응급 수리 구독
 ├── 공기질 관리
 │   ├── 공기청정기 관리
 │   └── 환기시스템 점검
@@ -89,24 +89,24 @@ Route::middleware(['jwt.auth', 'partner.verify'])->prefix('partner')->group(func
     └── 세탁기 청소
 ```
 
-#### 1.2 핵심 서비스: 에어콘 필터 청소
+#### 1.2 핵심 구독: 에어콘 필터 청소
 
-**서비스 메타데이터**:
+**구독 메타데이터**:
 ```php
 [
-    'name' => '에어콘 필터 청소 정기서비스',
+    'name' => '에어콘 필터 청소 정기구독',
     'slug' => 'aircon-filter-cleaning',
     'category' => '가정관리/에어콘관리',
-    'description' => '전문 기사가 정기적으로 방문하여 에어콘 필터를 청소하고 점검하는 서비스',
-    'service_type' => 'physical_service',
+    'description' => '전문 기사가 정기적으로 방문하여 에어콘 필터를 청소하고 점검하는 구독',
+    'subscribe_type' => 'physical_subscribe',
     'location_based' => true,
-    'service_area' => ['서울', '경기', '인천'],
+    'subscribe_area' => ['서울', '경기', '인천'],
     'duration_minutes' => 45,
     'equipment_required' => ['청소도구', '소독제', '교체필터(옵션)']
 ]
 ```
 
-#### 1.3 서비스 페이지 블록 구성
+#### 1.3 구독 페이지 블록 구성
 
 1. **Hero 블록**: "깨끗한 공기, 건강한 가정"
    - 메인 이미지: 깨끗한 에어콘 필터
@@ -136,7 +136,7 @@ Route::middleware(['jwt.auth', 'partner.verify'])->prefix('partner')->group(func
 
 ### 2. 가격 모델 및 구독 설계
 
-#### 2.1 서비스 티어 구성
+#### 2.1 구독 티어 구성
 
 **Good-Better-Best 모델 적용**:
 
@@ -144,7 +144,7 @@ Route::middleware(['jwt.auth', 'partner.verify'])->prefix('partner')->group(func
 |------|--------|----------|----------|
 | **가격** | ₩29,000/월 | ₩49,000/월 | ₩79,000/월 |
 | **방문 주기** | 2개월마다 | 매월 | 매월 + 응급출동 |
-| **서비스 시간** | 평일 오후 | 평일 전일 | 24시간 |
+| **구독 시간** | 평일 오후 | 평일 전일 | 24시간 |
 | **청소 범위** | 필터 청소만 | 필터 + 내부청소 | 전체 점검 + 소독 |
 | **교체 필터** | 별도 비용 | 1개 포함 | 2개 포함 |
 | **A/S 보장** | 3개월 | 6개월 | 12개월 |
@@ -165,11 +165,11 @@ $location_pricing = [
 
 #### 2.3 사용량 기반 과금
 
-**추가 서비스 과금**:
+**추가 구독 과금**:
 - 에어콘 대수: 2대 초과 시 대당 ₩10,000 추가
 - 응급 출동: ₩50,000 (플래티넘 제외)
 - 필터 교체: ₩15,000~₩30,000 (브랜드별 차등)
-- 주말/공휴일 서비스: 50% 할증
+- 주말/공휴일 구독: 50% 할증
 
 #### 2.4 계절별 프로모션
 
@@ -181,7 +181,7 @@ class SeasonalPromotion {
             'period' => ['2024-05-01', '2024-08-31'],
             'discount' => 30,
             'description' => '여름 시즌 에어콘 집중관리',
-            'bonus' => '무료 항균 코팅 서비스'
+            'bonus' => '무료 항균 코팅 구독'
         ];
     }
 
@@ -190,7 +190,7 @@ class SeasonalPromotion {
             'period' => ['2024-11-01', '2024-02-28'],
             'discount' => 20,
             'description' => '겨울 준비 에어콘 정비',
-            'bonus' => '히터 점검 서비스'
+            'bonus' => '히터 점검 구독'
         ];
     }
 }
@@ -293,8 +293,8 @@ class CustomerAcquisitionEngine {
             'partnership_channels' => [
                 'real_estate_agents' => '부동산 중개업소 제휴',
                 'appliance_stores' => '가전매장 교차 판매',
-                'cleaning_services' => '기존 청소업체 제휴',
-                'insurance_companies' => '가전보험 연계 서비스'
+                'cleaning_subscribes' => '기존 청소업체 제휴',
+                'insurance_companies' => '가전보험 연계 구독'
             ]
         ];
     }
@@ -433,9 +433,9 @@ class LeadDistributionEngine {
 
 #### 3.1 고객 여정 설계
 
-**에어콘 청소 서비스 고객 여정**:
+**에어콘 청소 구독 고객 여정**:
 ```
-문제 인식 → 정보 탐색 → 서비스 비교 → 무료 상담 → 체험 서비스 → 구독 결정 → 정기 서비스 → 만족도 평가 → 추천/업그레이드
+문제 인식 → 정보 탐색 → 구독 비교 → 무료 상담 → 체험 구독 → 구독 결정 → 정기 구독 → 만족도 평가 → 추천/업그레이드
 ```
 
 #### 3.2 온보딩 프로세스
@@ -456,10 +456,10 @@ class InitialConsultation {
 }
 ```
 
-**2단계: 무료 진단 서비스 (30분)**
+**2단계: 무료 진단 구독 (30분)**
 - 에어콘 상태 점검
 - 청소 필요도 평가
-- 맞춤형 서비스 추천
+- 맞춤형 구독 추천
 - 투명한 견적 제공
 
 **3단계: 맞춤형 무료 체험 시스템**
@@ -470,17 +470,17 @@ class AirconTrialManager {
     public function getTrialOptions() {
         return [
             'one_time_trial' => [
-                'name' => '1회 체험 서비스',
-                'description' => '실제 에어콘 청소 서비스 1회 무료 체험',
+                'name' => '1회 체험 구독',
+                'description' => '실제 에어콘 청소 구독 1회 무료 체험',
                 'conditions' => [
-                    'trial_period' => '체험 서비스 후 14일 결정 기간',
-                    'service_scope' => '베이직 플랜 전체 서비스',
+                    'trial_period' => '체험 구독 후 14일 결정 기간',
+                    'subscribe_scope' => '베이직 플랜 전체 구독',
                     'follow_up' => '체험 후 전담 상담사 배정'
                 ],
                 'eligibility' => [
                     'new_customers_only' => true,
                     'one_per_household' => true,
-                    'service_area_check' => true
+                    'subscribe_area_check' => true
                 ]
             ],
 
@@ -490,12 +490,12 @@ class AirconTrialManager {
                 'conditions' => [
                     'summer_trial' => [
                         'duration' => '30일',
-                        'services_included' => 2, // 2회 서비스
+                        'subscribes_included' => 2, // 2회 구독
                         'special_features' => ['항균 코팅', '냉각 효율 점검']
                     ],
                     'winter_trial' => [
                         'duration' => '45일',
-                        'services_included' => 1,
+                        'subscribes_included' => 1,
                         'special_features' => ['히터 점검', '필터 교체']
                     ]
                 ]
@@ -503,13 +503,13 @@ class AirconTrialManager {
 
             'premium_trial' => [
                 'name' => '프리미엄 체험 (대상 제한)',
-                'description' => '고급 고객 대상 프리미엄 서비스 체험',
+                'description' => '고급 고객 대상 프리미엄 구독 체험',
                 'conditions' => [
                     'trial_period' => '60일',
-                    'services_included' => 3,
+                    'subscribes_included' => 3,
                     'dedicated_engineer' => true,
                     'premium_features' => [
-                        '24시간 응급 서비스',
+                        '24시간 응급 구독',
                         '전담 기사 배정',
                         '무료 필터 교체 2회'
                     ]
@@ -528,7 +528,7 @@ class AirconTrialManager {
 
         // 기본 체험 자격 확인
         if ($this->isNewCustomer($customerProfile) &&
-            $this->isInServiceArea($customerProfile)) {
+            $this->isInsubscribeArea($customerProfile)) {
             $eligibleTrials[] = 'one_time_trial';
         }
 
@@ -557,13 +557,13 @@ class TrialConversionStrategy {
         $flows = [
             'one_time_trial' => [
                 'day_0' => [
-                    'action' => '무료 체험 서비스 실행',
-                    'quality_check' => '서비스 품질 확인',
+                    'action' => '무료 체험 구독 실행',
+                    'quality_check' => '구독 품질 확인',
                     'customer_feedback' => '즉시 만족도 조사'
                 ],
                 'day_1' => [
                     'follow_up_call' => '체험 만족도 확인',
-                    'service_explanation' => '정기 서비스 혜택 설명',
+                    'subscribe_explanation' => '정기 구독 혜택 설명',
                     'special_offer' => '체험 고객 한정 20% 할인'
                 ],
                 'day_7' => [
@@ -580,17 +580,17 @@ class TrialConversionStrategy {
 
             'seasonal_trial' => [
                 'week_1' => [
-                    'first_service' => '첫 번째 정기 서비스',
+                    'first_subscribe' => '첫 번째 정기 구독',
                     'performance_tracking' => '에어컨 효율 개선 측정',
                     'energy_savings_report' => '전력 절약 효과 리포트'
                 ],
                 'week_2' => [
                     'mid_trial_check' => '중간 점검 및 피드백',
-                    'additional_services' => '추가 서비스 체험 기회',
+                    'additional_subscribes' => '추가 구독 체험 기회',
                     'neighbor_referral' => '이웃 추천 인센티브'
                 ],
                 'week_4' => [
-                    'final_service' => '마지막 체험 서비스',
+                    'final_subscribe' => '마지막 체험 구독',
                     'roi_calculation' => 'ROI 계산서 제공',
                     'conversion_incentive' => '즉시 가입 특별 혜택'
                 ]
@@ -604,7 +604,7 @@ class TrialConversionStrategy {
 
 #### 3.3 구독 상태 관리
 
-**물리적 서비스 특화 상태**:
+**물리적 구독 특화 상태**:
 ```
 Trial (체험) → Active (정기방문) → Rescheduled (일정변경) → Suspended (일시중단) → Cancelled (해지)
 ```
@@ -633,7 +633,7 @@ class CustomerSegmentation {
 #### 3.5 이탈 방지 시스템
 
 **위험 신호 감지**:
-- 서비스 연기 요청 증가 (월 2회 이상)
+- 구독 연기 요청 증가 (월 2회 이상)
 - 만족도 평가 3점 이하
 - 고객센터 불만 접수
 - 결제 실패 발생
@@ -645,7 +645,7 @@ class ChurnPrevention {
         switch($churnReason) {
             case 'price_sensitive':
                 return ['discount' => 30, 'duration' => 3, 'message' => '3개월 30% 할인'];
-            case 'service_quality':
+            case 'subscribe_quality':
                 return ['upgrade' => 'premium', 'duration' => 2, 'message' => '프리미엄 무료 업그레이드'];
             case 'scheduling_issues':
                 return ['flexible_schedule' => true, 'message' => '유연한 스케줄링 제공'];
@@ -654,34 +654,34 @@ class ChurnPrevention {
 }
 ```
 
-### 5. 서비스 파트너 할당 및 운영 시스템
+### 5. 구독 파트너 할당 및 운영 시스템
 
-#### 5.1 영업→서비스 파트너 연계 프로세스
+#### 5.1 영업→구독 파트너 연계 프로세스
 
-**고객 계약 완료 후 서비스 파트너 할당**:
+**고객 계약 완료 후 구독 파트너 할당**:
 
 ```php
-class ServicePartnerAssignmentEngine {
-    public function assignServicePartner($customer_subscription) {
-        // 1. 고객 정보 및 서비스 요구사항 분석
-        $service_requirements = $this->analyzeServiceRequirements($customer_subscription);
+class subscribePartnerAssignmentEngine {
+    public function assignsubscribePartner($customer_subscription) {
+        // 1. 고객 정보 및 구독 요구사항 분석
+        $subscribe_requirements = $this->analyzesubscribeRequirements($customer_subscription);
 
         // 2. 지역별 가용 엔지니어 조회
         $available_engineers = $this->getAvailableEngineers([
-            'location' => $customer_subscription->service_address,
-            'service_type' => 'aircon_cleaning',
+            'location' => $customer_subscription->subscribe_address,
+            'subscribe_type' => 'aircon_cleaning',
             'customer_tier' => $customer_subscription->plan_tier
         ]);
 
         // 3. 엔지니어별 매칭 점수 계산
         $engineer_scores = [];
         foreach ($available_engineers as $engineer) {
-            $score = $this->calculateEngineerMatchScore($engineer, $service_requirements);
+            $score = $this->calculateEngineerMatchScore($engineer, $subscribe_requirements);
             $engineer_scores[$engineer->id] = $score;
         }
 
         // 4. 최적 엔지니어 선택
-        $selected_engineer = $this->selectOptimalEngineer($engineer_scores, $service_requirements);
+        $selected_engineer = $this->selectOptimalEngineer($engineer_scores, $subscribe_requirements);
 
         // 5. 할당 및 첫 방문 스케줄링
         $this->assignEngineerToCustomer($customer_subscription, $selected_engineer);
@@ -696,14 +696,14 @@ class ServicePartnerAssignmentEngine {
         // 지역 근접성 (30%)
         $distance = $this->calculateDistance(
             $engineer->base_location,
-            $requirements['service_address']
+            $requirements['subscribe_address']
         );
         $score += (50 - min($distance, 50)) / 50 * 30;
 
         // 전문 분야 일치도 (25%)
         $specialty_match = $this->calculateSpecialtyMatch(
             $engineer->specialties,
-            $requirements['service_types']
+            $requirements['subscribe_types']
         );
         $score += $specialty_match * 25;
 
@@ -734,7 +734,7 @@ class ServicePartnerAssignmentEngine {
 **플래티넘 고객: 전담 엔지니어 시스템**
 
 ```php
-class PlatinumCustomerService {
+class PlatinumCustomersubscribe {
     public function assignDedicatedEngineer($platinum_customer) {
         $criteria = [
             'required_tier' => ['gold', 'platinum'], // 골드 이상 엔지니어만
@@ -744,7 +744,7 @@ class PlatinumCustomerService {
             'location_match' => true // 동일 지역 우선
         ];
 
-        $eligible_engineers = ServicePartner::where('tier_level', '>=', 'gold')
+        $eligible_engineers = subscribePartner::where('tier_level', '>=', 'gold')
             ->where('dedicated_customer_count', '<', 20)
             ->where('avg_rating', '>=', 4.5)
             ->whereJsonContains('service_areas', $platinum_customer->address->district)
@@ -810,7 +810,7 @@ class DailyWorkScheduler {
                 'appointment_id' => $appointment->id,
                 'lat' => $appointment->customer->address->latitude,
                 'lng' => $appointment->customer->address->longitude,
-                'service_duration' => $appointment->estimated_duration,
+                'subscribe_duration' => $appointment->estimated_duration,
                 'customer_priority' => $appointment->customer->subscription->plan_tier
             ];
         })->toArray();
@@ -822,42 +822,42 @@ class DailyWorkScheduler {
 
 #### 5.4 품질 관리 및 고객 만족도 추적
 
-**서비스 완료 후 자동 품질 관리**:
+**구독 완료 후 자동 품질 관리**:
 
 ```php
-class ServiceQualityManager {
-    public function handleServiceCompletion($appointment_id) {
+class subscribeQualityManager {
+    public function handlesubscribeCompletion($appointment_id) {
         $appointment = Appointment::find($appointment_id);
         $engineer = $appointment->assignedEngineer;
         $customer = $appointment->customer;
 
-        // 1. 서비스 완료 보고서 생성
-        $service_report = $this->generateServiceReport($appointment);
+        // 1. 구독 완료 보고서 생성
+        $subscribe_report = $this->generatesubscribeReport($appointment);
 
-        // 2. 고객 만족도 설문 발송 (서비스 완료 1시간 후)
+        // 2. 고객 만족도 설문 발송 (구독 완료 1시간 후)
         $this->scheduleSatisfactionSurvey($customer, $appointment, 1); // 1시간 후
 
         // 3. 사진 증빙 검증 (AI 기반)
-        $photo_verification = $this->verifyServicePhotos($service_report['photos']);
+        $photo_verification = $this->verifysubscribePhotos($subscribe_report['photos']);
 
         // 4. 엔지니어 성과 점수 업데이트
-        $this->updateEngineerPerformance($engineer, $service_report);
+        $this->updateEngineerPerformance($engineer, $subscribe_report);
 
-        // 5. 다음 서비스 자동 스케줄링
-        $this->scheduleNextService($customer->subscription);
+        // 5. 다음 구독 자동 스케줄링
+        $this->scheduleNextsubscribe($customer->subscription);
 
         // 6. 영업 파트너에게 완료 알림 및 커미션 적립
-        $this->notifySalesPartnerAndAddCommission($customer, $service_report);
+        $this->notifySalesPartnerAndAddCommission($customer, $subscribe_report);
 
-        return $service_report;
+        return $subscribe_report;
     }
 
-    private function generateServiceReport($appointment) {
+    private function generatesubscribeReport($appointment) {
         return [
             'appointment_id' => $appointment->id,
             'engineer_id' => $appointment->assigned_engineer_id,
             'customer_id' => $appointment->customer_id,
-            'service_type' => 'aircon_filter_cleaning',
+            'subscribe_type' => 'aircon_filter_cleaning',
             'start_time' => $appointment->actual_start_time,
             'completion_time' => now(),
             'duration_minutes' => $appointment->actual_duration,
@@ -887,17 +887,17 @@ class ServiceQualityManager {
 
 #### 5.5 수익 분배 실시간 처리
 
-**서비스 완료 시 자동 수익 정산**:
+**구독 완료 시 자동 수익 정산**:
 
 ```php
 class RevenueDistributionProcessor {
-    public function processServiceRevenue($appointment) {
+    public function processsubscribeRevenue($appointment) {
         $customer = $appointment->customer;
-        $service_fee = $appointment->service_amount;
+        $subscribe_fee = $appointment->subscribe_amount;
         $engineer = $appointment->assignedEngineer;
 
-        // 1. 서비스 파트너(엔지니어) 수수료 계산
-        $engineer_commission = $this->calculateEngineerCommission($engineer, $service_fee);
+        // 1. 구독 파트너(엔지니어) 수수료 계산
+        $engineer_commission = $this->calculateEngineerCommission($engineer, $subscribe_fee);
 
         // 2. 영업 파트너 커미션 체인 조회
         $sales_commission_chain = CustomerCommissionChain::where('customer_id', $customer->id)
@@ -908,16 +908,16 @@ class RevenueDistributionProcessor {
 
         // 3. 엔지니어 수수료 배분
         $revenue_distribution[] = [
-            'partner_type' => 'service',
+            'partner_type' => 'subscribe',
             'partner_id' => $engineer->partner_id,
             'amount' => $engineer_commission,
-            'percentage' => ($engineer_commission / $service_fee) * 100,
-            'type' => 'service_fee'
+            'percentage' => ($engineer_commission / $subscribe_fee) * 100,
+            'type' => 'subscribe_fee'
         ];
 
         // 4. 영업 파트너 커미션 배분
         foreach ($sales_commission_chain as $commission) {
-            $sales_amount = $service_fee * ($commission->commission_rate / 100);
+            $sales_amount = $subscribe_fee * ($commission->commission_rate / 100);
             $revenue_distribution[] = [
                 'partner_type' => 'sales',
                 'partner_id' => $commission->partner_id,
@@ -929,13 +929,13 @@ class RevenueDistributionProcessor {
 
         // 5. 플랫폼 수수료
         $total_distributed = collect($revenue_distribution)->sum('amount');
-        $platform_fee = $service_fee - $total_distributed;
+        $platform_fee = $subscribe_fee - $total_distributed;
 
         $revenue_distribution[] = [
             'partner_type' => 'platform',
             'partner_id' => null,
             'amount' => $platform_fee,
-            'percentage' => ($platform_fee / $service_fee) * 100,
+            'percentage' => ($platform_fee / $subscribe_fee) * 100,
             'type' => 'platform_fee'
         ];
 
@@ -950,26 +950,26 @@ class RevenueDistributionProcessor {
 
 ### 6. 결제 및 스케줄링 시스템
 
-#### 4.1 물리적 서비스 특화 결제 모델
+#### 4.1 물리적 구독 특화 결제 모델
 
 **선불 vs 후불 결제**:
 ```php
-class ServiceBilling {
-    public function calculateMonthlyBilling($subscription, $actualServices) {
+class subscribeBilling {
+    public function calculateMonthlyBilling($subscription, $actualsubscribes) {
         $basePlan = $subscription->plan;
         $scheduledVisits = $this->getScheduledVisits($subscription, date('Y-m'));
-        $actualVisits = count($actualServices);
+        $actualVisits = count($actualsubscribes);
 
-        // 미방문 서비스에 대한 크레딧 처리
+        // 미방문 구독에 대한 크레딧 처리
         if ($actualVisits < $scheduledVisits) {
             $missedVisits = $scheduledVisits - $actualVisits;
             $creditAmount = ($basePlan->price / $scheduledVisits) * $missedVisits;
 
             return [
                 'base_charge' => $basePlan->price,
-                'service_credit' => -$creditAmount,
-                'additional_charges' => $this->calculateExtras($actualServices),
-                'total' => $basePlan->price - $creditAmount + $this->calculateExtras($actualServices)
+                'subscribe_credit' => -$creditAmount,
+                'additional_charges' => $this->calculateExtras($actualsubscribes),
+                'total' => $basePlan->price - $creditAmount + $this->calculateExtras($actualsubscribes)
             ];
         }
 
@@ -980,30 +980,30 @@ class ServiceBilling {
 
 #### 4.2 스케줄링 통합 결제
 
-**서비스 예약과 결제 연동**:
+**구독 예약과 결제 연동**:
 - 예약 확정 시 결제 승인
-- 서비스 완료 후 최종 정산
+- 구독 완료 후 최종 정산
 - 노쇼/취소 시 페널티 정책
 
 ```php
-class ServiceSchedulingBilling {
-    public function processServiceCompletion($appointment) {
-        $baseService = $appointment->subscription->plan->price;
-        $additionalServices = $this->getAdditionalServices($appointment);
-        $totalAmount = $baseService + $additionalServices;
+class subscribeSchedulingBilling {
+    public function processsubscribeCompletion($appointment) {
+        $basesubscribe = $appointment->subscription->plan->price;
+        $additionalsubscribes = $this->getAdditionalsubscribes($appointment);
+        $totalAmount = $basesubscribe + $additionalsubscribes;
 
-        // 서비스 완료 후 추가 비용 처리
-        if ($additionalServices > 0) {
-            $this->processAdditionalPayment($appointment->customer, $additionalServices);
+        // 구독 완료 후 추가 비용 처리
+        if ($additionalsubscribes > 0) {
+            $this->processAdditionalPayment($appointment->customer, $additionalsubscribes);
         }
 
-        // 서비스 완료 영수증 발송
-        $this->sendServiceReceipt($appointment, $totalAmount);
+        // 구독 완료 영수증 발송
+        $this->sendsubscribeReceipt($appointment, $totalAmount);
     }
 }
 ```
 
-### 5. 서비스 전달 및 품질 관리
+### 5. 구독 전달 및 품질 관리
 
 #### 5.1 기사 관리 시스템
 
@@ -1012,11 +1012,11 @@ class ServiceSchedulingBilling {
 class TechnicianAssignment {
     public function assignTechnician($appointment) {
         $location = $appointment->customer->address;
-        $serviceType = $appointment->service_type;
+        $subscribeType = $appointment->subscribe_type;
         $preferredTime = $appointment->preferred_time;
 
-        $availableTechnicians = Technician::where('service_area', 'LIKE', "%{$location->district}%")
-            ->where('skills', 'LIKE', "%{$serviceType}%")
+        $availableTechnicians = Technician::where('subscribe_area', 'LIKE', "%{$location->district}%")
+            ->where('skills', 'LIKE', "%{$subscribeType}%")
             ->whereHas('schedule', function($query) use ($preferredTime) {
                 $query->where('available_time', $preferredTime)
                       ->where('is_booked', false);
@@ -1030,11 +1030,11 @@ class TechnicianAssignment {
 }
 ```
 
-#### 5.2 서비스 품질 체크리스트
+#### 5.2 구독 품질 체크리스트
 
-**표준화된 서비스 프로세스**:
+**표준화된 구독 프로세스**:
 ```php
-class ServiceChecklist {
+class subscribeChecklist {
     public function getAirconCleaningChecklist() {
         return [
             'preparation' => [
@@ -1063,12 +1063,12 @@ class ServiceChecklist {
 }
 ```
 
-#### 5.3 실시간 서비스 트래킹
+#### 5.3 실시간 구독 트래킹
 
 **고객 투명성 제공**:
 ```php
-class ServiceTracking {
-    public function updateServiceStatus($appointmentId, $status, $details = null) {
+class subscribeTracking {
+    public function updatesubscribeStatus($appointmentId, $status, $details = null) {
         $appointment = Appointment::find($appointmentId);
         $appointment->update(['status' => $status]);
 
@@ -1084,8 +1084,8 @@ class ServiceTracking {
         return match($status) {
             'dispatched' => '기사가 출발했습니다',
             'arrived' => '기사가 도착했습니다',
-            'in_progress' => '서비스를 진행 중입니다',
-            'completed' => '서비스가 완료되었습니다',
+            'in_progress' => '구독를 진행 중입니다',
+            'completed' => '구독가 완료되었습니다',
             'rescheduled' => '일정이 변경되었습니다'
         };
     }
@@ -1102,10 +1102,10 @@ class NewCustomerJourneyTest extends TestCase
 {
     public function test_complete_customer_onboarding()
     {
-        // 1. 서비스 페이지 방문
-        $response = $this->get('/services/aircon-filter-cleaning');
+        // 1. 구독 페이지 방문
+        $response = $this->get('/subscribes/aircon-filter-cleaning');
         $response->assertStatus(200);
-        $response->assertSee('에어콘 필터 청소 정기서비스');
+        $response->assertSee('에어콘 필터 청소 정기구독');
 
         // 2. 무료 상담 신청
         $consultationData = [
@@ -1131,21 +1131,21 @@ class NewCustomerJourneyTest extends TestCase
         $response = $this->post('/subscriptions', $subscriptionData);
         $response->assertStatus(201);
 
-        // 4. 첫 서비스 스케줄링 확인
+        // 4. 첫 구독 스케줄링 확인
         $this->assertDatabaseHas('appointments', [
             'customer_id' => $customer->id,
-            'service_date' => now()->addDays(3)->format('Y-m-d'),
+            'subscribe_date' => now()->addDays(3)->format('Y-m-d'),
             'status' => 'scheduled'
         ]);
     }
 }
 ```
 
-**시나리오 2: 서비스 실행 및 품질 관리**
+**시나리오 2: 구독 실행 및 품질 관리**
 ```php
-class ServiceExecutionTest extends TestCase
+class subscribeExecutionTest extends TestCase
 {
-    public function test_service_execution_workflow()
+    public function test_subscribe_execution_workflow()
     {
         $appointment = $this->createScheduledAppointment();
 
@@ -1154,7 +1154,7 @@ class ServiceExecutionTest extends TestCase
         $this->assertNotNull($technician);
         $this->assertEquals('assigned', $appointment->fresh()->status);
 
-        // 2. 서비스 시작
+        // 2. 구독 시작
         $this->actingAs($technician)->post("/appointments/{$appointment->id}/start");
         $this->assertEquals('in_progress', $appointment->fresh()->status);
 
@@ -1215,7 +1215,7 @@ class PricingCalculationTest extends TestCase
 
 ### 7. 실제 운영 시나리오 (Multi-Partner Operation Scenarios)
 
-#### 7.1 일반적인 고객 획득 및 서비스 제공 플로우
+#### 7.1 일반적인 고객 획득 및 구독 제공 플로우
 
 **시나리오 1: 개인 셀러를 통한 고객 획득**
 
@@ -1233,14 +1233,14 @@ class PricingCalculationTest extends TestCase
 [Day 3] 김○○ 고객 상담
 ├── 고객 A: 베이직 플랜 계약 성공 (월 29,000원)
 ├── 고객 B: 가격 고민으로 보류
-└── 고객 C: 경쟁사 서비스 이용 중으로 거절
+└── 고객 C: 경쟁사 구독 이용 중으로 거절
 
-[Day 4] 서비스 파트너 자동 할당
+[Day 4] 구독 파트너 자동 할당
 └── 고객 A: 강남구 담당 이○○ 엔지니어 배정 (골드 등급)
 
-[Day 5] 첫 방문 서비스 완료
+[Day 5] 첫 방문 구독 완료
 ├── 오전 10시: 이○○ 엔지니어 고객 A 댁 방문
-├── 45분간 에어콘 필터 청소 서비스 제공
+├── 45분간 에어콘 필터 청소 구독 제공
 ├── 고객 만족도: 5점 (매우 만족)
 └── 자동 수익 분배:
     ├── 이○○ 엔지니어: 20,300원 (70% - 골드 등급)
@@ -1261,7 +1261,7 @@ class ApartmentComplexContract {
             'negotiation_period' => '3개월',
             'contract_terms' => [
                 'discount_rate' => '30% 할인 (단체계약)',
-                'service_fee' => '월 20,300원 (베이직 기준)',
+                'subscribe_fee' => '월 20,300원 (베이직 기준)',
                 'target_penetration' => '100세대 (20%)',
                 'contract_period' => '2년'
             ],
@@ -1285,7 +1285,7 @@ class ApartmentComplexContract {
             'benefits_offered' => [
                 '관리사무소 수수료: 월 30만원',
                 '입주민 30% 할인 혜택',
-                '무료 체험 서비스 50가구',
+                '무료 체험 구독 50가구',
                 '아파트 공용시설 에어콘 무료 청소'
             ]
         ]);
@@ -1315,7 +1315,7 @@ class ApartmentComplexContract {
             'expected_signups' => 120, // 목표 초과 달성
             'monthly_revenue' => 120 * 20300, // 2,436,000원/월
             'master_partner_commission' => 2436000 * 0.15, // 365,400원/월
-            'platform_net_revenue' => 2436000 * 0.60 // 1,461,600원/월 (25% + 서비스 파트너 수수료 제외)
+            'platform_net_revenue' => 2436000 * 0.60 // 1,461,600원/월 (25% + 구독 파트너 수수료 제외)
         ];
     }
 }
@@ -1372,10 +1372,10 @@ class SummerPeakOperationStrategy {
             ],
 
             'operational_scaling' => [
-                'service_partners' => [
+                'subscribe_partners' => [
                     'current_engineers' => 80,
                     'summer_recruitment' => 40, // 임시 계약직 엔지니어
-                    'daily_capacity' => 120 * 6, // 720 서비스/일
+                    'daily_capacity' => 120 * 6, // 720 구독/일
                     'peak_demand_handling' => 'AI 기반 동적 스케줄링'
                 ],
 
@@ -1402,7 +1402,7 @@ class SummerPeakOperationStrategy {
 
 #### 7.4 품질 관리 및 분쟁 해결
 
-**시나리오 4: 서비스 품질 이슈 대응**
+**시나리오 4: 구독 품질 이슈 대응**
 
 ```php
 class QualityIssueResolution {
@@ -1418,7 +1418,7 @@ class QualityIssueResolution {
 
             'immediate_response' => [
                 'auto_response_time' => '15분 이내',
-                'compensation_offered' => '무료 재서비스 + 다음 달 50% 할인',
+                'compensation_offered' => '무료 재구독 + 다음 달 50% 할인',
                 'engineer_action' => '당일 재방문 스케줄링',
                 'supervisor_assignment' => '골드 등급 슈퍼바이저 박○○ 배정'
             ],
@@ -1440,8 +1440,8 @@ class QualityIssueResolution {
 
             'corrective_actions' => [
                 'customer_satisfaction' => [
-                    'immediate_refund' => 49000, // 1개월 서비스 비용
-                    'service_upgrade' => '플래티넘 등급 엔지니어 전담 배정',
+                    'immediate_refund' => 49000, // 1개월 구독 비용
+                    'subscribe_upgrade' => '플래티넘 등급 엔지니어 전담 배정',
                     'goodwill_credit' => '다음 3개월 20% 할인'
                 ],
 
@@ -1454,7 +1454,7 @@ class QualityIssueResolution {
 
                 'system_improvement' => [
                     'ai_photo_analysis' => '실시간 사진 품질 검증 강화',
-                    'customer_feedback' => '서비스 완료 즉시 만족도 조사',
+                    'customer_feedback' => '구독 완료 즉시 만족도 조사',
                     'engineer_scoring' => '실시간 성과 점수 업데이트'
                 ]
             ]
@@ -1729,7 +1729,7 @@ class OrganizationRestructuringScenario {
             'organizational_impact' => [
                 'immediate_response' => [
                     'downline_notification' => '24시간 내 하위 조직 통보',
-                    'customer_reassignment' => '고객 서비스 연속성 보장',
+                    'customer_reassignment' => '고객 구독 연속성 보장',
                     'commission_freeze' => '해결 시까지 커미션 동결'
                 ],
 
@@ -1756,10 +1756,10 @@ class MultiLevelCommissionScenario {
     public function realTimeCommissionDistribution() {
         $transaction_example = [
             'trigger_event' => [
-                'customer_service_completed' => [
+                'customer_subscribe_completed' => [
                     'customer_id' => 'CUST_2024_001234',
-                    'service_amount' => 49000, // 프리미엄 플랜
-                    'service_date' => '2024-06-15',
+                    'subscribe_amount' => 49000, // 프리미엄 플랜
+                    'subscribe_date' => '2024-06-15',
                     'engineer_id' => 'ENG_2024_789',
                     'sales_lineage' => [
                         'level_1' => 'AGENT_김민수', // 직접 영업
@@ -1771,7 +1771,7 @@ class MultiLevelCommissionScenario {
             ],
 
             'commission_calculation' => [
-                'service_partner_commission' => [
+                'subscribe_partner_commission' => [
                     'engineer_tier' => 'gold',
                     'commission_rate' => 70.0,
                     'amount' => 34300 // 49000 * 0.70
@@ -1813,7 +1813,7 @@ class MultiLevelCommissionScenario {
 
             'real_time_processing' => [
                 'step_1_validation' => [
-                    'verify_service_completion' => true,
+                    'verify_subscribe_completion' => true,
                     'verify_payment_received' => true,
                     'verify_lineage_active' => true,
                     'processing_time' => '< 30 seconds'
@@ -1869,8 +1869,8 @@ class BusinessMetrics
             'churn_rate' => $this->calculateChurnRate(),
             'ltv' => $this->calculateCustomerLTV(),
 
-            // 서비스 지표
-            'service_completion_rate' => $this->getServiceCompletionRate(),
+            // 구독 지표
+            'subscribe_completion_rate' => $this->getsubscribeCompletionRate(),
             'customer_satisfaction' => $this->getAverageSatisfactionScore(),
             'technician_utilization' => $this->getTechnicianUtilization()
         ];
@@ -1880,7 +1880,7 @@ class BusinessMetrics
 
 #### 7.2 성공 기준
 
-**구독 서비스 플랫폼 검증 기준**:
+**구독 구독 플랫폼 검증 기준**:
 
 1. **기술적 성능**
    - 페이지 로딩 시간: 3초 이내
@@ -1901,29 +1901,29 @@ class BusinessMetrics
 
 #### 8.1 플랫폼 적용성 평가
 
-에어콘 필터 청소 서비스에 대한 구독형 플랫폼 적용 결과:
+에어콘 필터 청소 구독에 대한 구독형 플랫폼 적용 결과:
 
 ✅ **성공적 적용 영역**:
-- 서비스 카탈로그 체계적 관리
+- 구독 카탈로그 체계적 관리
 - 다층 가격 모델과 동적 할인 시스템
 - 고객 생명주기 자동화 관리
-- 실시간 서비스 트래킹과 품질 관리
+- 실시간 구독 트래킹과 품질 관리
 
-✅ **물리적 서비스 특화 기능**:
+✅ **물리적 구독 특화 기능**:
 - 지역 기반 기사 배정 시스템
-- 서비스 체크리스트 및 품질 보증
+- 구독 체크리스트 및 품질 보증
 - 계절별 수요 대응 가격 정책
-- 실시간 서비스 상태 추적
+- 실시간 구독 상태 추적
 
 #### 8.2 개선 효과 예상
 
 **기존 대비 개선 효과**:
 - 고객 획득 비용 30% 절감
-- 서비스 품질 일관성 95% 향상
+- 구독 품질 일관성 95% 향상
 - 고객 만족도 20% 개선
 - 운영 효율성 40% 증대
 
 **확장 가능성**:
-본 플랫폼은 에어콘 청소뿐만 아니라 다양한 가정관리 서비스(청소, 수리, 점검 등)로 확장 가능하며, B2B 사무실 관리 서비스로도 활용할 수 있는 높은 확장성을 보여줍니다.
+본 플랫폼은 에어콘 청소뿐만 아니라 다양한 가정관리 구독(청소, 수리, 점검 등)로 확장 가능하며, B2B 사무실 관리 구독로도 활용할 수 있는 높은 확장성을 보여줍니다.
 
-따라서 **구독형 서비스 관리 시스템이 물리적 서비스 비즈니스에도 효과적으로 적용 가능함을 입증**했습니다.
+따라서 **구독형 구독 관리 시스템이 물리적 구독 비즈니스에도 효과적으로 적용 가능함을 입증**했습니다.

@@ -14,7 +14,7 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('service_categories', function (Blueprint $table) {
+        Schema::create('subscribe_categories', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
             $table->timestamp('deleted_at')->nullable();
@@ -31,7 +31,7 @@ return new class extends Migration
 
             // 계층형 구조를 위한 부모 카테고리 ID
             $table->unsignedBigInteger('parent_id')->nullable();
-            $table->foreign('parent_id')->references('id')->on('service_categories')->onDelete('set null');
+            $table->foreign('parent_id')->references('id')->on('subscribe_categories')->onDelete('set null');
 
             // SEO
             $table->string('meta_title')->nullable();
@@ -46,11 +46,11 @@ return new class extends Migration
         });
 
         // Insert default categories
-        DB::table('service_categories')->insert([
+        DB::table('subscribe_categories')->insert([
             [
                 'code' => 'web-development',
                 'title' => '웹 개발',
-                'description' => '웹사이트 및 웹 애플리케이션 개발 서비스',
+                'description' => '웹사이트 및 웹 애플리케이션 개발 구독',
                 'color' => '#3B82F6',
                 'icon' => 'fas fa-code',
                 'pos' => 1,
@@ -61,7 +61,7 @@ return new class extends Migration
             [
                 'code' => 'mobile-development',
                 'title' => '모바일 개발',
-                'description' => '모바일 앱 개발 서비스',
+                'description' => '모바일 앱 개발 구독',
                 'color' => '#10B981',
                 'icon' => 'fas fa-mobile-alt',
                 'pos' => 2,
@@ -72,7 +72,7 @@ return new class extends Migration
             [
                 'code' => 'design',
                 'title' => '디자인',
-                'description' => 'UI/UX 디자인 및 그래픽 디자인 서비스',
+                'description' => 'UI/UX 디자인 및 그래픽 디자인 구독',
                 'color' => '#F59E0B',
                 'icon' => 'fas fa-palette',
                 'pos' => 3,
@@ -83,7 +83,7 @@ return new class extends Migration
             [
                 'code' => 'marketing',
                 'title' => '마케팅',
-                'description' => '디지털 마케팅 및 SEO 서비스',
+                'description' => '디지털 마케팅 및 SEO 구독',
                 'color' => '#EF4444',
                 'icon' => 'fas fa-bullhorn',
                 'pos' => 4,
@@ -94,7 +94,7 @@ return new class extends Migration
             [
                 'code' => 'consulting',
                 'title' => '컨설팅',
-                'description' => '기술 컨설팅 및 비즈니스 컨설팅 서비스',
+                'description' => '기술 컨설팅 및 비즈니스 컨설팅 구독',
                 'color' => '#8B5CF6',
                 'icon' => 'fas fa-chart-line',
                 'pos' => 5,
@@ -112,6 +112,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('service_categories');
+        Schema::dropIfExists('subscribe_categories');
     }
 };

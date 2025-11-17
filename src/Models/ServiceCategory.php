@@ -1,6 +1,6 @@
 <?php
 
-namespace Jiny\Service\Models;
+namespace Jiny\Subscribe\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -31,8 +31,8 @@ class ServiceCategory extends Model
         'deleted_at' => 'datetime'
     ];
 
-    public function services()
+    public function subscribes()
     {
-        return $this->hasMany(Service::class);
+        return $this->hasMany(subscribe::class);
     }
 }

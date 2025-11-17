@@ -1,11 +1,11 @@
 <?php
 
-namespace Jiny\Service\Http\Controllers\Admin\ServicePayments;
+namespace Jiny\Subscribe\Http\Controllers\Admin\subscribePayments;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Jiny\Service\Models\ServicePayment;
-use Jiny\Service\Models\Service;
+use Jiny\Subscribe\Models\subscribePayment;
+use Jiny\Subscribe\Models\subscribe;
 
 class IndexController extends Controller
 {
@@ -16,12 +16,12 @@ class IndexController extends Controller
         $status = $request->get('status');
         $payment_method = $request->get('payment_method');
         $payment_type = $request->get('payment_type');
-        $service_id = $request->get('service_id');
+        $subscribe_id = $request->get('subscribe_id');
         $date_from = $request->get('date_from');
         $date_to = $request->get('date_to');
 
         // 기본 쿼리
-        $query = ServicePayment::with(['serviceUser', 'service'])
+        $query = subscribePayment::with(['subscribeUser', 'subscribe'])
                               ->orderBy('created_at', 'desc');
 
         // 검색 조건
@@ -31,7 +31,7 @@ class IndexController extends Controller
                   ->orWhere('payment_uuid', 'like', "%{$search}%")
                   ->orWhere('transaction_id', 'like', "%{$search}%")
                   ->orWhere('order_id', 'like', "%{$search}%")
-                  ->orWhereHas('serviceUser', function($subQ) use ($search) {
+                  ->orWhereHas('subscribeUser', function($subQ) use ($search) {
                       $subQ->where('user_email', 'like', "%{$search}%")
                            ->orWhere('user_name', 'like', "%{$search}%");
                   });
@@ -53,9 +53,9 @@ class IndexController extends Controller
             $query->where('payment_type', $payment_type);
         }
 
-        // 서비스 필터
-        if ($service_id) {
-            $query->where('service_id', $service_id);
+        // 구독 필터
+        if ($subscribe_id) {
+            $query->where('subscribe_id', $subscribe_id);
         }
 
         // 날짜 범위 필터
@@ -73,7 +73,7 @@ class IndexController extends Controller
         $stats = $this->getStatistics($request);
 
         // 필터용 데이터
-        $services = Service::where('enable', true)->orderBy('title')->get();
+        $subscribes = subscribe::where('enable', true)->orderBy('title')->get();
         $statusOptions = [
             'pending' => '결제 대기',
             'processing' => '결제 진행 중',
@@ -103,10 +103,10 @@ class IndexController extends Controller
             'setup_fee' => '설치비'
         ];
 
-        return view('jiny-service::admin.service_payments.index', compact(
+        return view('jiny-subscribe::admin.service_payments.index', compact(
             'payments',
             'stats',
-            'services',
+            'subscribes',
             'statusOptions',
             'paymentMethodOptions',
             'paymentTypeOptions'
@@ -115,11 +115,11 @@ class IndexController extends Controller
 
     private function getStatistics(Request $request)
     {
-        $baseQuery = ServicePayment::query();
+        $baseQuery = subscribePayment::query();
 
         // 필터 적용
-        if ($request->get('service_id')) {
-            $baseQuery->where('service_id', $request->get('service_id'));
+        if ($request->get('subscribe_id')) {
+            $baseQuery->where('subscribe_id', $request->get('subscribe_id'));
         }
         if ($request->get('date_from')) {
             $baseQuery->whereDate('created_at', '>=', $request->get('date_from'));

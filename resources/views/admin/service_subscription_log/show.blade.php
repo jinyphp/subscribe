@@ -1,4 +1,4 @@
-@extends('jiny-service::layouts.admin.sidebar')
+@extends('jiny-subscribe::layouts.admin.sidebar')
 
 @section('title', '구독 로그 상세')
 
@@ -17,11 +17,11 @@
                     <p class="text-muted mb-0">로그 ID: {{ $log->id }} - {{ $log->created_at->format('Y년 m월 d일 H:i:s') }}</p>
                 </div>
                 <div class="d-flex gap-2">
-                    <a href="{{ route('admin.service.subscription-logs.index') }}" class="btn btn-secondary">
+                    <a href="{{ route('admin.subscribe.subscription-logs.index') }}" class="btn btn-secondary">
                         <i class="fe fe-arrow-left me-2"></i>목록으로
                     </a>
-                    @if($log->serviceUser)
-                        <a href="{{ route('admin.service.users.show', $log->serviceUser->id) }}" class="btn btn-info">
+                    @if($log->subscribeUser)
+                        <a href="{{ route('admin.subscribe.users.show', $log->subscribeUser->id) }}" class="btn btn-info">
                             <i class="fe fe-user me-2"></i>사용자 보기
                         </a>
                     @endif
@@ -93,25 +93,25 @@
                                     <td width="120" class="text-muted">사용자 UUID</td>
                                     <td><code>{{ $log->user_uuid }}</code></td>
                                 </tr>
-                                @if($log->serviceUser)
+                                @if($log->subscribeUser)
                                     <tr>
                                         <td class="text-muted">사용자명</td>
-                                        <td><strong>{{ $log->serviceUser->user_name }}</strong></td>
+                                        <td><strong>{{ $log->subscribeUser->user_name }}</strong></td>
                                     </tr>
                                     <tr>
                                         <td class="text-muted">이메일</td>
-                                        <td>{{ $log->serviceUser->user_email }}</td>
+                                        <td>{{ $log->subscribeUser->user_email }}</td>
                                     </tr>
                                     <tr>
                                         <td class="text-muted">샤드</td>
-                                        <td><code>{{ $log->serviceUser->user_shard }}</code></td>
+                                        <td><code>{{ $log->subscribeUser->user_shard }}</code></td>
                                     </tr>
                                 @endif
                                 <tr>
-                                    <td class="text-muted">서비스</td>
+                                    <td class="text-muted">구독</td>
                                     <td>
-                                        @if($log->service)
-                                            <span class="badge bg-light text-dark">{{ $log->service->title }}</span>
+                                        @if($log->subscribe)
+                                            <span class="badge bg-light text-dark">{{ $log->subscribe->title }}</span>
                                         @else
                                             <span class="text-muted">N/A</span>
                                         @endif
@@ -307,7 +307,7 @@
                         </div>
                     @endforeach
                     <div class="text-center">
-                        <a href="{{ route('admin.service.subscription-logs.index', ['user_uuid' => $log->user_uuid]) }}" class="btn btn-sm btn-outline-primary">
+                        <a href="{{ route('admin.subscribe.subscription-logs.index', ['user_uuid' => $log->user_uuid]) }}" class="btn btn-sm btn-outline-primary">
                             전체 보기
                         </a>
                     </div>
@@ -327,7 +327,7 @@
                     @foreach($similarLogs as $similarLog)
                         <div class="d-flex justify-content-between align-items-start mb-3">
                             <div class="flex-grow-1">
-                                <div class="fw-medium">{{ $similarLog->serviceUser->user_name ?? 'N/A' }}</div>
+                                <div class="fw-medium">{{ $similarLog->subscribeUser->user_name ?? 'N/A' }}</div>
                                 <small class="text-muted">{{ $similarLog->created_at->format('m/d H:i') }}</small>
                             </div>
                             <div class="ms-2">
@@ -338,7 +338,7 @@
                         </div>
                     @endforeach
                     <div class="text-center">
-                        <a href="{{ route('admin.service.subscription-logs.index', ['action' => $log->action]) }}" class="btn btn-sm btn-outline-primary">
+                        <a href="{{ route('admin.subscribe.subscription-logs.index', ['action' => $log->action]) }}" class="btn btn-sm btn-outline-primary">
                             전체 보기
                         </a>
                     </div>

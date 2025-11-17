@@ -1,13 +1,13 @@
 <?php
 
-namespace Jiny\Service\Http\Controllers\Admin\Services;
+namespace Jiny\Subscribe\Http\Controllers\Admin\subscribes;
 
 use Illuminate\Routing\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 /**
- * Services 상세보기 컨트롤러
+ * subscribes 상세보기 컨트롤러
  */
 class ShowController extends Controller
 {
@@ -16,19 +16,19 @@ class ShowController extends Controller
     public function __construct()
     {
         $this->config = [
-            'table' => 'services',
-            'view' => 'jiny-service::admin.services.show',
-            'title' => 'Service 상세보기',
+            'table' => 'subscribes',
+            'view' => 'jiny-subscribe::admin.services.show',
+            'title' => 'subscribe 상세보기',
         ];
     }
 
     public function __invoke(Request $request, $id)
     {
         // Eloquent 모델 사용으로 변경
-        $service = \Jiny\Service\Models\SiteService::findOrFail($id);
+        $subscribe = \Jiny\Subscribe\Models\Sitesubscribe::findOrFail($id);
 
         return view($this->config['view'], [
-            'service' => $service,
+            'subscribe' => $subscribe,
             'config' => $this->config,
         ]);
     }

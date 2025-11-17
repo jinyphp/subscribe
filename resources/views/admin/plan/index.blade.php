@@ -1,4 +1,4 @@
-@extends('jiny-service::layouts.admin.sidebar')
+@extends('jiny-subscribe::layouts.admin.sidebar')
 
 @section('content')
 <div class="container-fluid">
@@ -7,11 +7,11 @@
         <div class="col-12">
             <div class="d-flex justify-content-between align-items-center">
                 <div>
-                    <h2 class="mb-1">서비스 플랜 관리</h2>
-                    <p class="text-muted mb-0">서비스별 요금제 플랜을 관리합니다.</p>
+                    <h2 class="mb-1">구독 플랜 관리</h2>
+                    <p class="text-muted mb-0">구독별 요금제 플랜을 관리합니다.</p>
                 </div>
                 <div>
-                    <a href="{{ route('admin.service.plan.create') }}" class="btn btn-primary">
+                    <a href="{{ route('admin.subscribe.plan.create') }}" class="btn btn-primary">
                         <i class="fe fe-plus me-2"></i>새 플랜 추가
                     </a>
                 </div>
@@ -94,7 +94,7 @@
     <!-- 필터 -->
     <div class="card mb-4">
         <div class="card-body">
-            <form method="GET" action="{{ route('admin.service.plan.index') }}">
+            <form method="GET" action="{{ route('admin.subscribe.plan.index') }}">
                 <div class="row">
                     <div class="col-md-3">
                         <div class="form-group">
@@ -109,12 +109,12 @@
                     </div>
                     <div class="col-md-2">
                         <div class="form-group">
-                            <label for="service_id">서비스</label>
-                            <select id="service_id" name="service_id" class="form-control">
+                            <label for="subscribe_id">구독</label>
+                            <select id="subscribe_id" name="subscribe_id" class="form-control">
                                 <option value="">전체</option>
-                                @foreach($services as $service)
-                                    <option value="{{ $service->id }}" {{ request('service_id') == $service->id ? 'selected' : '' }}>
-                                        {{ $service->title }}
+                                @foreach($subscribes as $subscribe)
+                                    <option value="{{ $subscribe->id }}" {{ request('subscribe_id') == $subscribe->id ? 'selected' : '' }}>
+                                        {{ $subscribe->title }}
                                     </option>
                                 @endforeach
                             </select>
@@ -147,7 +147,7 @@
                         <button type="submit" class="btn btn-outline-primary me-2">
                             <i class="fe fe-search me-1"></i>검색
                         </button>
-                        <a href="{{ route('admin.service.plan.index') }}" class="btn btn-outline-secondary">
+                        <a href="{{ route('admin.subscribe.plan.index') }}" class="btn btn-outline-secondary">
                             <i class="fe fe-refresh-cw me-1"></i>초기화
                         </a>
                     </div>
@@ -156,10 +156,10 @@
         </div>
     </div>
 
-    <!-- 서비스 플랜 목록 -->
+    <!-- 구독 플랜 목록 -->
     <div class="card">
         <div class="card-header">
-            <h5 class="mb-0">서비스 플랜 목록</h5>
+            <h5 class="mb-0">구독 플랜 목록</h5>
         </div>
         <div class="card-body p-0">
             @if($plans->count() > 0)
@@ -169,7 +169,7 @@
                             <tr>
                                 <th width="80">정렬순서</th>
                                 <th>플랜명</th>
-                                <th>서비스</th>
+                                <th>구독</th>
                                 <th>타입</th>
                                 <th>상태</th>
                                 <th>구독자</th>
@@ -202,7 +202,7 @@
                                     </div>
                                 </div>
                             </td>
-                            <td>{{ $plan->service->title ?? '-' }}</td>
+                            <td>{{ $plan->subscribe->title ?? '-' }}</td>
                             <td>
                                 <span class="badge bg-{{
                                     $plan->plan_type === 'basic' ? 'secondary' :
@@ -224,16 +224,16 @@
                                 @endif
                             </td>
                             <td>
-                                <strong>{{ $plan->serviceUsers()->count() }}</strong>명
+                                <strong>{{ $plan->subscribeUsers()->count() }}</strong>명
                             </td>
                             <td>
                                 <div class="btn-group btn-group-sm" role="group">
-                                    <a href="{{ route('admin.service.plan.show', $plan->id) }}"
+                                    <a href="{{ route('admin.subscribe.plan.show', $plan->id) }}"
                                        class="btn btn-outline-info btn-square"
                                        title="상세보기">
                                         <i class="fe fe-eye"></i>
                                     </a>
-                                    <a href="{{ route('admin.service.plan.edit', $plan->id) }}"
+                                    <a href="{{ route('admin.subscribe.plan.edit', $plan->id) }}"
                                        class="btn btn-outline-primary btn-square"
                                        title="수정">
                                         <i class="fe fe-edit"></i>
@@ -244,18 +244,18 @@
                                         </button>
                                         <ul class="dropdown-menu">
                                             <li>
-                                                <a class="dropdown-item" href="{{ route('admin.service.plan.detail.index', $plan->id) }}">
+                                                <a class="dropdown-item" href="{{ route('admin.subscribe.plan.detail.index', $plan->id) }}">
                                                     <i class="fe fe-list me-2"></i>상세 기능 관리
                                                 </a>
                                             </li>
                                             <li>
-                                                <a class="dropdown-item" href="{{ route('admin.service.plan.price.index', $plan->id) }}">
+                                                <a class="dropdown-item" href="{{ route('admin.subscribe.plan.price.index', $plan->id) }}">
                                                     <i class="fe fe-dollar-sign me-2"></i>가격 옵션 관리
                                                 </a>
                                             </li>
                                         </ul>
                                     </div>
-                                    @if($plan->serviceUsers()->count() === 0)
+                                    @if($plan->subscribeUsers()->count() === 0)
                                     <button type="button"
                                             class="btn btn-outline-danger btn-square"
                                             title="삭제"
@@ -286,9 +286,9 @@
         @else
             <div class="text-center py-5">
                 <i class="fe fe-package fe-3x text-muted mb-3"></i>
-                <h5 class="text-muted">등록된 서비스 플랜이 없습니다</h5>
-                <p class="text-muted">새로운 서비스 플랜을 등록해보세요.</p>
-                <a href="{{ route('admin.service.plan.create') }}" class="btn btn-primary">
+                <h5 class="text-muted">등록된 구독 플랜이 없습니다</h5>
+                <p class="text-muted">새로운 구독 플랜을 등록해보세요.</p>
+                <a href="{{ route('admin.subscribe.plan.create') }}" class="btn btn-primary">
                     <i class="fe fe-plus me-2"></i>첫 번째 플랜 만들기
                 </a>
             </div>
@@ -306,7 +306,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <p>이 서비스 플랜을 삭제하시겠습니까?</p>
+                <p>이 구독 플랜을 삭제하시겠습니까?</p>
                 <p class="text-danger small">
                     <i class="fe fe-alert-triangle me-1"></i>
                     삭제된 데이터는 복구할 수 없습니다.
@@ -371,7 +371,7 @@
 function deletePlan(id) {
     const modal = new bootstrap.Modal(document.getElementById('deleteModal'));
     const form = document.getElementById('deleteForm');
-    form.action = `/admin/service/plan/${id}`;
+    form.action = `/admin/subscribe/plan/${id}`;
     modal.show();
 }
 </script>

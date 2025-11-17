@@ -1,4 +1,4 @@
-@extends('jiny-service::layouts.admin.sidebar')
+@extends('jiny-subscribe::layouts.admin.sidebar')
 
 @section('content')
 <div class="container-fluid">
@@ -7,14 +7,14 @@
         <div class="col-12">
             <div class="d-flex justify-content-between align-items-center">
                 <div>
-                    <h2 class="mb-1">{{ $service->title }} - 가격 옵션 관리</h2>
-                    <p class="text-muted mb-0">서비스의 다양한 가격 옵션을 관리합니다.</p>
+                    <h2 class="mb-1">{{ $subscribe->title }} - 가격 옵션 관리</h2>
+                    <p class="text-muted mb-0">구독의 다양한 가격 옵션을 관리합니다.</p>
                 </div>
                 <div>
-                    <a href="{{ route('admin.site.services.show', $service->id) }}" class="btn btn-outline-secondary me-2">
-                        <i class="fe fe-arrow-left me-2"></i>서비스로
+                    <a href="{{ route('admin.site.subscribes.show', $subscribe->id) }}" class="btn btn-outline-secondary me-2">
+                        <i class="fe fe-arrow-left me-2"></i>구독로
                     </a>
-                    <a href="{{ route('admin.site.services.price.create', $service->id) }}" class="btn btn-primary">
+                    <a href="{{ route('admin.site.subscribes.price.create', $subscribe->id) }}" class="btn btn-primary">
                         <i class="fe fe-plus me-2"></i>가격 옵션 추가
                     </a>
                 </div>
@@ -22,20 +22,20 @@
         </div>
     </div>
 
-    <!-- 서비스 정보 카드 -->
+    <!-- 구독 정보 카드 -->
     <div class="card mb-4">
         <div class="card-body">
             <div class="row">
                 <div class="col-md-8">
-                    <h5 class="mb-1">{{ $service->title }}</h5>
-                    <p class="text-muted mb-2">{{ $service->slug }}</p>
-                    <p class="mb-0">{{ $service->description }}</p>
+                    <h5 class="mb-1">{{ $subscribe->title }}</h5>
+                    <p class="text-muted mb-2">{{ $subscribe->slug }}</p>
+                    <p class="mb-0">{{ $subscribe->description }}</p>
                 </div>
                 <div class="col-md-4 text-end">
-                    <span class="badge bg-{{ $service->enable ? 'success' : 'secondary' }} mb-2">
-                        {{ $service->enable ? '활성' : '비활성' }}
+                    <span class="badge bg-{{ $subscribe->enable ? 'success' : 'secondary' }} mb-2">
+                        {{ $subscribe->enable ? '활성' : '비활성' }}
                     </span>
-                    @if($service->featured)
+                    @if($subscribe->featured)
                         <span class="badge bg-warning text-dark mb-2">추천</span>
                     @endif
                 </div>
@@ -118,7 +118,7 @@
     <!-- 필터 -->
     <div class="card mb-4">
         <div class="card-body">
-            <form method="GET" action="{{ route('admin.site.services.price.index', $service->id) }}">
+            <form method="GET" action="{{ route('admin.site.subscribes.price.index', $subscribe->id) }}">
                 <div class="row">
                     <div class="col-md-3">
                         <div class="form-group">
@@ -155,7 +155,7 @@
                         <button type="submit" class="btn btn-outline-primary me-2">
                             <i class="fe fe-search me-1"></i>검색
                         </button>
-                        <a href="{{ route('admin.site.services.price.index', $service->id) }}" class="btn btn-outline-secondary">
+                        <a href="{{ route('admin.site.subscribes.price.index', $subscribe->id) }}" class="btn btn-outline-secondary">
                             <i class="fe fe-refresh-cw me-1"></i>초기화
                         </a>
                     </div>
@@ -240,12 +240,12 @@
                                 <td>{{ $price->pos }}</td>
                                 <td>
                                     <div class="btn-group btn-group-sm">
-                                        <a href="{{ route('admin.site.services.price.show', [$service->id, $price->id]) }}"
+                                        <a href="{{ route('admin.site.subscribes.price.show', [$subscribe->id, $price->id]) }}"
                                            class="btn btn-outline-info"
                                            title="상세보기">
                                             <i class="fe fe-eye"></i>
                                         </a>
-                                        <a href="{{ route('admin.site.services.price.edit', [$service->id, $price->id]) }}"
+                                        <a href="{{ route('admin.site.subscribes.price.edit', [$subscribe->id, $price->id]) }}"
                                            class="btn btn-outline-primary"
                                            title="수정">
                                             <i class="fe fe-edit"></i>
@@ -273,7 +273,7 @@
                     <i class="fe fe-dollar-sign fe-3x text-muted mb-3"></i>
                     <h5 class="text-muted">등록된 가격 옵션이 없습니다</h5>
                     <p class="text-muted">새로운 가격 옵션을 추가해보세요.</p>
-                    <a href="{{ route('admin.site.services.price.create', $service->id) }}" class="btn btn-primary">
+                    <a href="{{ route('admin.site.subscribes.price.create', $subscribe->id) }}" class="btn btn-primary">
                         <i class="fe fe-plus me-2"></i>첫 번째 가격 옵션 추가
                     </a>
                 </div>
@@ -315,7 +315,7 @@
 function deletePrice(id) {
     const modal = new bootstrap.Modal(document.getElementById('deleteModal'));
     const form = document.getElementById('deleteForm');
-    form.action = `/admin/site/services/{{ $service->id }}/price/${id}`;
+    form.action = `/admin/site/subscribes/{{ $subscribe->id }}/price/${id}`;
     modal.show();
 }
 </script>

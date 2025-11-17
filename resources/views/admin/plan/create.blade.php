@@ -1,21 +1,21 @@
-@extends('jiny-service::layouts.admin.sidebar')
+@extends('jiny-subscribe::layouts.admin.sidebar')
 
 @section('content')
 <div class="container-fluid">
     <!-- Header -->
     <div class="row mb-4">
         <div class="col-md-8">
-            <h1 class="h3 mb-0 text-gray-800">새 서비스 플랜 만들기</h1>
-            <p class="mb-0 text-muted">새로운 서비스 요금제 플랜을 생성합니다.</p>
+            <h1 class="h3 mb-0 text-gray-800">새 구독 플랜 만들기</h1>
+            <p class="mb-0 text-muted">새로운 구독 요금제 플랜을 생성합니다.</p>
         </div>
         <div class="col-md-4 text-right">
-            <a href="{{ route('admin.service.plan.index') }}" class="btn btn-outline-secondary">
+            <a href="{{ route('admin.subscribe.plan.index') }}" class="btn btn-outline-secondary">
                 <i class="fas fa-arrow-left"></i> 목록으로
             </a>
         </div>
     </div>
 
-    <form method="POST" action="{{ route('admin.service.plan.store') }}">
+    <form method="POST" action="{{ route('admin.subscribe.plan.store') }}">
         @csrf
 
         <div class="row">
@@ -28,27 +28,27 @@
                     <div class="card-body">
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="service_id" class="form-label">서비스 <span class="text-danger">*</span></label>
+                                <label for="subscribe_id" class="form-label">구독 <span class="text-danger">*</span></label>
                                 <div class="d-flex">
-                                    <select name="service_id" id="service_id" class="form-control @error('service_id') is-invalid @enderror" required>
-                                        <option value="">서비스를 선택하세요</option>
-                                        @foreach($services as $service)
-                                            <option value="{{ $service->id }}" {{ old('service_id') == $service->id ? 'selected' : '' }}>
-                                                {{ $service->title }}
+                                    <select name="subscribe_id" id="subscribe_id" class="form-control @error('subscribe_id') is-invalid @enderror" required>
+                                        <option value="">구독를 선택하세요</option>
+                                        @foreach($subscribes as $subscribe)
+                                            <option value="{{ $subscribe->id }}" {{ old('subscribe_id') == $subscribe->id ? 'selected' : '' }}>
+                                                {{ $subscribe->title }}
                                             </option>
                                         @endforeach
                                     </select>
-                                    <a href="{{ route('admin.site.services.index') }}" class="btn btn-outline-info ml-2" title="서비스 관리">
+                                    <a href="{{ route('admin.site.subscribes.index') }}" class="btn btn-outline-info ml-2" title="구독 관리">
                                         ⚙️
                                     </a>
                                 </div>
-                                @if($services->count() === 0)
+                                @if($subscribes->count() === 0)
                                     <small class="text-muted">
                                         ℹ️
-                                        사용 가능한 서비스가 없습니다. <a href="{{ route('admin.site.services.index') }}">서비스를 먼저 생성하세요</a>
+                                        사용 가능한 구독가 없습니다. <a href="{{ route('admin.site.subscribes.index') }}">구독를 먼저 생성하세요</a>
                                     </small>
                                 @endif
-                                @error('service_id')
+                                @error('subscribe_id')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
@@ -420,7 +420,7 @@
                         <button type="submit" class="btn btn-primary btn-block">
                             <i class="fas fa-save"></i> 플랜 생성
                         </button>
-                        <a href="{{ route('admin.service.plan.index') }}" class="btn btn-outline-secondary btn-block mt-2">
+                        <a href="{{ route('admin.subscribe.plan.index') }}" class="btn btn-outline-secondary btn-block mt-2">
                             <i class="fas fa-times"></i> 취소
                         </a>
                     </div>

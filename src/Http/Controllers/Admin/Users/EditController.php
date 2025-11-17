@@ -1,32 +1,32 @@
 <?php
 
-namespace Jiny\Service\Http\Controllers\Admin\Users;
+namespace Jiny\Subscribe\Http\Controllers\Admin\Users;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Jiny\Service\Models\ServiceUser;
-use Jiny\Service\Models\SiteService;
-use Jiny\Service\Models\ServicePlan;
+use Jiny\Subscribe\Models\subscribeUser;
+use Jiny\Subscribe\Models\Sitesubscribe;
+use Jiny\Subscribe\Models\subscribePlan;
 
 class EditController extends Controller
 {
     public function __invoke(Request $request, $id)
     {
-        $serviceUser = ServiceUser::with(['service', 'payments', 'subscriptionLogs'])
+        $subscribeUser = subscribeUser::with(['subscribe', 'payments', 'subscriptionLogs'])
                                  ->findOrFail($id);
 
-        // 활성화된 서비스 목록
-        $services = SiteService::where('is_active', true)
+        // 활성화된 구독 목록
+        $subscribes = Sitesubscribe::where('is_active', true)
                               ->orderBy('name')
                               ->get();
 
         // 활성화된 플랜 목록
-        $plans = ServicePlan::with('service')
+        $plans = subscribePlan::with('subscribe')
                            ->where('is_active', true)
                            ->orderBy('sort_order')
                            ->orderBy('monthly_price')
                            ->get()
-                           ->groupBy('service_id');
+                           ->groupBy('subscribe_id');
 
         // 상태 옵션
         $statusOptions = [
@@ -62,30 +62,30 @@ class EditController extends Controller
         }
 
         // 결제 내역
-        $payments = $serviceUser->payments()
+        $payments = $subscribeUser->payments()
                                ->orderBy('created_at', 'desc')
                                ->limit(10)
                                ->get();
 
         // 구독 로그
-        $subscriptionLogs = $serviceUser->subscriptionLogs()
+        $subscriptionLogs = $subscribeUser->subscriptionLogs()
                                        ->orderBy('created_at', 'desc')
                                        ->limit(20)
                                        ->get();
 
         // 통계 정보
         $stats = [
-            'total_payments' => $serviceUser->payments()->count(),
-            'total_paid' => $serviceUser->total_paid,
-            'successful_payments' => $serviceUser->payments()->completed()->count(),
-            'failed_payments' => $serviceUser->payments()->failed()->count(),
-            'refunded_amount' => $serviceUser->refund_amount,
-            'days_until_expiry' => $serviceUser->days_until_expiry,
+            'total_payments' => $subscribeUser->payments()->count(),
+            'total_paid' => $subscribeUser->total_paid,
+            'successful_payments' => $subscribeUser->payments()->completed()->count(),
+            'failed_payments' => $subscribeUser->payments()->failed()->count(),
+            'refunded_amount' => $subscribeUser->refund_amount,
+            'days_until_expiry' => $subscribeUser->days_until_expiry,
         ];
 
         // 현재 플랜 정보
-        $currentPlan = ServicePlan::where('plan_name', $serviceUser->plan_name)
-                                 ->where('service_id', $serviceUser->service_id)
+        $currentPlan = subscribePlan::where('plan_name', $subscribeUser->plan_name)
+                                 ->where('subscribe_id', $subscribeUser->subscribe_id)
                                  ->first();
 
         // 업그레이드/다운그레이드 가능한 플랜들
@@ -94,23 +94,23 @@ class EditController extends Controller
 
         if ($currentPlan) {
             if ($currentPlan->upgrade_paths) {
-                $availableUpgrades = ServicePlan::whereIn('plan_code', $currentPlan->upgrade_paths)
-                                               ->where('service_id', $serviceUser->service_id)
+                $availableUpgrades = subscribePlan::whereIn('plan_code', $currentPlan->upgrade_paths)
+                                               ->where('subscribe_id', $subscribeUser->subscribe_id)
                                                ->where('is_active', true)
                                                ->get();
             }
 
             if ($currentPlan->downgrade_paths) {
-                $availableDowngrades = ServicePlan::whereIn('plan_code', $currentPlan->downgrade_paths)
-                                                 ->where('service_id', $serviceUser->service_id)
+                $availableDowngrades = subscribePlan::whereIn('plan_code', $currentPlan->downgrade_paths)
+                                                 ->where('subscribe_id', $subscribeUser->subscribe_id)
                                                  ->where('is_active', true)
                                                  ->get();
             }
         }
 
-        return view('jiny-service::admin.users.edit', compact(
-            'serviceUser',
-            'services',
+        return view('jiny-subscribe::admin.users.edit', compact(
+            'subscribeUser',
+            'subscribes',
             'plans',
             'statusOptions',
             'billingCycles',

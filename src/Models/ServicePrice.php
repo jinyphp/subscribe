@@ -1,6 +1,6 @@
 <?php
 
-namespace Jiny\Service\Models;
+namespace Jiny\Subscribe\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -10,11 +10,11 @@ class ServicePrice extends Model
 {
     use SoftDeletes;
 
-    protected $table = 'service_plan_price';
+    protected $table = 'subscribe_plan_price';
 
     protected $fillable = [
-        'service_id',
-        'service_plan_id',
+        'subscribe_id',
+        'subscribe_plan_id',
         'name',
         'code',
         'description',
@@ -61,11 +61,11 @@ class ServicePrice extends Model
     ];
 
     /**
-     * 서비스와의 관계
+     * 구독와의 관계
      */
-    public function service(): BelongsTo
+    public function subscribe(): BelongsTo
     {
-        return $this->belongsTo(SiteService::class, 'service_id');
+        return $this->belongsTo(Sitesubscribe::class, 'subscribe_id');
     }
 
     /**
@@ -294,8 +294,8 @@ class ServicePrice extends Model
      */
     public function setAsPopular(): bool
     {
-        // 같은 서비스의 다른 옵션들을 인기에서 해제
-        static::where('service_id', $this->service_id)
+        // 같은 구독의 다른 옵션들을 인기에서 해제
+        static::where('subscribe_id', $this->subscribe_id)
               ->where('id', '!=', $this->id)
               ->update(['is_popular' => false]);
 
@@ -308,8 +308,8 @@ class ServicePrice extends Model
      */
     public function setAsRecommended(): bool
     {
-        // 같은 서비스의 다른 옵션들을 추천에서 해제
-        static::where('service_id', $this->service_id)
+        // 같은 구독의 다른 옵션들을 추천에서 해제
+        static::where('subscribe_id', $this->subscribe_id)
               ->where('id', '!=', $this->id)
               ->update(['is_recommended' => false]);
 

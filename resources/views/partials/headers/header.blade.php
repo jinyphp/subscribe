@@ -279,7 +279,7 @@
             </button>
         </div>
 
-        @includeIf('jiny-service::partials.navs.nav-header', ['menuItems' => Site::menuItems('default')])
+        @includeIf('jiny-subscribe::partials.navs.nav-header', ['menuItems' => Site::menuItems('default')])
 
     </div>
 </nav>

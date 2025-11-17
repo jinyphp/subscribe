@@ -1,4 +1,4 @@
-@extends($layout ?? 'jiny-service::layouts.admin.sidebar')
+@extends($layout ?? 'jiny-subscribe::layouts.admin.sidebar')
 
 @section('title', $config['title'])
 
@@ -13,11 +13,11 @@
                     <p class="text-muted mb-0">{{ $config['subtitle'] }}</p>
                 </div>
                 <div>
-                    <a href="/admin/service/plan" class="btn btn-outline-primary me-2">
-                        <i class="fe fe-list me-2"></i>서비스 관리
+                    <a href="/admin/subscribe/plan" class="btn btn-outline-primary me-2">
+                        <i class="fe fe-list me-2"></i>구독 관리
                     </a>
-                    <a href="{{ route('admin.site.services.create') }}" class="btn btn-primary">
-                        <i class="fe fe-plus me-2"></i>새 서비스 등록
+                    <a href="{{ route('admin.site.subscribes.create') }}" class="btn btn-primary">
+                        <i class="fe fe-plus me-2"></i>새 구독 등록
                     </a>
                 </div>
             </div>
@@ -36,7 +36,7 @@
                             </div>
                         </div>
                         <div class="flex-grow-1 ms-3">
-                            <h6 class="mb-0 text-muted">전체 서비스</h6>
+                            <h6 class="mb-0 text-muted">전체 구독</h6>
                             <h3 class="mb-0 fw-bold">{{ $stats['total'] }}</h3>
                         </div>
                     </div>
@@ -53,7 +53,7 @@
                             </div>
                         </div>
                         <div class="flex-grow-1 ms-3">
-                            <h6 class="mb-0 text-muted">서비스 중</h6>
+                            <h6 class="mb-0 text-muted">구독 중</h6>
                             <h3 class="mb-0 fw-bold">{{ $stats['published'] }}</h3>
                             <small class="text-success">{{ $stats['published_rate'] }}%</small>
                         </div>
@@ -88,7 +88,7 @@
                             </div>
                         </div>
                         <div class="flex-grow-1 ms-3">
-                            <h6 class="mb-0 text-muted">추천 서비스</h6>
+                            <h6 class="mb-0 text-muted">추천 구독</h6>
                             <h3 class="mb-0 fw-bold">{{ $stats['featured'] }}</h3>
                         </div>
                     </div>
@@ -132,24 +132,24 @@
     </div>
 
     <div class="row">
-        <!-- 최근 등록된 서비스 -->
+        <!-- 최근 등록된 구독 -->
         <div class="col-md-8">
             <div class="card border-0 shadow-sm h-100">
                 <div class="card-header border-0 bg-white">
                     <div class="d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0">최근 등록된 서비스</h5>
-                        <a href="{{ route('admin.site.services.index') }}" class="btn btn-sm btn-outline-primary">
+                        <h5 class="mb-0">최근 등록된 구독</h5>
+                        <a href="{{ route('admin.site.subscribes.index') }}" class="btn btn-sm btn-outline-primary">
                             전체보기 <i class="fe fe-arrow-right ms-1"></i>
                         </a>
                     </div>
                 </div>
                 <div class="card-body p-0">
-                    @if($recentServices->count() > 0)
+                    @if($recentsubscribes->count() > 0)
                         <div class="table-responsive">
                             <table class="table table-hover mb-0">
                                 <thead class="table-light">
                                     <tr>
-                                        <th>서비스</th>
+                                        <th>구독</th>
                                         <th>카테고리</th>
                                         <th>상태</th>
                                         <th>등록일</th>
@@ -157,13 +157,13 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach($recentServices as $service)
+                                    @foreach($recentsubscribes as $subscribe)
                                     <tr>
                                         <td>
                                             <div class="d-flex align-items-center">
-                                                @if($service->image)
-                                                    <img src="{{ $service->image }}"
-                                                         alt="{{ $service->title }}"
+                                                @if($subscribe->image)
+                                                    <img src="{{ $subscribe->image }}"
+                                                         alt="{{ $subscribe->title }}"
                                                          class="me-3 rounded"
                                                          style="width: 40px; height: 40px; object-fit: cover;">
                                                 @else
@@ -173,38 +173,38 @@
                                                     </div>
                                                 @endif
                                                 <div>
-                                                    <a href="{{ route('admin.site.services.show', $service->id) }}"
+                                                    <a href="{{ route('admin.site.subscribes.show', $subscribe->id) }}"
                                                        class="text-decoration-none fw-medium">
-                                                        {{ Str::limit($service->title, 25) }}
+                                                        {{ Str::limit($subscribe->title, 25) }}
                                                     </a>
-                                                    @if($service->featured)
+                                                    @if($subscribe->featured)
                                                         <span class="badge bg-warning text-dark ms-1">추천</span>
                                                     @endif
                                                 </div>
                                             </div>
                                         </td>
                                         <td>
-                                            @if($service->category_name)
-                                                <span class="badge bg-light text-dark">{{ $service->category_name }}</span>
+                                            @if($subscribe->category_name)
+                                                <span class="badge bg-light text-dark">{{ $subscribe->category_name }}</span>
                                             @else
                                                 <span class="text-muted">-</span>
                                             @endif
                                         </td>
                                         <td>
-                                            @if($service->enable)
-                                                <span class="badge bg-success">서비스중</span>
+                                            @if($subscribe->enable)
+                                                <span class="badge bg-success">구독중</span>
                                             @else
                                                 <span class="badge bg-secondary">준비중</span>
                                             @endif
                                         </td>
                                         <td>
                                             <small class="text-muted">
-                                                {{ \Carbon\Carbon::parse($service->created_at)->format('m-d H:i') }}
+                                                {{ \Carbon\Carbon::parse($subscribe->created_at)->format('m-d H:i') }}
                                             </small>
                                         </td>
                                         <td>
                                             <div class="btn-group btn-group-sm">
-                                                <a href="{{ route('admin.site.services.edit', $service->id) }}"
+                                                <a href="{{ route('admin.site.subscribes.edit', $subscribe->id) }}"
                                                    class="btn btn-outline-primary btn-sm"
                                                    title="수정">
                                                     <i class="fe fe-edit"></i>
@@ -219,7 +219,7 @@
                     @else
                         <div class="text-center py-4">
                             <i class="fe fe-briefcase fe-2x text-muted mb-2"></i>
-                            <p class="text-muted mb-0">등록된 서비스가 없습니다</p>
+                            <p class="text-muted mb-0">등록된 구독가 없습니다</p>
                         </div>
                     @endif
                 </div>
@@ -231,7 +231,7 @@
             <!-- 카테고리별 통계 -->
             <div class="card border-0 shadow-sm mb-4">
                 <div class="card-header border-0 bg-white">
-                    <h5 class="mb-0">카테고리별 서비스</h5>
+                    <h5 class="mb-0">카테고리별 구독</h5>
                 </div>
                 <div class="card-body">
                     @if($categoryStats->count() > 0)
@@ -240,11 +240,11 @@
                             <div>
                                 <h6 class="mb-1">{{ $category->title }}</h6>
                                 <small class="text-muted">
-                                    서비스중: {{ $category->published_count }} / 전체: {{ $category->service_count }}
+                                    구독중: {{ $category->published_count }} / 전체: {{ $category->subscribe_count }}
                                 </small>
                             </div>
                             <div class="text-end">
-                                <span class="badge bg-primary">{{ $category->service_count }}</span>
+                                <span class="badge bg-primary">{{ $category->subscribe_count }}</span>
                             </div>
                         </div>
                         @if(!$loop->last)
@@ -302,15 +302,15 @@
                 <div class="card-body">
                     <div class="row">
                         <div class="col-md-3">
-                            <a href="{{ route('admin.site.services.create') }}" class="card text-decoration-none quick-action-card">
+                            <a href="{{ route('admin.site.subscribes.create') }}" class="card text-decoration-none quick-action-card">
                                 <div class="card-body text-center">
                                     <i class="fe fe-plus fe-2x text-primary mb-2"></i>
-                                    <h6 class="mb-0">새 서비스 등록</h6>
+                                    <h6 class="mb-0">새 구독 등록</h6>
                                 </div>
                             </a>
                         </div>
                         <div class="col-md-3">
-                            <a href="{{ route('admin.service.categories.index') }}" class="card text-decoration-none quick-action-card">
+                            <a href="{{ route('admin.subscribe.categories.index') }}" class="card text-decoration-none quick-action-card">
                                 <div class="card-body text-center">
                                     <i class="fe fe-folder fe-2x text-success mb-2"></i>
                                     <h6 class="mb-0">카테고리 관리</h6>
@@ -318,18 +318,18 @@
                             </a>
                         </div>
                         <div class="col-md-3">
-                            <a href="{{ route('admin.site.services.index', ['enable' => '0']) }}" class="card text-decoration-none quick-action-card">
+                            <a href="{{ route('admin.site.subscribes.index', ['enable' => '0']) }}" class="card text-decoration-none quick-action-card">
                                 <div class="card-body text-center">
                                     <i class="fe fe-edit fe-2x text-warning mb-2"></i>
-                                    <h6 class="mb-0">준비중인 서비스</h6>
+                                    <h6 class="mb-0">준비중인 구독</h6>
                                 </div>
                             </a>
                         </div>
                         <div class="col-md-3">
-                            <a href="{{ route('admin.site.services.index', ['featured' => '1']) }}" class="card text-decoration-none quick-action-card">
+                            <a href="{{ route('admin.site.subscribes.index', ['featured' => '1']) }}" class="card text-decoration-none quick-action-card">
                                 <div class="card-body text-center">
                                     <i class="fe fe-star fe-2x text-info mb-2"></i>
-                                    <h6 class="mb-0">추천 서비스</h6>
+                                    <h6 class="mb-0">추천 구독</h6>
                                 </div>
                             </a>
                         </div>

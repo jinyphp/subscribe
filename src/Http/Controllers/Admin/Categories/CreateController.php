@@ -1,16 +1,16 @@
 <?php
 
-namespace Jiny\Service\Http\Controllers\Admin\Categories;
+namespace Jiny\Subscribe\Http\Controllers\Admin\Categories;
 
 use Illuminate\Routing\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 /**
- * Service Categories 생성 컨트롤러
+ * subscribe Categories 생성 컨트롤러
  *
  * 진입 경로:
- * Route::get('/admin/service/categories/create') → CreateController::__invoke()
+ * Route::get('/admin/subscribe/categories/create') → CreateController::__invoke()
  */
 class CreateController extends Controller
 {
@@ -24,10 +24,10 @@ class CreateController extends Controller
     protected function loadConfig()
     {
         $this->config = [
-            'table' => 'service_categories',
-            'view' => 'jiny-service::admin.categories.create',
-            'title' => 'Service Category 생성',
-            'subtitle' => '새로운 서비스 카테고리를 생성합니다.',
+            'table' => 'subscribe_categories',
+            'view' => 'jiny-subscribe::admin.categories.create',
+            'title' => 'subscribe Category 생성',
+            'subtitle' => '새로운 구독 카테고리를 생성합니다.',
         ];
     }
 
@@ -43,7 +43,7 @@ class CreateController extends Controller
 
     protected function getParentCategories()
     {
-        return DB::table('service_categories')
+        return DB::table('subscribe_categories')
             ->whereNull('parent_id')
             ->where('enable', true)
             ->orderBy('pos')

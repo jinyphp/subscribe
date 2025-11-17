@@ -1,5 +1,5 @@
 {
-    "name": "jiny/service",
+    "name": "jiny/subscribe",
     "description": "Jiny Service Package - Service management functionality for Laravel applications",
     "type": "library",
     "license": "MIT",
@@ -15,13 +15,13 @@
     },
     "autoload": {
         "psr-4": {
-            "Jiny\\Service\\": "src/"
+            "Jiny\\Subscribe\\": "src/"
         }
     },
     "extra": {
         "laravel": {
             "providers": [
-                "Jiny\\Service\\Providers\\JinyServiceServiceProvider"
+                "Jiny\\Subscribe\\Providers\\JinySubscribeServiceProvider"
             ]
         }
     },

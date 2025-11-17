@@ -1,20 +1,20 @@
 <?php
 
-namespace Jiny\Service\Models;
+namespace Jiny\Subscribe\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Jiny\Site\Services\ExchangeRateService;
+use Jiny\Site\subscribes\ExchangeRatesubscribe;
 
-class SiteServicePricing extends Model
+class SitesubscribePricing extends Model
 {
     use HasFactory, SoftDeletes;
 
-    protected $table = 'service_pricing';
+    protected $table = 'subscribe_pricing';
 
     protected $fillable = [
-        'service_id',
+        'subscribe_id',
         'enable',
         'pos',
         'name',
@@ -24,7 +24,7 @@ class SiteServicePricing extends Model
         'sale_price',
         'currency',
         'duration',
-        'included_services',
+        'included_subscribes',
         'deliverables',
         'revisions',
         'rush_available',
@@ -37,7 +37,7 @@ class SiteServicePricing extends Model
         'price' => 'decimal:2',
         'sale_price' => 'decimal:2',
         'rush_fee' => 'decimal:2',
-        'included_services' => 'array',
+        'included_subscribes' => 'array',
         'deliverables' => 'array',
         'revisions' => 'array',
         'rush_available' => 'boolean',
@@ -48,11 +48,11 @@ class SiteServicePricing extends Model
     ];
 
     /**
-     * 소속 서비스와의 관계
+     * 소속 구독와의 관계
      */
-    public function service()
+    public function subscribe()
     {
-        return $this->belongsTo(SiteService::class, 'service_id');
+        return $this->belongsTo(Sitesubscribe::class, 'subscribe_id');
     }
 
     /**
@@ -124,11 +124,11 @@ class SiteServicePricing extends Model
     }
 
     /**
-     * 포함된 서비스 개수
+     * 포함된 구독 개수
      */
-    public function getIncludedServicesCountAttribute()
+    public function getIncludedsubscribesCountAttribute()
     {
-        return is_array($this->included_services) ? count($this->included_services) : 0;
+        return is_array($this->included_subscribes) ? count($this->included_subscribes) : 0;
     }
 
     /**
@@ -164,8 +164,8 @@ class SiteServicePricing extends Model
         // 1. 환율 적용 (통화 변환)
         $convertedPrice = $basePrice;
         if ($baseCurrency !== $targetCurrency) {
-            $exchangeService = new ExchangeRateService();
-            $convertedPrice = $exchangeService->convertAmount(
+            $exchangesubscribe = new ExchangeRatesubscribe();
+            $convertedPrice = $exchangesubscribe->convertAmount(
                 $basePrice,
                 $baseCurrency,
                 $targetCurrency
@@ -269,8 +269,8 @@ class SiteServicePricing extends Model
 
         // 환율 적용
         if ($baseCurrency !== $targetCurrency) {
-            $exchangeService = new ExchangeRateService();
-            $rushFee = $exchangeService->convertAmount(
+            $exchangesubscribe = new ExchangeRatesubscribe();
+            $rushFee = $exchangesubscribe->convertAmount(
                 $this->rush_fee,
                 $baseCurrency,
                 $targetCurrency
@@ -337,7 +337,7 @@ class SiteServicePricing extends Model
     }
 
     /**
-     * 서비스 가격 비교 (다른 패키지와)
+     * 구독 가격 비교 (다른 패키지와)
      */
     public function comparePricing($otherPricing, $targetCurrency = null, $userCountryCode = null, $includeRushFee = false)
     {
@@ -362,9 +362,9 @@ class SiteServicePricing extends Model
     }
 
     /**
-     * 급행 서비스 가능 여부
+     * 급행 구독 가능 여부
      */
-    public function hasRushService()
+    public function hasRushsubscribe()
     {
         return $this->rush_available && $this->rush_fee > 0;
     }
@@ -374,7 +374,7 @@ class SiteServicePricing extends Model
      */
     public function getRushFeeOnly($targetCurrency = null)
     {
-        if (!$this->hasRushService()) {
+        if (!$this->hasRushsubscribe()) {
             return 0;
         }
 
@@ -383,8 +383,8 @@ class SiteServicePricing extends Model
         $rushFee = $this->rush_fee;
 
         if ($baseCurrency !== $targetCurrency) {
-            $exchangeService = new ExchangeRateService();
-            $rushFee = $exchangeService->convertAmount(
+            $exchangesubscribe = new ExchangeRatesubscribe();
+            $rushFee = $exchangesubscribe->convertAmount(
                 $this->rush_fee,
                 $baseCurrency,
                 $targetCurrency
@@ -403,7 +403,7 @@ class SiteServicePricing extends Model
     }
 
     /**
-     * 급행 서비스 가능한 패키지만 조회
+     * 급행 구독 가능한 패키지만 조회
      */
     public function scopeRushAvailable($query)
     {
@@ -459,7 +459,7 @@ class SiteServicePricing extends Model
     }
 
     /**
-     * 서비스 기간별 조회
+     * 구독 기간별 조회
      */
     public function scopeByDuration($query, $duration)
     {

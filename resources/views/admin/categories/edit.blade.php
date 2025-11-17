@@ -1,9 +1,10 @@
-@extends($layout ?? 'jiny-service::layouts.admin.sidebar')
+@extends($layout ?? 'jiny-subscribe::layouts.admin.sidebar')
 
 @section('title', $config['title'])
 
 @section('content')
 <div class="container-fluid">
+
     <!-- 헤더 -->
     <div class="row mb-4">
         <div class="col-12">
@@ -13,7 +14,7 @@
                     <p class="text-muted mb-0">{{ $config['subtitle'] }}</p>
                 </div>
                 <div>
-                    <a href="{{ route('admin.service.categories.index') }}" class="btn btn-outline-secondary">
+                    <a href="{{ route('admin.subscribe.categories.index') }}" class="btn btn-outline-secondary">
                         <i class="fe fe-arrow-left me-2"></i>목록으로
                     </a>
                 </div>
@@ -29,7 +30,7 @@
                     <h5 class="mb-0">카테고리 정보</h5>
                 </div>
                 <div class="card-body">
-                    <form method="POST" action="{{ route('admin.service.categories.update', $category->id) }}">
+                    <form method="POST" action="{{ route('admin.subscribe.categories.update', $category->id) }}">
                         @csrf
                         @method('PUT')
 
@@ -185,7 +186,7 @@
                         </div>
 
                         <div class="d-flex justify-content-between">
-                            <a href="{{ route('admin.service.categories.index') }}" class="btn btn-secondary">
+                            <a href="{{ route('admin.subscribe.categories.index') }}" class="btn btn-secondary">
                                 <i class="fe fe-x me-2"></i>취소
                             </a>
                             <button type="submit" class="btn btn-primary">
@@ -229,7 +230,7 @@
                     <div class="alert alert-warning mb-0">
                         <h6><i class="fe fe-alert-triangle me-2"></i>수정 안내</h6>
                         <ul class="mb-0 small">
-                            <li>카테고리에 서비스가 등록되어 있으면 신중히 수정하세요.</li>
+                            <li>카테고리에 구독가 등록되어 있으면 신중히 수정하세요.</li>
                             <li>URL 슬러그 변경시 SEO에 영향을 줄 수 있습니다.</li>
                             <li>상위 카테고리 변경시 구조를 확인하세요.</li>
                         </ul>

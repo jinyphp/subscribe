@@ -19,7 +19,7 @@
         <ul class="dropdown-menu">
             @if(isset($item['children']) && is_array($item['children']))
                 @foreach ($item['children'] as $subItem)
-                    @include('jiny-service::partials.navs.nav-classic.menu-item', ['item' => $subItem])
+                    @include('jiny-subscribe::partials.navs.nav-classic.menu-item', ['item' => $subItem])
                 @endforeach
             @endif
         </ul>

@@ -11,7 +11,7 @@
                 @if(isset($item['id'])) aria-labelledby="{{ $item['id'] }}" @endif>
                 @if(isset($item['children']) && is_array($item['children']))
                     @foreach($item['children'] as $child)
-                        @include('jiny-service::partials.navs.second.menu-item', ['item' => $child])
+                        @include('jiny-subscribe::partials.navs.second.menu-item', ['item' => $child])
                     @endforeach
                 @endif
             </ul>
@@ -82,7 +82,7 @@
             <ul class="{{ $item['dropdown_class'] ?? 'dropdown-menu' }}">
                 @if(isset($item['children']) && is_array($item['children']))
                     @foreach($item['children'] as $child)
-                        @include('jiny-service::partials.navs.second.menu-item', ['item' => $child])
+                        @include('jiny-subscribe::partials.navs.second.menu-item', ['item' => $child])
                     @endforeach
                 @endif
             </ul>

@@ -64,7 +64,7 @@
 
         {{-- 상단 메뉴 Collapse --}}
         <div class="collapse navbar-collapse" id="navbar-default">
-            @includeIf('jiny-service::partials.navs.nav-classic.top', [
+            @includeIf('jiny-subscribe::partials.navs.nav-classic.top', [
                 'menuItems' => Site::menuItems('classic')
             ])
         </div>

@@ -1,4 +1,4 @@
-@extends('jiny-service::layouts.admin.sidebar')
+@extends('jiny-subscribe::layouts.admin.sidebar')
 
 @section('content')
 <div class="container-fluid">
@@ -11,10 +11,10 @@
                     <p class="text-muted mb-0">플랜의 상세 기능과 제한사항을 관리합니다.</p>
                 </div>
                 <div>
-                    <a href="{{ route('admin.service.plan.index') }}" class="btn btn-outline-secondary me-2">
+                    <a href="{{ route('admin.subscribe.plan.index') }}" class="btn btn-outline-secondary me-2">
                         <i class="fe fe-arrow-left me-2"></i>플랜 목록
                     </a>
-                    <a href="{{ route('admin.service.plan.detail.create', $plan->id) }}" class="btn btn-primary">
+                    <a href="{{ route('admin.subscribe.plan.detail.create', $plan->id) }}" class="btn btn-primary">
                         <i class="fe fe-plus me-2"></i>상세 기능 추가
                     </a>
                 </div>
@@ -28,7 +28,7 @@
             <div class="row">
                 <div class="col-md-8">
                     <h5 class="mb-1">{{ $plan->plan_name }}</h5>
-                    <p class="text-muted mb-2">{{ $plan->service->title ?? '-' }} | {{ $plan->plan_code }}</p>
+                    <p class="text-muted mb-2">{{ $plan->subscribe->title ?? '-' }} | {{ $plan->plan_code }}</p>
                     <p class="mb-0">{{ $plan->description }}</p>
                 </div>
                 <div class="col-md-4 text-end">
@@ -169,12 +169,12 @@
                                 </td>
                                 <td>
                                     <div class="btn-group btn-group-sm">
-                                        <a href="{{ route('admin.service.plan.detail.show', [$plan->id, $detail->id]) }}"
+                                        <a href="{{ route('admin.subscribe.plan.detail.show', [$plan->id, $detail->id]) }}"
                                            class="btn btn-outline-info"
                                            title="상세보기">
                                             <i class="fe fe-eye"></i>
                                         </a>
-                                        <a href="{{ route('admin.service.plan.detail.edit', [$plan->id, $detail->id]) }}"
+                                        <a href="{{ route('admin.subscribe.plan.detail.edit', [$plan->id, $detail->id]) }}"
                                            class="btn btn-outline-primary"
                                            title="수정">
                                             <i class="fe fe-edit"></i>
@@ -202,7 +202,7 @@
                     <i class="fe fe-list fe-3x text-muted mb-3"></i>
                     <h5 class="text-muted">등록된 상세 기능이 없습니다</h5>
                     <p class="text-muted">새로운 상세 기능을 추가해보세요.</p>
-                    <a href="{{ route('admin.service.plan.detail.create', $plan->id) }}" class="btn btn-primary">
+                    <a href="{{ route('admin.subscribe.plan.detail.create', $plan->id) }}" class="btn btn-primary">
                         <i class="fe fe-plus me-2"></i>첫 번째 상세 기능 추가
                     </a>
                 </div>
@@ -244,7 +244,7 @@
 function deleteDetail(id) {
     const modal = new bootstrap.Modal(document.getElementById('deleteModal'));
     const form = document.getElementById('deleteForm');
-    form.action = `/admin/service/plan/{{ $plan->id }}/detail/${id}`;
+    form.action = `/admin/subscribe/plan/{{ $plan->id }}/detail/${id}`;
     modal.show();
 }
 </script>

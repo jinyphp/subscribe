@@ -1,13 +1,13 @@
 <?php
 
-namespace Jiny\Service\Http\Controllers\Admin\Process;
+namespace Jiny\Subscribe\Http\Controllers\Admin\Process;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Jiny\Service\Models\ServiceUser;
-use Jiny\Service\Models\ServicePlan;
-use Jiny\Service\Models\ServicePayment;
-use Jiny\Service\Models\ServiceSubscriptionLog;
+use Jiny\Subscribe\Models\subscribeUser;
+use Jiny\Subscribe\Models\subscribePlan;
+use Jiny\Subscribe\Models\subscribePayment;
+use Jiny\Subscribe\Models\subscribeSubscriptionLog;
 use Carbon\Carbon;
 
 class UpgradeController extends Controller
@@ -15,10 +15,10 @@ class UpgradeController extends Controller
     /**
      * 플랜 업그레이드
      */
-    public function upgrade(Request $request, $serviceUserId)
+    public function upgrade(Request $request, $subscribeUserId)
     {
         $request->validate([
-            'new_plan_code' => 'required|exists:site_service_plans,plan_code',
+            'new_plan_code' => 'required|exists:site_subscribe_plans,plan_code',
             'billing_cycle' => 'nullable|in:monthly,quarterly,yearly,lifetime',
             'payment_method' => 'nullable|string|max:50',
             'prorate_payment' => 'boolean',
@@ -26,13 +26,13 @@ class UpgradeController extends Controller
             'admin_notes' => 'nullable|string|max:1000',
         ]);
 
-        $serviceUser = ServiceUser::findOrFail($serviceUserId);
-        $currentPlan = ServicePlan::where('plan_name', $serviceUser->plan_name)
-                                 ->where('service_id', $serviceUser->service_id)
+        $subscribeUser = subscribeUser::findOrFail($subscribeUserId);
+        $currentPlan = subscribePlan::where('plan_name', $subscribeUser->plan_name)
+                                 ->where('subscribe_id', $subscribeUser->subscribe_id)
                                  ->first();
 
-        $newPlan = ServicePlan::where('plan_code', $request->new_plan_code)
-                             ->where('service_id', $serviceUser->service_id)
+        $newPlan = subscribePlan::where('plan_code', $request->new_plan_code)
+                             ->where('subscribe_id', $subscribeUser->subscribe_id)
                              ->where('is_active', true)
                              ->first();
 
@@ -51,35 +51,35 @@ class UpgradeController extends Controller
             ], 400);
         }
 
-        $billingCycle = $request->billing_cycle ?: $serviceUser->billing_cycle;
+        $billingCycle = $request->billing_cycle ?: $subscribeUser->billing_cycle;
 
         try {
-            \DB::transaction(function () use ($request, $serviceUser, $currentPlan, $newPlan, $billingCycle, &$payment, &$upgradePrice) {
+            \DB::transaction(function () use ($request, $subscribeUser, $currentPlan, $newPlan, $billingCycle, &$payment, &$upgradePrice) {
 
                 // 업그레이드 비용 계산
-                $upgradePrice = $this->calculateUpgradePrice($currentPlan, $newPlan, $serviceUser, $billingCycle, $request->prorate_payment);
+                $upgradePrice = $this->calculateUpgradePrice($currentPlan, $newPlan, $subscribeUser, $billingCycle, $request->prorate_payment);
 
-                $originalPlanName = $serviceUser->plan_name;
+                $originalPlanName = $subscribeUser->plan_name;
 
                 // 즉시 업그레이드 또는 다음 결제일에 업그레이드
                 if ($request->immediate_upgrade || $newPlan->immediate_upgrade) {
                     // 즉시 업그레이드
-                    $this->performImmediateUpgrade($serviceUser, $newPlan, $billingCycle);
+                    $this->performImmediateUpgrade($subscribeUser, $newPlan, $billingCycle);
                 } else {
                     // 다음 결제일에 업그레이드 예약
-                    $serviceUser->update([
+                    $subscribeUser->update([
                         'auto_upgrade' => true,
-                        'admin_notes' => ($serviceUser->admin_notes ?: '') . "\n다음 결제일에 '{$newPlan->plan_name}' 플랜으로 업그레이드 예정",
+                        'admin_notes' => ($subscribeUser->admin_notes ?: '') . "\n다음 결제일에 '{$newPlan->plan_name}' 플랜으로 업그레이드 예정",
                     ]);
                 }
 
                 // 업그레이드 비용이 있는 경우 결제 레코드 생성
                 if ($upgradePrice > 0) {
-                    $payment = ServicePayment::create([
-                        'service_user_id' => $serviceUser->id,
-                        'user_uuid' => $serviceUser->user_uuid,
-                        'service_id' => $serviceUser->service_id,
-                        'order_id' => 'UPG-' . $serviceUser->id . '-' . time(),
+                    $payment = subscribePayment::create([
+                        'subscribe_user_id' => $subscribeUser->id,
+                        'user_uuid' => $subscribeUser->user_uuid,
+                        'subscribe_id' => $subscribeUser->subscribe_id,
+                        'order_id' => 'UPG-' . $subscribeUser->id . '-' . time(),
                         'amount' => $upgradePrice,
                         'tax_amount' => 0,
                         'discount_amount' => 0,
@@ -91,25 +91,25 @@ class UpgradeController extends Controller
                         'payment_type' => 'upgrade',
                         'billing_cycle' => $billingCycle,
                         'billing_period_start' => now(),
-                        'billing_period_end' => $serviceUser->expires_at,
+                        'billing_period_end' => $subscribeUser->expires_at,
                         'paid_at' => now(),
                     ]);
 
                     // 총 결제 금액 업데이트
-                    $serviceUser->increment('total_paid', $upgradePrice);
+                    $subscribeUser->increment('total_paid', $upgradePrice);
                 }
 
                 // 업그레이드 로그 기록
-                ServiceSubscriptionLog::logUpgrade(
-                    $serviceUser->id,
+                subscribeSubscriptionLog::logUpgrade(
+                    $subscribeUser->id,
                     $originalPlanName,
                     $newPlan->plan_name,
                     $upgradePrice
                 );
 
                 // 관리자 액션 로그
-                ServiceSubscriptionLog::logAdminAction(
-                    $serviceUser->id,
+                subscribeSubscriptionLog::logAdminAction(
+                    $subscribeUser->id,
                     '플랜 업그레이드',
                     $request->admin_notes ?: "'{$originalPlanName}'에서 '{$newPlan->plan_name}'으로 업그레이드",
                     auth()->id(),
@@ -125,7 +125,7 @@ class UpgradeController extends Controller
                 'success' => true,
                 'message' => $message,
                 'data' => [
-                    'service_user_id' => $serviceUser->id,
+                    'subscribe_user_id' => $subscribeUser->id,
                     'old_plan' => $currentPlan->plan_name,
                     'new_plan' => $newPlan->plan_name,
                     'upgrade_price' => $upgradePrice,
@@ -145,23 +145,23 @@ class UpgradeController extends Controller
     /**
      * 플랜 다운그레이드
      */
-    public function downgrade(Request $request, $serviceUserId)
+    public function downgrade(Request $request, $subscribeUserId)
     {
         $request->validate([
-            'new_plan_code' => 'required|exists:site_service_plans,plan_code',
+            'new_plan_code' => 'required|exists:site_subscribe_plans,plan_code',
             'billing_cycle' => 'nullable|in:monthly,quarterly,yearly,lifetime',
             'immediate_downgrade' => 'boolean',
             'refund_amount' => 'nullable|numeric|min:0',
             'admin_notes' => 'nullable|string|max:1000',
         ]);
 
-        $serviceUser = ServiceUser::findOrFail($serviceUserId);
-        $currentPlan = ServicePlan::where('plan_name', $serviceUser->plan_name)
-                                 ->where('service_id', $serviceUser->service_id)
+        $subscribeUser = subscribeUser::findOrFail($subscribeUserId);
+        $currentPlan = subscribePlan::where('plan_name', $subscribeUser->plan_name)
+                                 ->where('subscribe_id', $subscribeUser->subscribe_id)
                                  ->first();
 
-        $newPlan = ServicePlan::where('plan_code', $request->new_plan_code)
-                             ->where('service_id', $serviceUser->service_id)
+        $newPlan = subscribePlan::where('plan_code', $request->new_plan_code)
+                             ->where('subscribe_id', $subscribeUser->subscribe_id)
                              ->where('is_active', true)
                              ->first();
 
@@ -180,55 +180,55 @@ class UpgradeController extends Controller
             ], 400);
         }
 
-        $billingCycle = $request->billing_cycle ?: $serviceUser->billing_cycle;
+        $billingCycle = $request->billing_cycle ?: $subscribeUser->billing_cycle;
 
         try {
-            \DB::transaction(function () use ($request, $serviceUser, $currentPlan, $newPlan, $billingCycle, &$refundAmount) {
+            \DB::transaction(function () use ($request, $subscribeUser, $currentPlan, $newPlan, $billingCycle, &$refundAmount) {
 
-                $originalPlanName = $serviceUser->plan_name;
+                $originalPlanName = $subscribeUser->plan_name;
 
                 // 환불 금액 계산
                 $refundAmount = $request->refund_amount;
                 if (!$refundAmount && $request->immediate_downgrade) {
-                    $remainingDays = now()->diffInDays($serviceUser->expires_at);
+                    $remainingDays = now()->diffInDays($subscribeUser->expires_at);
                     $refundAmount = $newPlan->getDowngradeRefund($currentPlan, $billingCycle, $remainingDays);
                 }
 
                 // 즉시 다운그레이드 또는 다음 결제일에 다운그레이드
                 if ($request->immediate_downgrade || $newPlan->immediate_downgrade) {
                     // 즉시 다운그레이드
-                    $this->performImmediateDowngrade($serviceUser, $newPlan, $billingCycle);
+                    $this->performImmediateDowngrade($subscribeUser, $newPlan, $billingCycle);
                 } else {
                     // 다음 결제일에 다운그레이드 예약
-                    $serviceUser->update([
-                        'admin_notes' => ($serviceUser->admin_notes ?: '') . "\n다음 결제일에 '{$newPlan->plan_name}' 플랜으로 다운그레이드 예정",
+                    $subscribeUser->update([
+                        'admin_notes' => ($subscribeUser->admin_notes ?: '') . "\n다음 결제일에 '{$newPlan->plan_name}' 플랜으로 다운그레이드 예정",
                     ]);
                 }
 
                 // 환불 처리
                 if ($refundAmount > 0) {
-                    $serviceUser->increment('refund_amount', $refundAmount);
-                    $serviceUser->update(['refunded_at' => now()]);
+                    $subscribeUser->increment('refund_amount', $refundAmount);
+                    $subscribeUser->update(['refunded_at' => now()]);
 
                     // 환불 로그 기록
-                    ServiceSubscriptionLog::logRefund(
-                        $serviceUser->id,
+                    subscribeSubscriptionLog::logRefund(
+                        $subscribeUser->id,
                         $refundAmount,
                         '다운그레이드로 인한 환불'
                     );
                 }
 
                 // 다운그레이드 로그 기록
-                ServiceSubscriptionLog::logDowngrade(
-                    $serviceUser->id,
+                subscribeSubscriptionLog::logDowngrade(
+                    $subscribeUser->id,
                     $originalPlanName,
                     $newPlan->plan_name,
                     $refundAmount
                 );
 
                 // 관리자 액션 로그
-                ServiceSubscriptionLog::logAdminAction(
-                    $serviceUser->id,
+                subscribeSubscriptionLog::logAdminAction(
+                    $subscribeUser->id,
                     '플랜 다운그레이드',
                     $request->admin_notes ?: "'{$originalPlanName}'에서 '{$newPlan->plan_name}'으로 다운그레이드",
                     auth()->id(),
@@ -244,7 +244,7 @@ class UpgradeController extends Controller
                 'success' => true,
                 'message' => $message,
                 'data' => [
-                    'service_user_id' => $serviceUser->id,
+                    'subscribe_user_id' => $subscribeUser->id,
                     'old_plan' => $currentPlan->plan_name,
                     'new_plan' => $newPlan->plan_name,
                     'refund_amount' => $refundAmount,
@@ -263,7 +263,7 @@ class UpgradeController extends Controller
     /**
      * 업그레이드 비용 계산
      */
-    private function calculateUpgradePrice(ServicePlan $currentPlan, ServicePlan $newPlan, ServiceUser $serviceUser, string $billingCycle, bool $prorate): float
+    private function calculateUpgradePrice(subscribePlan $currentPlan, subscribePlan $newPlan, subscribeUser $subscribeUser, string $billingCycle, bool $prorate): float
     {
         $currentPrice = $currentPlan->calculatePrice($billingCycle);
         $newPrice = $newPlan->calculatePrice($billingCycle);
@@ -274,7 +274,7 @@ class UpgradeController extends Controller
         }
 
         // 비례 계산: 남은 기간에 대한 차액만 청구
-        $remainingDays = now()->diffInDays($serviceUser->expires_at);
+        $remainingDays = now()->diffInDays($subscribeUser->expires_at);
         $totalDays = match ($billingCycle) {
             'monthly' => 30,
             'quarterly' => 90,
@@ -288,9 +288,9 @@ class UpgradeController extends Controller
     /**
      * 즉시 업그레이드 실행
      */
-    private function performImmediateUpgrade(ServiceUser $serviceUser, ServicePlan $newPlan, string $billingCycle): void
+    private function performImmediateUpgrade(subscribeUser $subscribeUser, subscribePlan $newPlan, string $billingCycle): void
     {
-        $serviceUser->update([
+        $subscribeUser->update([
             'plan_name' => $newPlan->plan_name,
             'plan_price' => $newPlan->calculatePrice($billingCycle),
             'plan_features' => $newPlan->features,
@@ -303,9 +303,9 @@ class UpgradeController extends Controller
     /**
      * 즉시 다운그레이드 실행
      */
-    private function performImmediateDowngrade(ServiceUser $serviceUser, ServicePlan $newPlan, string $billingCycle): void
+    private function performImmediateDowngrade(subscribeUser $subscribeUser, subscribePlan $newPlan, string $billingCycle): void
     {
-        $serviceUser->update([
+        $subscribeUser->update([
             'plan_name' => $newPlan->plan_name,
             'plan_price' => $newPlan->calculatePrice($billingCycle),
             'plan_features' => $newPlan->features,

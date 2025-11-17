@@ -1,6 +1,6 @@
-@extends('jiny-service::layouts.admin.sidebar')
+@extends('jiny-subscribe::layouts.admin.sidebar')
 
-@section('title', '서비스 구독자 편집')
+@section('title', '구독 구독자 편집')
 
 @push('meta')
 <meta name="csrf-token" content="{{ csrf_token() }}">
@@ -13,15 +13,15 @@
         <div class="col-12">
             <div class="d-flex justify-content-between align-items-center">
                 <div>
-                    <h1 class="h2 fw-bold text-dark">서비스 구독자 편집</h1>
-                    <p class="text-muted mb-0">{{ $serviceUser->user_name }}님의 구독 정보를 수정합니다.</p>
+                    <h1 class="h2 fw-bold text-dark">구독 구독자 편집</h1>
+                    <p class="text-muted mb-0">{{ $subscribeUser->user_name }}님의 구독 정보를 수정합니다.</p>
                 </div>
                 <div class="d-flex gap-2">
-                    <a href="{{ route('admin.service.users.index') }}"
+                    <a href="{{ route('admin.subscribe.users.index') }}"
                        class="btn btn-secondary">
                         <i class="fe fe-list me-2"></i>목록으로
                     </a>
-                    <a href="{{ route('admin.service.users.show', $serviceUser->id) }}"
+                    <a href="{{ route('admin.subscribe.users.show', $subscribeUser->id) }}"
                        class="btn btn-info">
                         <i class="fe fe-eye me-2"></i>상세보기
                     </a>
@@ -58,7 +58,7 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-body">
-                    <form action="{{ route('admin.service.users.update', $serviceUser->id) }}" method="POST">
+                    <form action="{{ route('admin.subscribe.users.update', $subscribeUser->id) }}" method="POST">
                         @csrf
                         @method('PUT')
 
@@ -71,7 +71,7 @@
                                     <input type="text"
                                            id="user_uuid"
                                            name="user_uuid"
-                                           value="{{ old('user_uuid', $serviceUser->user_uuid) }}"
+                                           value="{{ old('user_uuid', $subscribeUser->user_uuid) }}"
                                            class="form-control"
                                            readonly>
                                 </div>
@@ -81,7 +81,7 @@
                                     <input type="text"
                                            id="user_shard"
                                            name="user_shard"
-                                           value="{{ old('user_shard', $serviceUser->user_shard) }}"
+                                           value="{{ old('user_shard', $subscribeUser->user_shard) }}"
                                            class="form-control"
                                            readonly>
                                 </div>
@@ -91,7 +91,7 @@
                                     <input type="number"
                                            id="user_id"
                                            name="user_id"
-                                           value="{{ old('user_id', $serviceUser->user_id) }}"
+                                           value="{{ old('user_id', $subscribeUser->user_id) }}"
                                            class="form-control"
                                            readonly>
                                 </div>
@@ -101,7 +101,7 @@
                                     <input type="email"
                                            id="user_email"
                                            name="user_email"
-                                           value="{{ old('user_email', $serviceUser->user_email) }}"
+                                           value="{{ old('user_email', $subscribeUser->user_email) }}"
                                            class="form-control"
                                            required>
                                 </div>
@@ -111,27 +111,27 @@
                                     <input type="text"
                                            id="user_name"
                                            name="user_name"
-                                           value="{{ old('user_name', $serviceUser->user_name) }}"
+                                           value="{{ old('user_name', $subscribeUser->user_name) }}"
                                            class="form-control"
                                            required>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- 서비스 및 구독 정보 섹션 -->
+                        <!-- 구독 및 구독 정보 섹션 -->
                         <div class="border-bottom pb-4 mb-4">
-                            <h5 class="card-title">서비스 및 구독 정보</h5>
+                            <h5 class="card-title">구독 및 구독 정보</h5>
                             <div class="row g-3">
                                 <div class="col-md-6">
-                                    <label for="service_id" class="form-label">서비스 *</label>
-                                    <select id="service_id"
-                                            name="service_id"
+                                    <label for="subscribe_id" class="form-label">구독 *</label>
+                                    <select id="subscribe_id"
+                                            name="subscribe_id"
                                             class="form-select"
                                             required>
-                                        <option value="">서비스를 선택하세요</option>
-                                        @foreach($services as $service)
-                                            <option value="{{ $service->id }}" {{ old('service_id', $serviceUser->service_id) == $service->id ? 'selected' : '' }}>
-                                                {{ $service->title }}
+                                        <option value="">구독를 선택하세요</option>
+                                        @foreach($subscribes as $subscribe)
+                                            <option value="{{ $subscribe->id }}" {{ old('subscribe_id', $subscribeUser->subscribe_id) == $subscribe->id ? 'selected' : '' }}>
+                                                {{ $subscribe->title }}
                                             </option>
                                         @endforeach
                                     </select>
@@ -143,11 +143,11 @@
                                             name="status"
                                             class="form-select"
                                             required>
-                                        <option value="pending" {{ old('status', $serviceUser->status) == 'pending' ? 'selected' : '' }}>대기중</option>
-                                        <option value="active" {{ old('status', $serviceUser->status) == 'active' ? 'selected' : '' }}>활성</option>
-                                        <option value="suspended" {{ old('status', $serviceUser->status) == 'suspended' ? 'selected' : '' }}>일시정지</option>
-                                        <option value="cancelled" {{ old('status', $serviceUser->status) == 'cancelled' ? 'selected' : '' }}>취소</option>
-                                        <option value="expired" {{ old('status', $serviceUser->status) == 'expired' ? 'selected' : '' }}>만료</option>
+                                        <option value="pending" {{ old('status', $subscribeUser->status) == 'pending' ? 'selected' : '' }}>대기중</option>
+                                        <option value="active" {{ old('status', $subscribeUser->status) == 'active' ? 'selected' : '' }}>활성</option>
+                                        <option value="suspended" {{ old('status', $subscribeUser->status) == 'suspended' ? 'selected' : '' }}>일시정지</option>
+                                        <option value="cancelled" {{ old('status', $subscribeUser->status) == 'cancelled' ? 'selected' : '' }}>취소</option>
+                                        <option value="expired" {{ old('status', $subscribeUser->status) == 'expired' ? 'selected' : '' }}>만료</option>
                                     </select>
                                 </div>
 
@@ -157,10 +157,10 @@
                                             name="billing_cycle"
                                             class="form-select"
                                             required>
-                                        <option value="monthly" {{ old('billing_cycle', $serviceUser->billing_cycle) == 'monthly' ? 'selected' : '' }}>월간</option>
-                                        <option value="quarterly" {{ old('billing_cycle', $serviceUser->billing_cycle) == 'quarterly' ? 'selected' : '' }}>분기</option>
-                                        <option value="yearly" {{ old('billing_cycle', $serviceUser->billing_cycle) == 'yearly' ? 'selected' : '' }}>연간</option>
-                                        <option value="lifetime" {{ old('billing_cycle', $serviceUser->billing_cycle) == 'lifetime' ? 'selected' : '' }}>평생</option>
+                                        <option value="monthly" {{ old('billing_cycle', $subscribeUser->billing_cycle) == 'monthly' ? 'selected' : '' }}>월간</option>
+                                        <option value="quarterly" {{ old('billing_cycle', $subscribeUser->billing_cycle) == 'quarterly' ? 'selected' : '' }}>분기</option>
+                                        <option value="yearly" {{ old('billing_cycle', $subscribeUser->billing_cycle) == 'yearly' ? 'selected' : '' }}>연간</option>
+                                        <option value="lifetime" {{ old('billing_cycle', $subscribeUser->billing_cycle) == 'lifetime' ? 'selected' : '' }}>평생</option>
                                     </select>
                                 </div>
 
@@ -170,10 +170,10 @@
                                             name="payment_status"
                                             class="form-select"
                                             required>
-                                        <option value="pending" {{ old('payment_status', $serviceUser->payment_status) == 'pending' ? 'selected' : '' }}>대기중</option>
-                                        <option value="paid" {{ old('payment_status', $serviceUser->payment_status) == 'paid' ? 'selected' : '' }}>결제완료</option>
-                                        <option value="failed" {{ old('payment_status', $serviceUser->payment_status) == 'failed' ? 'selected' : '' }}>결제실패</option>
-                                        <option value="refunded" {{ old('payment_status', $serviceUser->payment_status) == 'refunded' ? 'selected' : '' }}>환불</option>
+                                        <option value="pending" {{ old('payment_status', $subscribeUser->payment_status) == 'pending' ? 'selected' : '' }}>대기중</option>
+                                        <option value="paid" {{ old('payment_status', $subscribeUser->payment_status) == 'paid' ? 'selected' : '' }}>결제완료</option>
+                                        <option value="failed" {{ old('payment_status', $subscribeUser->payment_status) == 'failed' ? 'selected' : '' }}>결제실패</option>
+                                        <option value="refunded" {{ old('payment_status', $subscribeUser->payment_status) == 'refunded' ? 'selected' : '' }}>환불</option>
                                     </select>
                                 </div>
                             </div>
@@ -188,7 +188,7 @@
                                     <input type="datetime-local"
                                            id="started_at"
                                            name="started_at"
-                                           value="{{ old('started_at', $serviceUser->started_at ? $serviceUser->started_at->format('Y-m-d\TH:i') : '') }}"
+                                           value="{{ old('started_at', $subscribeUser->started_at ? $subscribeUser->started_at->format('Y-m-d\TH:i') : '') }}"
                                            class="form-control">
                                 </div>
 
@@ -197,7 +197,7 @@
                                     <input type="datetime-local"
                                            id="expires_at"
                                            name="expires_at"
-                                           value="{{ old('expires_at', $serviceUser->expires_at ? $serviceUser->expires_at->format('Y-m-d\TH:i') : '') }}"
+                                           value="{{ old('expires_at', $subscribeUser->expires_at ? $subscribeUser->expires_at->format('Y-m-d\TH:i') : '') }}"
                                            class="form-control">
                                 </div>
 
@@ -206,7 +206,7 @@
                                     <input type="datetime-local"
                                            id="next_billing_at"
                                            name="next_billing_at"
-                                           value="{{ old('next_billing_at', $serviceUser->next_billing_at ? $serviceUser->next_billing_at->format('Y-m-d\TH:i') : '') }}"
+                                           value="{{ old('next_billing_at', $subscribeUser->next_billing_at ? $subscribeUser->next_billing_at->format('Y-m-d\TH:i') : '') }}"
                                            class="form-control">
                                 </div>
                             </div>
@@ -221,7 +221,7 @@
                                     <input type="text"
                                            id="plan_name"
                                            name="plan_name"
-                                           value="{{ old('plan_name', $serviceUser->plan_name) }}"
+                                           value="{{ old('plan_name', $subscribeUser->plan_name) }}"
                                            class="form-control">
                                 </div>
 
@@ -230,7 +230,7 @@
                                     <input type="number"
                                            id="plan_price"
                                            name="plan_price"
-                                           value="{{ old('plan_price', $serviceUser->plan_price) }}"
+                                           value="{{ old('plan_price', $subscribeUser->plan_price) }}"
                                            step="0.01"
                                            min="0"
                                            class="form-control">
@@ -241,7 +241,7 @@
                                     <input type="number"
                                            id="monthly_price"
                                            name="monthly_price"
-                                           value="{{ old('monthly_price', $serviceUser->monthly_price) }}"
+                                           value="{{ old('monthly_price', $subscribeUser->monthly_price) }}"
                                            step="0.01"
                                            min="0"
                                            class="form-control">
@@ -252,7 +252,7 @@
                                     <input type="number"
                                            id="total_paid"
                                            name="total_paid"
-                                           value="{{ old('total_paid', $serviceUser->total_paid) }}"
+                                           value="{{ old('total_paid', $subscribeUser->total_paid) }}"
                                            step="0.01"
                                            min="0"
                                            class="form-control">
@@ -263,7 +263,7 @@
                                     <input type="text"
                                            id="payment_method"
                                            name="payment_method"
-                                           value="{{ old('payment_method', $serviceUser->payment_method) }}"
+                                           value="{{ old('payment_method', $subscribeUser->payment_method) }}"
                                            class="form-control">
                                 </div>
                             </div>
@@ -278,7 +278,7 @@
                                     <input type="number"
                                            id="refund_amount"
                                            name="refund_amount"
-                                           value="{{ old('refund_amount', $serviceUser->refund_amount) }}"
+                                           value="{{ old('refund_amount', $subscribeUser->refund_amount) }}"
                                            step="0.01"
                                            min="0"
                                            class="form-control">
@@ -289,7 +289,7 @@
                                     <input type="datetime-local"
                                            id="refunded_at"
                                            name="refunded_at"
-                                           value="{{ old('refunded_at', $serviceUser->refunded_at ? $serviceUser->refunded_at->format('Y-m-d\TH:i') : '') }}"
+                                           value="{{ old('refunded_at', $subscribeUser->refunded_at ? $subscribeUser->refunded_at->format('Y-m-d\TH:i') : '') }}"
                                            class="form-control">
                                 </div>
 
@@ -298,7 +298,7 @@
                                     <textarea id="cancel_reason"
                                               name="cancel_reason"
                                               rows="3"
-                                              class="form-control">{{ old('cancel_reason', $serviceUser->cancel_reason) }}</textarea>
+                                              class="form-control">{{ old('cancel_reason', $subscribeUser->cancel_reason) }}</textarea>
                                 </div>
                             </div>
                         </div>
@@ -313,7 +313,7 @@
                                                id="auto_renewal"
                                                name="auto_renewal"
                                                value="1"
-                                               {{ old('auto_renewal', $serviceUser->auto_renewal) ? 'checked' : '' }}
+                                               {{ old('auto_renewal', $subscribeUser->auto_renewal) ? 'checked' : '' }}
                                                class="form-check-input">
                                         <label for="auto_renewal" class="form-check-label">
                                             자동 갱신
@@ -327,7 +327,7 @@
                                                id="auto_upgrade"
                                                name="auto_upgrade"
                                                value="1"
-                                               {{ old('auto_upgrade', $serviceUser->auto_upgrade) ? 'checked' : '' }}
+                                               {{ old('auto_upgrade', $subscribeUser->auto_upgrade) ? 'checked' : '' }}
                                                class="form-check-input">
                                         <label for="auto_upgrade" class="form-check-label">
                                             자동 업그레이드
@@ -345,13 +345,13 @@
                                 <textarea id="admin_notes"
                                           name="admin_notes"
                                           rows="4"
-                                          class="form-control">{{ old('admin_notes', $serviceUser->admin_notes) }}</textarea>
+                                          class="form-control">{{ old('admin_notes', $subscribeUser->admin_notes) }}</textarea>
                             </div>
                         </div>
 
                         <!-- 버튼 -->
                         <div class="d-flex justify-content-end gap-2 pt-3">
-                            <a href="{{ route('admin.service.users.show', $serviceUser->id) }}"
+                            <a href="{{ route('admin.subscribe.users.show', $subscribeUser->id) }}"
                                class="btn btn-secondary">
                                 <i class="fe fe-x me-2"></i>취소
                             </a>

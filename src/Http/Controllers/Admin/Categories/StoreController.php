@@ -1,6 +1,6 @@
 <?php
 
-namespace Jiny\Service\Http\Controllers\Admin\Categories;
+namespace Jiny\Subscribe\Http\Controllers\Admin\Categories;
 
 use Illuminate\Routing\Controller;
 use Illuminate\Http\Request;
@@ -8,10 +8,10 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 /**
- * Service Categories 저장 컨트롤러
+ * subscribe Categories 저장 컨트롤러
  *
  * 진입 경로:
- * Route::post('/admin/service/categories') → StoreController::__invoke()
+ * Route::post('/admin/subscribe/categories') → StoreController::__invoke()
  */
 class StoreController extends Controller
 {
@@ -25,8 +25,8 @@ class StoreController extends Controller
     protected function loadConfig()
     {
         $this->config = [
-            'table' => 'service_categories',
-            'redirect_route' => 'admin.service.categories.index',
+            'table' => 'subscribe_categories',
+            'redirect_route' => 'admin.subscribe.categories.index',
         ];
     }
 
@@ -34,10 +34,10 @@ class StoreController extends Controller
     {
         $validated = $request->validate([
             'title' => 'required|string|max:255',
-            'code' => 'nullable|string|max:255|unique:service_categories,code',
+            'code' => 'nullable|string|max:255|unique:subscribe_categories,code',
             'description' => 'nullable|string',
             'image' => 'nullable|string|max:255',
-            'parent_id' => 'nullable|integer|exists:service_categories,id',
+            'parent_id' => 'nullable|integer|exists:subscribe_categories,id',
             'pos' => 'nullable|integer|min:0',
             'enable' => 'boolean',
             'meta_title' => 'nullable|string|max:255',

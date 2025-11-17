@@ -1,13 +1,13 @@
 <?php
 
-namespace Jiny\Service\Http\Controllers\Admin\Services;
+namespace Jiny\Subscribe\Http\Controllers\Admin\subscribes;
 
 use Illuminate\Routing\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 /**
- * Services 수정 폼 컨트롤러
+ * subscribes 수정 폼 컨트롤러
  */
 class EditController extends Controller
 {
@@ -16,28 +16,28 @@ class EditController extends Controller
     public function __construct()
     {
         $this->config = [
-            'table' => 'services',
-            'view' => 'jiny-service::admin.services.edit',
-            'title' => 'Service 수정',
-            'subtitle' => '서비스 정보를 수정합니다.',
+            'table' => 'subscribes',
+            'view' => 'jiny-subscribe::admin.services.edit',
+            'title' => 'subscribe 수정',
+            'subtitle' => '구독 정보를 수정합니다.',
         ];
     }
 
     public function __invoke(Request $request, $id)
     {
-        $service = DB::table($this->config['table'])
+        $subscribe = DB::table($this->config['table'])
             ->where('id', $id)
             ->whereNull('deleted_at')
             ->first();
 
-        if (!$service) {
+        if (!$subscribe) {
             return redirect()
-                ->route('admin.site.services.index')
-                ->with('error', 'Service를 찾을 수 없습니다.');
+                ->route('admin.site.subscribes.index')
+                ->with('error', 'subscribe를 찾을 수 없습니다.');
         }
 
-        // 활성화된 서비스 카테고리 목록 조회
-        $categories = DB::table('service_categories')
+        // 활성화된 구독 카테고리 목록 조회
+        $categories = DB::table('subscribe_categories')
             ->whereNull('deleted_at')
             ->where('enable', true)
             ->orderBy('pos')
@@ -52,7 +52,7 @@ class EditController extends Controller
         }
 
         return view($this->config['view'], [
-            'service' => $service,
+            'subscribe' => $subscribe,
             'categories' => $categoriesArray,
             'config' => $this->config,
         ]);

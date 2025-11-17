@@ -1,8 +1,8 @@
 <?php
 
-namespace Jiny\Service\Http\Controllers\Admin;
+namespace Jiny\Subscribe\Http\Controllers\Admin;
 
-use Jiny\Service\Models\ServiceCategory;
+use Jiny\Subscribe\Models\ServiceCategory;
 use Illuminate\Http\Request;
 
 class ServiceCategoryController extends BaseAdminController
@@ -11,7 +11,7 @@ class ServiceCategoryController extends BaseAdminController
     {
         parent::__construct();
         $this->model = ServiceCategory::class;
-        $this->viewPath = 'jiny-service::admin.service-categories';
+        $this->viewPath = 'jiny-subscribe::admin.service-categories';
         $this->routePrefix = 'service-categories';
         $this->title = '서비스 카테고리';
     }

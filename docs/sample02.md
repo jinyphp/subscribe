@@ -9,7 +9,7 @@
 // 1. 플랫폼 관리자 (jiny/admin 패키지 활용)
 // - 테이블: users (중앙 관리)
 // - 인증: 세션 기반 admin 미들웨어
-Route::middleware(['admin'])->prefix('admin/service')->group(function () {
+Route::middleware(['admin'])->prefix('admin/subscribe')->group(function () {
     Route::get('education/dashboard', [AdminEducationController::class, 'dashboard']);
     Route::resource('education/courses', AdminCourseController::class);
     Route::get('education/instructors', [AdminInstructorController::class, 'index']);
@@ -19,7 +19,7 @@ Route::middleware(['admin'])->prefix('admin/service')->group(function () {
 // 2. 학습자/고객 (jiny/auth 패키지 - JWT 인증)
 // - 테이블: users_001~099 (샤딩)
 // - 인증: JWT 토큰
-Route::middleware(['jwt.auth'])->prefix('home/service')->group(function () {
+Route::middleware(['jwt.auth'])->prefix('home/subscribe')->group(function () {
     Route::get('education/courses', [StudentController::class, 'browseCourses']);
     Route::post('education/enroll', [StudentController::class, 'enroll']);
     Route::get('my-learning', [StudentController::class, 'myLearning']);
@@ -51,7 +51,7 @@ Schema::table('partners', function (Blueprint $table) {
 
 ## 개요
 
-이 예제는 구독형 서비스 관리 시스템을 온라인 교육 플랫폼인 "코딩마스터 아카데미" 비즈니스에 적용하여 디지털 구독 서비스의 효과성을 검증합니다. 전통적인 오프라인 교육을 현대적인 구독 모델로 혁신하고, 개인화된 학습 경험을 제공하는 사례입니다. Jiny 생태계의 기존 패키지들과 완전히 통합되어 일관된 교육 플랫폼을 구축합니다.
+이 예제는 구독형 구독 관리 시스템을 온라인 교육 플랫폼인 "코딩마스터 아카데미" 비즈니스에 적용하여 디지털 구독 구독의 효과성을 검증합니다. 전통적인 오프라인 교육을 현대적인 구독 모델로 혁신하고, 개인화된 학습 경험을 제공하는 사례입니다. Jiny 생태계의 기존 패키지들과 완전히 통합되어 일관된 교육 플랫폼을 구축합니다.
 
 ## 비즈니스 모델 분석
 
@@ -85,9 +85,9 @@ Schema::table('partners', function (Blueprint $table) {
     └── 대학원생/박사과정 (학술 전문성)
 ```
 
-## 서비스 설계 적용
+## 구독 설계 적용
 
-### 1. 교육 서비스 카탈로그 설계
+### 1. 교육 구독 카탈로그 설계
 
 #### 1.1 강의 분류 체계
 ```
@@ -110,16 +110,16 @@ Schema::table('partners', function (Blueprint $table) {
     └── CI/CD 파이프라인
 ```
 
-#### 1.2 핵심 서비스: 웹 개발 풀스택 코스
+#### 1.2 핵심 구독: 웹 개발 풀스택 코스
 
-**서비스 메타데이터**:
+**구독 메타데이터**:
 ```php
 [
     'name' => '풀스택 웹 개발자 완성 코스',
     'slug' => 'fullstack-web-developer',
     'category' => '웹개발/풀스택',
-    'description' => '0부터 시작하여 실제 웹 서비스를 구축할 수 있는 풀스택 개발자로 성장',
-    'service_type' => 'online_education',
+    'description' => '0부터 시작하여 실제 웹 구독를 구축할 수 있는 풀스택 개발자로 성장',
+    'subscribe_type' => 'online_education',
     'duration_weeks' => 24,
     'skill_level' => 'beginner_to_intermediate',
     'technologies' => ['HTML', 'CSS', 'JavaScript', 'React', 'Node.js', 'MongoDB'],
@@ -167,9 +167,9 @@ class PersonalizedLearningPath {
 
 ### 2. 구독 모델 및 가격 설계
 
-#### 2.1 교육 서비스 티어 구성
+#### 2.1 교육 구독 티어 구성
 
-**Learning-as-a-Service 모델**:
+**Learning-as-a-subscribe 모델**:
 
 | 항목 | 베이직 러너 | 프로 디벨로퍼 | 엔터프라이즈 |
 |------|-------------|---------------|--------------|
@@ -671,4 +671,4 @@ class EducationKPITracker {
 - **오프라인 연계**: 부트캠프 및 워크샵 개최
 - **대학 제휴**: 학위 과정 연계 프로그램
 
-이 예제는 feature.md의 구독 서비스 관리 시스템이 물리적 서비스(에어콘 청소)와 디지털 서비스(온라인 교육) 모두에 효과적으로 적용될 수 있음을 보여줍니다.
+이 예제는 feature.md의 구독 구독 관리 시스템이 물리적 구독(에어콘 청소)와 디지털 구독(온라인 교육) 모두에 효과적으로 적용될 수 있음을 보여줍니다.
